@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../../core/presentation/widgets/custom_dropdown_field.dart';
+import '../../../../../core/presentation/widgets/custom_text_field.dart';
 import '../../../../../core/theme/church_colors.dart';
 import '../../../../auth/providers/auth_provider.dart';
 import '../../../../accounting/providers/accounting_provider.dart';
@@ -36,7 +38,7 @@ class _CashReconciliationDetailDialogState
   Future<void> _loadDetails() async {
     try {
       final repo = ref.read(cashRepositoryProvider);
-      final token = await ref.read(authProvider.notifier).getToken();
+      final token = ref.read(authProvider.notifier).getToken();
       if (token == null) throw Exception('No autenticado');
 
       final details = await repo.getReconciliationDetails(
@@ -63,7 +65,7 @@ class _CashReconciliationDetailDialogState
   Future<void> _openPdf() async {
     try {
       final repo = ref.read(cashRepositoryProvider);
-      final token = await ref.read(authProvider.notifier).getToken();
+      final token = ref.read(authProvider.notifier).getToken();
       if (token == null) throw Exception('No autenticado');
 
       final url = await repo.getPdfUrl(token, widget.reconciliationId);
@@ -76,81 +78,119 @@ class _CashReconciliationDetailDialogState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error al generar PDF: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al generar PDF: $e')));
       }
     }
   }
 
   void _showDepositDialog() {
+    if (_reconciliation == null) return;
+
+    if (ref.read(accountingProvider).accounts.isEmpty) {
+      ref.read(accountingProvider.notifier).loadAccounts();
+    }
+
     int? selectedAccountId;
+    final amountController = TextEditingController(
+      text: _reconciliation!.totalGeneral.toStringAsFixed(2),
+    );
     showDialog(
       context: context,
       builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            final accountingState = ref.watch(accountingProvider);
-            // Filtrar cuentas de tipo 'asset' o similares para bancos.
-            final bankAccounts = accountingState.accounts
-                .where((a) => a.type == 'asset')
-                .toList();
+        return Consumer(
+          builder: (context, dialogRef, child) {
+            return StatefulBuilder(
+              builder: (context, setDialogState) {
+                final accountingState = dialogRef.watch(accountingProvider);
+                // Filtrar solo las cuentas que pertenecen a Bancos (1102) y son transaccionales.
+                final bankAccounts = accountingState.accounts
+                    .where(
+                      (a) =>
+                          (a.type == 'Activo' || a.type == 'asset') &&
+                          a.isTransactional &&
+                          a.code.startsWith('1102'),
+                    )
+                    .toList();
 
-            return AlertDialog(
-              title: const Text('Realizar Depósito Bancario'),
-              content: SizedBox(
-                width: 400,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Monto a depositar: \$${_reconciliation!.totalGeneral.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
+                return AlertDialog(
+                  title: const Text('Realizar Depósito Bancario'),
+                  content: SizedBox(
+                    width: 400,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Monto a depositar:',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextField(
+                          controller: amountController,
+                          keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true,
+                          ),
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            prefixText: '\$ ',
+                            isDense: true,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Text('Seleccione la cuenta bancaria de destino:'),
+                        const SizedBox(height: 8),
+                        DropdownButtonFormField<int>(
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Cuenta de Banco',
+                          ),
+                          value: selectedAccountId,
+                          items: bankAccounts.map((a) {
+                            return DropdownMenuItem(
+                              value: a.id,
+                              child: Text('${a.code} - ${a.name}'),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            setDialogState(() => selectedAccountId = val);
+                          },
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                    const Text('Seleccione la cuenta bancaria de destino:'),
-                    const SizedBox(height: 8),
-                    DropdownButtonFormField<int>(
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Cuenta de Banco',
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Cancelar'),
+                    ),
+                    ElevatedButton(
+                      onPressed: selectedAccountId == null
+                          ? null
+                          : () async {
+                              final depositAmount =
+                                  double.tryParse(amountController.text) ?? 0.0;
+                              Navigator.pop(
+                                context,
+                              ); // Cierra el modal de depósito
+                              await _executeDeposit(
+                                selectedAccountId!,
+                                depositAmount,
+                              );
+                            },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        foregroundColor: Colors.white,
                       ),
-                      value: selectedAccountId,
-                      items: bankAccounts.map((a) {
-                        return DropdownMenuItem(
-                          value: a.id,
-                          child: Text('${a.code} - ${a.name}'),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        setDialogState(() => selectedAccountId = val);
-                      },
+                      child: const Text('Confirmar Depósito'),
                     ),
                   ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar'),
-                ),
-                ElevatedButton(
-                  onPressed: selectedAccountId == null
-                      ? null
-                      : () async {
-                          Navigator.pop(context); // Cierra el modal de depósito
-                          await _executeDeposit(selectedAccountId!);
-                        },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('Confirmar Depósito'),
-                ),
-              ],
+                );
+              },
             );
           },
         );
@@ -158,11 +198,11 @@ class _CashReconciliationDetailDialogState
     );
   }
 
-  Future<void> _executeDeposit(int bankAccountId) async {
+  Future<void> _executeDeposit(int bankAccountId, double amount) async {
     try {
       await ref
           .read(cashProvider.notifier)
-          .depositCash(widget.reconciliationId, bankAccountId);
+          .depositCash(widget.reconciliationId, bankAccountId, amount);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -172,14 +212,16 @@ class _CashReconciliationDetailDialogState
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error: $e')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final notifier = ref.read(cashProvider.notifier);
     return AlertDialog(
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -369,6 +411,52 @@ class _CashReconciliationDetailDialogState
                         ),
                       ],
                     ),
+                    if (_reconciliation!.isDeposited) ...[
+                      const Divider(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Monto Depositado en Banco:',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '\$${(_reconciliation!.depositAmount ?? 0.0).toStringAsFixed(2)}',
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.green,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Diferencia Final (Depósito vs Físico):',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '\$${(_reconciliation!.depositDifference ?? 0.0).toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color:
+                                  (_reconciliation!.depositDifference ?? 0.0) ==
+                                      0
+                                  ? Colors.green
+                                  : ((_reconciliation!.depositDifference ??
+                                                0.0) <
+                                            0
+                                        ? Colors.red
+                                        : Colors.orange),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -388,6 +476,16 @@ class _CashReconciliationDetailDialogState
             label: const Text('Registrar Depósito Bancario'),
             onPressed: _showDepositDialog,
           ),
+        OutlinedButton.icon(
+          icon: const Icon(Icons.add),
+          label: const Text('Registrar Ingreso'),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (_) => _AddTransactionDialog(notifier: notifier),
+            );
+          },
+        ),
         if (!_isLoading && _error == null)
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
@@ -398,6 +496,147 @@ class _CashReconciliationDetailDialogState
             label: const Text('Generar / Imprimir PDF'),
             onPressed: _openPdf,
           ),
+      ],
+    );
+  }
+}
+
+class _AddTransactionDialog extends StatefulWidget {
+  final CashNotifier notifier;
+  const _AddTransactionDialog({required this.notifier});
+
+  @override
+  State<_AddTransactionDialog> createState() => _AddTransactionDialogState();
+}
+
+class _AddTransactionDialogState extends State<_AddTransactionDialog> {
+  final _amountCtrl = TextEditingController();
+  final _descCtrl = TextEditingController();
+  final _rateCtrl = TextEditingController();
+
+  String _selectedCurrency = 'DOP';
+
+  @override
+  void initState() {
+    super.initState();
+    _rateCtrl.text = '1.0';
+  }
+
+  void _onCurrencyChanged(String? newValue) {
+    if (newValue == null) return;
+    setState(() {
+      _selectedCurrency = newValue;
+      if (newValue == 'USD') {
+        _rateCtrl.text = '58.0';
+      } else if (newValue == 'EUR') {
+        _rateCtrl.text = '65.0';
+      } else {
+        _rateCtrl.text = '1.0';
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Registrar Ingreso'),
+      content: SizedBox(
+        width: 400,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CustomDropdownField<String>(
+              value: _selectedCurrency,
+              labelText: 'Moneda',
+              items: const [
+                DropdownMenuItem(
+                  value: 'DOP',
+                  child: Text('Pesos Dominicanos (DOP)'),
+                ),
+                DropdownMenuItem(value: 'USD', child: Text('Dólares (USD)')),
+                DropdownMenuItem(value: 'EUR', child: Text('Euros (EUR)')),
+              ],
+              onChanged: _onCurrencyChanged,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: CustomTextField(
+                    controller: _amountCtrl,
+                    labelText: 'Monto Original',
+                    prefixText: _selectedCurrency == 'DOP'
+                        ? 'RD\$ '
+                        : (_selectedCurrency == 'USD' ? 'US\$ ' : '€ '),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                  ),
+                ),
+                if (_selectedCurrency != 'DOP') ...[
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 1,
+                    child: CustomTextField(
+                      controller: _rateCtrl,
+                      labelText: 'Tasa',
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 16),
+            CustomTextField(
+              controller: _descCtrl,
+              labelText: 'Descripción / Concepto',
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text(
+            'Cancelar',
+            style: TextStyle(color: ChurchColors.grey),
+          ),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: ChurchColors.primary,
+            foregroundColor: Colors.white,
+          ),
+          onPressed: () {
+            final rawAmount = double.tryParse(_amountCtrl.text) ?? 0.0;
+            final rate = double.tryParse(_rateCtrl.text) ?? 1.0;
+
+            if (rawAmount > 0 && _descCtrl.text.isNotEmpty) {
+              double finalAmount = rawAmount;
+              String finalDesc = _descCtrl.text;
+
+              if (_selectedCurrency != 'DOP') {
+                finalAmount = rawAmount * rate;
+                final symbol = _selectedCurrency == 'USD' ? 'US\$' : '€';
+                finalDesc =
+                    '[$symbol${rawAmount.toStringAsFixed(2)} @ $rate] $finalDesc';
+              }
+
+              // 15 es el ID temporal de la cuenta "Diezmos/Ofrendas" (Ingreso)
+              widget.notifier.addTransaction(
+                15,
+                finalAmount,
+                'income',
+                finalDesc,
+              );
+              Navigator.pop(context);
+            }
+          },
+          child: const Text('Guardar'),
+        ),
       ],
     );
   }

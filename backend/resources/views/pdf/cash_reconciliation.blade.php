@@ -179,25 +179,28 @@
             <span class="val">-${{ number_format($reconciliation->transactions->where('type', 'expense')->sum('amount'), 2) }}</span>
         </div>
         <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 10px 0;">
-        <div class="summary-row">
-            <span class="label">Saldo Esperado:</span>
-            <span class="val">${{ number_format($reconciliation->transactions->where('type', 'income')->sum('amount') - $reconciliation->transactions->where('type', 'expense')->sum('amount'), 2) }}</span>
-        </div>
         <div class="summary-row" style="margin-top: 15px;">
-            <span class="label">Efectivo Físico Contado:</span>
+            <span class="label">Efectivo Físico Contado (Ingreso del Turno):</span>
             <span class="val total">${{ number_format($reconciliation->total_general, 2) }}</span>
         </div>
+        @if($reconciliation->is_deposited)
+        <hr style="border: 0; border-top: 1px dashed #E5E7EB; margin: 15px 0;">
+        <div class="summary-row" style="margin-top: 10px;">
+            <span class="label">Monto Depositado en Banco:</span>
+            <span class="val total" style="color: #10B981;">${{ number_format($reconciliation->deposit_amount, 2) }}</span>
+        </div>
         <div class="summary-row" style="margin-top: 15px;">
-            <span class="label">Diferencia:</span>
+            <span class="label">Diferencia Final (Depósito vs Físico):</span>
             <span class="val 
-                @if($reconciliation->difference == 0) status-perfect 
-                @elseif($reconciliation->difference < 0) status-faltante 
+                @if($reconciliation->deposit_difference == 0) status-perfect 
+                @elseif($reconciliation->deposit_difference < 0) status-faltante 
                 @else status-sobrante 
                 @endif
             ">
-                ${{ number_format($reconciliation->difference, 2) }}
+                ${{ number_format($reconciliation->deposit_difference, 2) }}
             </span>
         </div>
+        @endif
     </div>
 
     <div style="margin-top: 50px; text-align: center; color: #9ca3af;">

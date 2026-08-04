@@ -121,20 +121,21 @@ class CashRepository {
     String token,
     int id,
     int accountId,
+    double amount,
   ) async {
     final response = await http.post(
       Uri.parse('$_baseUrl/cash-reconciliations/$id/deposit'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
       },
-      body: jsonEncode({
-        'account_id': accountId,
-      }),
+      body: jsonEncode({'account_id': accountId, 'amount': amount}),
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {
-      final errorMsg = jsonDecode(response.body)['error'] ?? 'Error desconocido';
+      final body = jsonDecode(response.body);
+      final errorMsg = body['error'] ?? body['message'] ?? 'Error desconocido';
       throw Exception('Error al depositar: $errorMsg');
     }
   }

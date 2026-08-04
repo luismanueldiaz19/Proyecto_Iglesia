@@ -34,12 +34,16 @@ class AccountingAccountSeeder extends Seeder
             ['code' => '4104', 'name' => 'Donaciones Locales', 'type' => 'Ingreso', 'is_transactional' => true],
             ['code' => '4105', 'name' => 'Donaciones Extranjeras', 'type' => 'Ingreso', 'is_transactional' => true],
             ['code' => '4106', 'name' => 'Sobrante de Caja', 'type' => 'Ingreso', 'is_transactional' => true],
-            ['code' => '5000', 'name' => 'Gastos', 'type' => 'Gasto', 'is_transactional' => false],
-            ['code' => '5100', 'name' => 'Gastos Operativos', 'type' => 'Gasto', 'is_transactional' => true],
-            ['code' => '5101', 'name' => 'Gastos de Mantenimiento', 'type' => 'Gasto', 'is_transactional' => true],
-            ['code' => '5102', 'name' => 'Pago de Nómina', 'type' => 'Gasto', 'is_transactional' => true],
-            ['code' => '5103', 'name' => 'Servicios Públicos (Agua, Luz, etc.)', 'type' => 'Gasto', 'is_transactional' => true],
-            ['code' => '5104', 'name' => 'Faltante de Caja', 'type' => 'Gasto', 'is_transactional' => true],
+            ['code' => '5000', 'name' => 'Costos', 'type' => 'Costo', 'is_transactional' => false],
+            ['code' => '5100', 'name' => 'Costo de Ventas Librería', 'type' => 'Costo', 'is_transactional' => true],
+            ['code' => '5101', 'name' => 'Costo de Ventas Cafetería', 'type' => 'Costo', 'is_transactional' => true],
+            ['code' => '6000', 'name' => 'Gastos', 'type' => 'Gasto', 'is_transactional' => false],
+            ['code' => '6100', 'name' => 'Gastos Operativos', 'type' => 'Gasto', 'is_transactional' => true],
+            ['code' => '6101', 'name' => 'Gastos de Mantenimiento', 'type' => 'Gasto', 'is_transactional' => true],
+            ['code' => '6102', 'name' => 'Pago de Nómina', 'type' => 'Gasto', 'is_transactional' => true],
+            ['code' => '6103', 'name' => 'Servicios Públicos (Agua, Luz, etc.)', 'type' => 'Gasto', 'is_transactional' => true],
+            ['code' => '6104', 'name' => 'Faltante de Caja', 'type' => 'Gasto', 'is_transactional' => true],
+            ['code' => '6105', 'name' => 'Gastos Legales y Jurídicos', 'type' => 'Gasto', 'is_transactional' => true],
         ];
 
         foreach ($accounts as $account) {

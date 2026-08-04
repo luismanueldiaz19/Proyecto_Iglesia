@@ -227,14 +227,23 @@ class CashNotifier extends StateNotifier<CashState> {
     }
   }
 
-  Future<void> depositCash(int reconciliationId, int bankAccountId) async {
+  Future<void> depositCash(
+    int reconciliationId,
+    int bankAccountId,
+    double amount,
+  ) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
       final token = await _getToken();
       if (token == null) throw Exception('No autenticado');
 
-      await _repository.depositReconciliation(token, reconciliationId, bankAccountId);
-      
+      await _repository.depositReconciliation(
+        token,
+        reconciliationId,
+        bankAccountId,
+        amount,
+      );
+
       // Actualizamos el historial
       await fetchHistory();
     } catch (e) {

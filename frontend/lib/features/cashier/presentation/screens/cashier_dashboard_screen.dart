@@ -80,7 +80,9 @@ class CashierDashboardScreen extends ConsumerWidget {
                       context.push('/cashier/history');
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Selecciona un módulo primero')),
+                        const SnackBar(
+                          content: Text('Selecciona un módulo primero'),
+                        ),
                       );
                     }
                   },
@@ -218,6 +220,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                               ),
                             ],
                           ),
+
                           Row(
                             children: [
                               OutlinedButton.icon(

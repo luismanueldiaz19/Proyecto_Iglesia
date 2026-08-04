@@ -14,6 +14,8 @@ class CashReconciliationModel {
   final bool isDeposited;
   final int? depositAccountId;
   final String? depositDate;
+  final double? depositAmount;
+  final double? depositDifference;
 
   CashReconciliationModel({
     required this.id,
@@ -28,6 +30,8 @@ class CashReconciliationModel {
     this.isDeposited = false,
     this.depositAccountId,
     this.depositDate,
+    this.depositAmount,
+    this.depositDifference,
   });
 
   factory CashReconciliationModel.fromJson(Map<String, dynamic> json) {
@@ -52,6 +56,8 @@ class CashReconciliationModel {
       isDeposited: json['is_deposited'] ?? false,
       depositAccountId: json['deposit_account_id'],
       depositDate: _formatDate(json['deposit_date']),
+      depositAmount: json['deposit_amount'] != null ? double.tryParse(json['deposit_amount'].toString()) : null,
+      depositDifference: json['deposit_difference'] != null ? double.tryParse(json['deposit_difference'].toString()) : null,
     );
   }
 

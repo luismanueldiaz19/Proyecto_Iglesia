@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Log;
+use App\Models\CashTransaction;
 
 class CashReconciliationController extends Controller
 {
@@ -159,11 +160,21 @@ class CashReconciliationController extends Controller
             if (abs($difference) > 0) {
                 $lines = [];
                 if ($difference > 0) {
-                    // Sobrante
+                    // Diferencia Positiva: Se asume como Ingreso no reportado
+                    $ingresosAccountId = 14;
                     $lines[] = ['account_id' => $cajaGeneralAccountId, 'debit' => abs($difference), 'credit' => 0];
-                    $lines[] = ['account_id' => $sobranteAccountId, 'debit' => 0, 'credit' => abs($difference)];
+                    $lines[] = ['account_id' => $ingresosAccountId, 'debit' => 0, 'credit' => abs($difference)];
+
+                    // Crear la transacción visible en el cuadre
+                    CashTransaction::create([
+                        'cash_reconciliation_id' => $reconciliation->id,
+                        'account_id' => $ingresosAccountId,
+                        'amount' => abs($difference),
+                        'type' => 'income',
+                        'description' => 'Ingreso reportado en cuadre físico',
+                    ]);
                 } else {
-                    // Faltante
+                    // Diferencia Negativa: Faltante de caja real durante el turno
                     $lines[] = ['account_id' => $faltanteAccountId, 'debit' => abs($difference), 'credit' => 0];
                     $lines[] = ['account_id' => $cajaGeneralAccountId, 'debit' => 0, 'credit' => abs($difference)];
                 }
@@ -180,6 +191,16 @@ class CashReconciliationController extends Controller
                 }
             }
 
+            // Igualamos el saldo esperado al físico para que el reporte no muestre un sobrante de "diferencia" falso.
+            // Si hubo diferencia, ya la reportamos como ingreso o faltante.
+            $reconciliation->update([
+                'total_local_currency' => $physicalTotal,
+                'total_general' => $physicalTotal,
+                'total_expenses' => $theoreticalExpense,
+                'difference' => 0, // Reseteamos la diferencia porque ya fue asimilada.
+                'status' => 'closed',
+            ]);
+
             return response()->json($reconciliation);
         });
     }
@@ -188,6 +209,7 @@ class CashReconciliationController extends Controller
     {
         $request->validate([
             'account_id' => 'required|exists:accounting_accounts,id',
+            'amount' => 'required|numeric|min:0.01',
         ]);
 
         return DB::transaction(function () use ($request, $id, $accounting) {
@@ -201,9 +223,14 @@ class CashReconciliationController extends Controller
                 return response()->json(['error' => 'Este cuadre ya fue depositado.'], 400);
             }
 
-            $amountToDeposit = $reconciliation->total_general;
+            $amountToDeposit = $request->amount;
             $cajaGeneralAccountId = 3; // Caja General
             $bankAccountId = $request->account_id;
+            $sobranteAccountId = 21;
+            $faltanteAccountId = 27;
+
+            // Diferencia entre lo que se debía depositar (físico del cuadre) y lo que se depositó realmente
+            $depositDifference = $amountToDeposit - $reconciliation->total_general;
 
             if ($amountToDeposit > 0) {
                 $lines = [
@@ -211,21 +238,36 @@ class CashReconciliationController extends Controller
                     ['account_id' => $cajaGeneralAccountId, 'debit' => 0, 'credit' => $amountToDeposit],
                 ];
 
+                // Si hay diferencia en el depósito, la registramos.
+                if (abs($depositDifference) > 0) {
+                    if ($depositDifference > 0) {
+                        // Se depositó MÁS de lo que había en la caja (Sobrante)
+                        $lines[] = ['account_id' => $cajaGeneralAccountId, 'debit' => abs($depositDifference), 'credit' => 0];
+                        $lines[] = ['account_id' => $sobranteAccountId, 'debit' => 0, 'credit' => abs($depositDifference)];
+                    } else {
+                        // Se depositó MENOS de lo que había en la caja (Faltante)
+                        $lines[] = ['account_id' => $faltanteAccountId, 'debit' => abs($depositDifference), 'credit' => 0];
+                        $lines[] = ['account_id' => $cajaGeneralAccountId, 'debit' => 0, 'credit' => abs($depositDifference)];
+                    }
+                }
+
                 try {
                     $accounting->recordManualEntry(
-                        description: "Depósito Bancario de Cierre de Caja Módulo {$reconciliation->module_id} #" . $reconciliation->id,
+                        description: "Depósito Bancario de Ingresos Cuadre #" . $reconciliation->id,
                         lines: $lines,
                         referenceId: $reconciliation->id,
                         referenceType: CashReconciliation::class
                     );
                 } catch (\Exception $e) {
-                    \Illuminate\Support\Facades\Log::error("Error contable en depósito de caja: " . $e->getMessage());
+                    Log::error("Error contable en depósito de caja: " . $e->getMessage());
                 }
             }
 
             $reconciliation->update([
                 'is_deposited' => true,
                 'deposit_account_id' => $bankAccountId,
+                'deposit_amount' => $amountToDeposit,
+                'deposit_difference' => $depositDifference,
                 'deposit_date' => now(),
             ]);
 

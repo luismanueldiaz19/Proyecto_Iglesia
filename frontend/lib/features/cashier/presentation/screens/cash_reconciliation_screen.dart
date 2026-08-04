@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/church_colors.dart';
 import '../../../../core/presentation/widgets/church_confirm_dialog.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../providers/cash_provider.dart';
 import '../../data/models/denomination_model.dart';
 
@@ -194,10 +196,12 @@ class _CashReconciliationScreenState
                                   final q = quantities[d.id] ?? 0;
                                   final rawTotal = q * d.value;
                                   double convertedTotal = rawTotal;
-                                  if (d.currency == 'USD')
+                                  if (d.currency == 'USD') {
                                     convertedTotal *= usdRate;
-                                  if (d.currency == 'EUR')
+                                  }
+                                  if (d.currency == 'EUR') {
                                     convertedTotal *= eurRate;
+                                  }
 
                                   final symbol = _getCurrencySymbol(d.currency);
 
@@ -228,35 +232,13 @@ class _CashReconciliationScreenState
                                             ),
                                           ),
                                           const Spacer(),
-                                          IconButton(
-                                            icon: const Icon(
-                                              Icons.remove_circle_outline,
-                                            ),
-                                            onPressed: q > 0
-                                                ? () => setState(
-                                                    () => quantities[d.id] =
-                                                        q - 1,
-                                                  )
-                                                : null,
-                                          ),
-                                          SizedBox(
-                                            width: 40,
-                                            child: Text(
-                                              '$q',
-                                              textAlign: TextAlign.center,
-                                              style: const TextStyle(
-                                                fontSize: 18,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                          IconButton(
-                                            icon: const Icon(
-                                              Icons.add_circle_outline,
-                                            ),
-                                            onPressed: () => setState(
-                                              () => quantities[d.id] = q + 1,
-                                            ),
+                                          _DenominationCounter(
+                                            initialValue: q,
+                                            onChanged: (newVal) {
+                                              setState(() {
+                                                quantities[d.id] = newVal;
+                                              });
+                                            },
                                           ),
                                           const Spacer(),
                                           SizedBox(
@@ -348,55 +330,54 @@ class _CashReconciliationScreenState
                   ),
                   const SizedBox(height: 32),
 
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: isPerfect
-                          ? Colors.green.withValues(alpha: 0.1)
-                          : (isFaltante
-                                ? Colors.red.withValues(alpha: 0.1)
-                                : Colors.orange.withValues(alpha: 0.1)),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: isPerfect
-                            ? Colors.green
-                            : (isFaltante ? Colors.red : Colors.orange),
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          isPerfect
-                              ? 'CUADRE PERFECTO'
-                              : (isFaltante
-                                    ? 'FALTANTE DE CAJA'
-                                    : 'SOBRANTE DE CAJA'),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                            color: isPerfect
-                                ? Colors.green
-                                : (isFaltante ? Colors.red : Colors.orange),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          '\$${difference.abs().toStringAsFixed(2)}',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 32,
-                            color: isPerfect
-                                ? Colors.green
-                                : (isFaltante ? Colors.red : Colors.orange),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
+                  // Container(
+                  //   padding: const EdgeInsets.all(16),
+                  //   decoration: BoxDecoration(
+                  //     color: isPerfect
+                  //         ? Colors.green.withValues(alpha: 0.1)
+                  //         : (isFaltante
+                  //               ? Colors.red.withValues(alpha: 0.1)
+                  //               : Colors.orange.withValues(alpha: 0.1)),
+                  //     borderRadius: BorderRadius.circular(8),
+                  //     border: Border.all(
+                  //       color: isPerfect
+                  //           ? Colors.green
+                  //           : (isFaltante ? Colors.red : Colors.orange),
+                  //     ),
+                  //   ),
+                  //   child: Column(
+                  //     crossAxisAlignment: CrossAxisAlignment.stretch,
+                  //     children: [
+                  //       Text(
+                  //         isPerfect
+                  //             ? 'CUADRE PERFECTO'
+                  //             : (isFaltante
+                  //                   ? 'FALTANTE DE CAJA'
+                  //                   : 'SOBRANTE DE CAJA'),
+                  //         textAlign: TextAlign.center,
+                  //         style: TextStyle(
+                  //           fontWeight: FontWeight.bold,
+                  //           fontSize: 18,
+                  //           color: isPerfect
+                  //               ? Colors.green
+                  //               : (isFaltante ? Colors.red : Colors.orange),
+                  //         ),
+                  //       ),
+                  //       const SizedBox(height: 8),
+                  //       Text(
+                  //         '\$${difference.abs().toStringAsFixed(2)}',
+                  //         textAlign: TextAlign.center,
+                  //         style: TextStyle(
+                  //           fontWeight: FontWeight.bold,
+                  //           fontSize: 32,
+                  //           color: isPerfect
+                  //               ? Colors.green
+                  //               : (isFaltante ? Colors.red : Colors.orange),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                   const Spacer(),
 
                   if (state.isLoading)
@@ -494,12 +475,102 @@ class _CashReconciliationScreenState
         ),
         const SizedBox(width: 8),
         Text(
-          '\$${amount.toStringAsFixed(2)}',
+          'RD\$${CurrencyFormatter.formatAmount(amount)}',
           style: TextStyle(
             fontSize: isBold ? 16 : 14,
             fontWeight: FontWeight.bold,
             color: color,
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DenominationCounter extends StatefulWidget {
+  final int initialValue;
+  final ValueChanged<int> onChanged;
+
+  const _DenominationCounter({
+    required this.initialValue,
+    required this.onChanged,
+  });
+
+  @override
+  State<_DenominationCounter> createState() => _DenominationCounterState();
+}
+
+class _DenominationCounterState extends State<_DenominationCounter> {
+  late TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: widget.initialValue == 0 ? '' : widget.initialValue.toString(),
+    );
+  }
+
+  @override
+  void didUpdateWidget(covariant _DenominationCounter oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue) {
+      final textVal = int.tryParse(_controller.text) ?? 0;
+      if (textVal != widget.initialValue) {
+        final newText = widget.initialValue == 0
+            ? ''
+            : widget.initialValue.toString();
+        _controller.value = _controller.value.copyWith(
+          text: newText,
+          selection: TextSelection.collapsed(offset: newText.length),
+        );
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        IconButton(
+          icon: const Icon(Icons.remove_circle_outline),
+          onPressed: widget.initialValue > 0
+              ? () {
+                  widget.onChanged(widget.initialValue - 1);
+                }
+              : null,
+        ),
+        SizedBox(
+          width: 60,
+          child: TextField(
+            controller: _controller,
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            decoration: const InputDecoration(
+              isDense: true,
+              contentPadding: EdgeInsets.symmetric(vertical: 8),
+              border: OutlineInputBorder(),
+            ),
+            onChanged: (val) {
+              final newVal = int.tryParse(val) ?? 0;
+              widget.onChanged(newVal);
+            },
+          ),
+        ),
+        IconButton(
+          icon: const Icon(Icons.add_circle_outline),
+          onPressed: () {
+            widget.onChanged(widget.initialValue + 1);
+          },
         ),
       ],
     );

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('code')->unique();
             $table->string('name');
-            $table->enum('type', ['Activo', 'Pasivo', 'Capital', 'Ingreso', 'Gasto']);
+            $table->enum('type', ['Activo', 'Pasivo', 'Capital', 'Ingreso', 'Costo', 'Gasto']);
             $table->foreignId('parent_id')->nullable()->constrained('accounting_accounts')->nullOnDelete();
             $table->boolean('is_transactional')->default(true);
             $table->timestamps();
