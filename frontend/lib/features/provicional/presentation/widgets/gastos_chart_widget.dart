@@ -108,15 +108,11 @@ class GastosChartWidget extends StatelessWidget {
                       BarChartData(
                         alignment: BarChartAlignment.spaceAround,
                         barTouchData: BarTouchData(
-                          enabled: true,
+                          enabled: false,
                           touchTooltipData: BarTouchTooltipData(
-                            getTooltipColor: (_) => Colors.blueGrey.shade900
-                                .withValues(alpha: 0.88),
-                            tooltipPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 8,
-                            ),
-                            tooltipMargin: 8,
+                            getTooltipColor: (_) => Colors.transparent,
+                            tooltipPadding: EdgeInsets.zero,
+                            tooltipMargin: 4,
                             getTooltipItem: (group, groupIndex, rod, rodIndex) {
                               final item = _dataForMonth(group.x);
                               if (item == null) return null;
@@ -128,20 +124,24 @@ class GastosChartWidget extends StatelessWidget {
                                     item['num_checks']?.toString() ?? '0',
                                   ) ??
                                   0;
+
+                              if (total == 0 && checks == 0) return null;
+
                               return BarTooltipItem(
                                 '\$${_formatYLabel(total)}\n',
                                 TextStyle(
-                                  color: Colors.orange.shade300,
+                                  color: Colors.orange.shade700,
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 11,
+                                  fontSize: 10,
                                 ),
                                 children: [
                                   TextSpan(
                                     text:
                                         '$checks cheque${checks != 1 ? 's' : ''}',
                                     style: TextStyle(
-                                      color: Colors.blue.shade200,
-                                      fontSize: 10,
+                                      color: Colors.blueGrey.shade600,
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.normal,
                                     ),
                                   ),
                                 ],
@@ -244,8 +244,7 @@ class GastosChartWidget extends StatelessWidget {
 
       return BarChartGroupData(
         x: monthIndex,
-        // Always show the check-count badge above each bar
-        showingTooltipIndicators: checks > 0 ? [0] : [],
+        showingTooltipIndicators: [0],
         barRods: [
           BarChartRodData(
             toY: displayValue,

@@ -19,6 +19,13 @@ class AuthRepositoryImpl implements AuthRepository {
     }
 
     try {
+      //   {
+      // "username": "ludeveloper",
+      // "password": "199512"
+      // }
+
+      print('${ApiConfig.baseUrl}/login');
+
       final response = await http.post(
         Uri.parse('${ApiConfig.baseUrl}/login'),
         headers: {
@@ -28,18 +35,33 @@ class AuthRepositoryImpl implements AuthRepository {
         body: jsonEncode({'username': username, 'password': password}),
       );
 
+      print(response.body);
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final token = data['access_token'];
         final user = data['user'];
         final name = user['name'] ?? username;
         final userRoles = user['roles'] as List<dynamic>;
-        final role = userRoles.isNotEmpty ? userRoles.first['name'] : 'Usuario';
+        String role = 'Usuario';
+        if (userRoles.isNotEmpty) {
+          final firstRole = userRoles.first;
+          if (firstRole is String) {
+            role = firstRole;
+          } else if (firstRole is Map && firstRole['name'] != null) {
+            role = firstRole['name'].toString();
+          }
+        }
 
         // Guardamos la sesión (24 horas) con el token real y los datos del usuario
-        await _localStorage.saveSession(username, name, role.toString(), token);
+        await _localStorage.saveSession(username, name, role, token);
 
-        return UserEntity(id: user['id'], name: name, username: username, role: role.toString());
+        return UserEntity(
+          id: user['id'],
+          name: name,
+          username: username,
+          role: role,
+        );
       } else {
         final errorData = jsonDecode(response.body);
         throw Exception(
@@ -52,7 +74,7 @@ class AuthRepositoryImpl implements AuthRepository {
           e.toString().contains('requeridos')) {
         rethrow; // Es nuestro error de validación
       }
-      throw Exception('Fallo de conexión al servidor. Comprueba tu red local.');
+      throw Exception('Fallo de conexión al servidor: $e');
     }
   }
 
@@ -81,13 +103,9 @@ class AuthRepositoryImpl implements AuthRepository {
       final username = _localStorage.getUsername();
       final name = _localStorage.getName() ?? username ?? '';
       final role = _localStorage.getRole() ?? 'Usuario';
-      
+
       if (username != null) {
-        return UserEntity(
-          name: name,
-          username: username,
-          role: role,
-        );
+        return UserEntity(name: name, username: username, role: role);
       }
     }
 

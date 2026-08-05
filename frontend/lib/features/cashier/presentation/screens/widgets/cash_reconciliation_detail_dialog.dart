@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'package:file_picker/file_picker.dart';
 
 import '../../../../../core/presentation/widgets/custom_dropdown_field.dart';
 import '../../../../../core/presentation/widgets/custom_text_field.dart';
@@ -71,10 +73,40 @@ class _CashReconciliationDetailDialogState
       final url = await repo.getPdfUrl(token, widget.reconciliationId);
       final uri = Uri.parse(url);
 
-      if (await canLaunchUrl(uri)) {
-        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      final response = await http.get(
+        uri,
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        String? outputFile = await FilePicker.saveFile(
+          dialogTitle: 'Guardar Cuadre PDF',
+          fileName: 'cuadre_${widget.reconciliationId}.pdf',
+          type: FileType.custom,
+          allowedExtensions: ['pdf'],
+        );
+
+        if (outputFile != null) {
+          if (!outputFile.endsWith('.pdf')) {
+            outputFile += '.pdf';
+          }
+          final file = File(outputFile);
+          await file.writeAsBytes(response.bodyBytes);
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('PDF guardado en: $outputFile')),
+            );
+          }
+        }
       } else {
-        throw Exception('No se pudo abrir el PDF');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al descargar PDF: ${response.statusCode}'),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {

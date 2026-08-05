@@ -131,11 +131,12 @@ class UsersCrudScreen extends ConsumerWidget {
                       onPressed: () => _showUserDialog(context, ref, user),
                       tooltip: 'Editar',
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete_rounded, color: Colors.red),
-                      onPressed: () => _confirmDelete(context, ref, user),
-                      tooltip: 'Eliminar',
-                    ),
+                    if (user.role != 'Administrador')
+                      IconButton(
+                        icon: const Icon(Icons.delete_rounded, color: Colors.red),
+                        onPressed: () => _confirmDelete(context, ref, user),
+                        tooltip: 'Eliminar',
+                      ),
                   ],
                 ),
               ),

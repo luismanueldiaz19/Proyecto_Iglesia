@@ -97,66 +97,24 @@ class DashboardChartWidget extends StatelessWidget {
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
                 barTouchData: BarTouchData(
-                  enabled: true,
+                  enabled: false,
                   touchTooltipData: BarTouchTooltipData(
-                    getTooltipColor: (_) =>
-                        Colors.blueGrey.shade900.withValues(alpha: 0.9),
-                    tooltipPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 8,
-                    ),
-                    tooltipMargin: 8,
+                    getTooltipColor: (_) => Colors.transparent,
+                    tooltipPadding: EdgeInsets.zero,
+                    tooltipMargin: 4,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      final item = chartData[groupIndex];
-                      final double ingresos =
-                          double.tryParse(item['ingresos'].toString()) ?? 0;
-                      final double gastos =
-                          double.tryParse(item['gastos'].toString()) ?? 0;
-                      final double dif =
-                          double.tryParse(item['diferencia'].toString()) ?? 0;
-
-                      String mesStr = item['mes'].toString();
-                      int mesNum = int.tryParse(mesStr.split('-').last) ?? 0;
-                      String mesNombre = mesNum > 0 && mesNum <= 12
-                          ? _months[mesNum]
-                          : mesStr;
-
+                      final double originalValue = rod.toY * rod.toY;
+                      if (originalValue == 0) return null; // No label for 0
+                      
                       return BarTooltipItem(
-                        '$mesNombre\n',
-                        const TextStyle(
-                          color: Colors.white,
+                        '\$${_formatYLabel(originalValue)}',
+                        TextStyle(
+                          color: rodIndex == 0
+                              ? Colors.teal.shade700
+                              : Colors.orange.shade700,
                           fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                          fontSize: 9,
                         ),
-                        children: [
-                          TextSpan(
-                            text:
-                                'Ingresos: \$${CurrencyFormatter.formatAmount(ingresos)}\n',
-                            style: TextStyle(
-                              color: Colors.green.shade300,
-                              fontSize: 12,
-                            ),
-                          ),
-                          TextSpan(
-                            text:
-                                'Gastos: \$${CurrencyFormatter.formatAmount(gastos)}\n',
-                            style: TextStyle(
-                              color: Colors.red.shade300,
-                              fontSize: 12,
-                            ),
-                          ),
-                          TextSpan(
-                            text:
-                                'Dif: ${dif >= 0 ? '+' : ''}\$${CurrencyFormatter.formatAmount(dif)}',
-                            style: TextStyle(
-                              color: dif >= 0
-                                  ? Colors.blue.shade300
-                                  : Colors.redAccent.shade100,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
                       );
                     },
                   ),
@@ -169,26 +127,44 @@ class DashboardChartWidget extends StatelessWidget {
                       getTitlesWidget: (value, meta) {
                         if (value < 0 || value >= chartData.length)
                           return const SizedBox.shrink();
-                        final mesStr = chartData[value.toInt()]['mes']
-                            .toString();
+                        
+                        final dataItem = chartData[value.toInt()];
+                        final mesStr = dataItem['mes'].toString();
+                        final dif = double.tryParse(dataItem['diferencia'].toString()) ?? 0;
+                        
                         final parts = mesStr.split('-');
                         final mesNum = int.tryParse(parts.last) ?? 0;
                         final label = mesNum > 0 && mesNum <= 12
                             ? _months[mesNum]
                             : mesStr;
+                            
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(
-                            label,
-                            style: TextStyle(
-                              color: Colors.grey.shade600,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                label,
+                                style: TextStyle(
+                                  color: Colors.grey.shade600,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${dif >= 0 ? '+' : ''}\$${CurrencyFormatter.formatAmount(dif)}',
+                                style: TextStyle(
+                                  color: dif >= 0 ? Colors.blue.shade400 : Colors.redAccent.shade200,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         );
                       },
-                      reservedSize: 28,
+                      reservedSize: 42,
                     ),
                   ),
                   leftTitles: AxisTitles(
@@ -239,6 +215,7 @@ class DashboardChartWidget extends StatelessWidget {
 
                   return BarChartGroupData(
                     x: index,
+                    showingTooltipIndicators: [0, 1],
                     barRods: [
                       BarChartRodData(
                         toY: math.sqrt(ingresos),

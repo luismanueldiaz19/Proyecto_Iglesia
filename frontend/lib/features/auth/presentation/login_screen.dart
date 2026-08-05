@@ -64,7 +64,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
               ],
             ),
-            clipBehavior: Clip.antiAlias, // Redondea perfectamente los hijos sin bordes blancos
+            clipBehavior: Clip
+                .antiAlias, // Redondea perfectamente los hijos sin bordes blancos
             child: Flex(
               direction: isDesktop ? Axis.horizontal : Axis.vertical,
               children: [
@@ -185,8 +186,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                   onTap: () {
                                     setState(() {
                                       _selectedRole = 'admin';
-                                      _usernameController.text = 'admin';
-                                      _passwordController.text = '123456';
+                                      _usernameController.text = 'ludeveloper';
+                                      _passwordController.text = '199512';
                                     });
                                   },
                                   child: Container(
