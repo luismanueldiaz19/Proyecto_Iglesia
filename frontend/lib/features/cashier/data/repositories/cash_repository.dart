@@ -48,6 +48,33 @@ class CashRepository {
     }
   }
 
+  Future<List<CashReconciliationModel>> getAllReconciliations(
+    String token, {
+    int? moduleId,
+    String? startDate,
+    String? endDate,
+  }) async {
+    final Map<String, String> queryParams = {};
+    if (moduleId != null) queryParams['module_id'] = moduleId.toString();
+    if (startDate != null) queryParams['start_date'] = startDate;
+    if (endDate != null) queryParams['end_date'] = endDate;
+
+    final uri = Uri.parse('$_baseUrl/cash-reconciliations/all')
+        .replace(queryParameters: queryParams);
+
+    final response = await http.get(
+      uri,
+      headers: await _getHeaders(token),
+    );
+
+    if (response.statusCode == 200) {
+      final List data = jsonDecode(response.body);
+      return data.map((json) => CashReconciliationModel.fromJson(json)).toList();
+    } else {
+      throw Exception('Error al cargar todos los cuadres: ${response.body}');
+    }
+  }
+
   Future<CashReconciliationModel?> getCurrentReconciliation(
     String token,
     int moduleId,
@@ -114,6 +141,32 @@ class CashRepository {
       return jsonDecode(response.body)['url'];
     } else {
       throw Exception('Error al obtener URL del PDF: ${response.body}');
+    }
+  }
+
+  Future<String> getAllReconciliationsPdfUrl(
+    String token, {
+    int? moduleId,
+    String? startDate,
+    String? endDate,
+  }) async {
+    final Map<String, String> queryParams = {};
+    if (moduleId != null) queryParams['module_id'] = moduleId.toString();
+    if (startDate != null) queryParams['start_date'] = startDate;
+    if (endDate != null) queryParams['end_date'] = endDate;
+
+    final uri = Uri.parse('$_baseUrl/cash-reconciliations/all/pdf-url')
+        .replace(queryParameters: queryParams);
+
+    final response = await http.get(
+      uri,
+      headers: await _getHeaders(token),
+    );
+
+    if (response.statusCode == 200) {
+      return jsonDecode(response.body)['url'];
+    } else {
+      throw Exception('Error al obtener URL del PDF de todos los cuadres: ${response.body}');
     }
   }
 

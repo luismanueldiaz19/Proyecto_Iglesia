@@ -223,19 +223,19 @@ class CashierDashboardScreen extends ConsumerWidget {
 
                           Row(
                             children: [
-                              OutlinedButton.icon(
-                                icon: const Icon(Icons.add),
-                                label: const Text('Registrar Ingreso'),
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => _AddTransactionDialog(
-                                      notifier: notifier,
-                                    ),
-                                  );
-                                },
-                              ),
-                              const SizedBox(width: 16),
+                              // OutlinedButton.icon(
+                              //   icon: const Icon(Icons.add),
+                              //   label: const Text('Registrar Ingreso'),
+                              //   onPressed: () {
+                              //     showDialog(
+                              //       context: context,
+                              //       builder: (_) => _AddTransactionDialog(
+                              //         notifier: notifier,
+                              //       ),
+                              //     );
+                              //   },
+                              // ),
+                              // const SizedBox(width: 16),
                               ElevatedButton.icon(
                                 icon: const Icon(Icons.calculate_rounded),
                                 label: const Text('Cuadrar y Cerrar Caja'),

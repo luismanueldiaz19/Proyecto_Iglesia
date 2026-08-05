@@ -3,11 +3,7 @@ class ModuleModel {
   final String name;
   final bool isActive;
 
-  ModuleModel({
-    required this.id,
-    required this.name,
-    required this.isActive,
-  });
+  ModuleModel({required this.id, required this.name, required this.isActive});
 
   factory ModuleModel.fromJson(Map<String, dynamic> json) {
     return ModuleModel(

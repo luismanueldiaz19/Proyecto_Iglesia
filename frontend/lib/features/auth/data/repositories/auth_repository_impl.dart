@@ -31,13 +31,15 @@ class AuthRepositoryImpl implements AuthRepository {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         final token = data['access_token'];
-        final userRoles = data['user']['roles'] as List<dynamic>;
-        final role = userRoles.isNotEmpty ? userRoles.first : 'Usuario';
+        final user = data['user'];
+        final name = user['name'] ?? username;
+        final userRoles = user['roles'] as List<dynamic>;
+        final role = userRoles.isNotEmpty ? userRoles.first['name'] : 'Usuario';
 
-        // Guardamos la sesión (24 horas) con el token real
-        await _localStorage.saveSession(username, token);
+        // Guardamos la sesión (24 horas) con el token real y los datos del usuario
+        await _localStorage.saveSession(username, name, role.toString(), token);
 
-        return UserEntity(username: username, role: role.toString());
+        return UserEntity(id: user['id'], name: name, username: username, role: role.toString());
       } else {
         final errorData = jsonDecode(response.body);
         throw Exception(
@@ -77,10 +79,14 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserEntity?> checkSession() async {
     if (_localStorage.isSessionValid()) {
       final username = _localStorage.getUsername();
+      final name = _localStorage.getName() ?? username ?? '';
+      final role = _localStorage.getRole() ?? 'Usuario';
+      
       if (username != null) {
         return UserEntity(
+          name: name,
           username: username,
-          role: username == 'admin' ? 'Administrador' : 'Cajera',
+          role: role,
         );
       }
     }

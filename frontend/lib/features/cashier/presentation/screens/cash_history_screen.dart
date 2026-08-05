@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/church_colors.dart';
 import '../../providers/cash_provider.dart';
+import '../../data/models/module_model.dart';
 import 'widgets/cash_reconciliation_detail_dialog.dart';
 
 class CashHistoryScreen extends ConsumerStatefulWidget {
@@ -49,9 +50,22 @@ class _CashHistoryScreenState extends ConsumerState<CashHistoryScreen> {
               itemCount: state.historyReconciliations.length,
               itemBuilder: (context, index) {
                 final history = state.historyReconciliations[index];
-                // final isSobrante = history.difference > 0;
-                final isFaltante = history.difference < 0;
-                final isPerfect = history.difference == 0;
+                final finalDifference = history.isDeposited
+                    ? (history.depositDifference ?? history.difference)
+                    : history.difference;
+                final isFaltante = finalDifference < 0;
+                final isPerfect = finalDifference == 0;
+
+                final moduleName = state.modules
+                    .firstWhere(
+                      (m) => m.id == history.moduleId,
+                      orElse: () => ModuleModel(
+                        id: 0,
+                        name: 'Desconocido',
+                        isActive: false,
+                      ),
+                    )
+                    .name;
 
                 Color statusColor;
                 if (isPerfect) {
@@ -99,20 +113,20 @@ class _CashHistoryScreenState extends ConsumerState<CashHistoryScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Cierre #${history.id} - ${history.date}',
+                                  '$moduleName (Cierre #${history.id}) - ${history.date}',
                                   style: const TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                     color: ChurchColors.primary,
                                   ),
                                 ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  'Gastos registrados: \$${history.totalExpenses.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    color: ChurchColors.grey,
-                                  ),
-                                ),
+                                // const SizedBox(height: 8),
+                                // Text(
+                                //   'Gastos registrados: \$${history.totalExpenses.toStringAsFixed(2)}',
+                                //   style: const TextStyle(
+                                //     color: ChurchColors.grey,
+                                //   ),
+                                // ),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
@@ -128,7 +142,7 @@ class _CashHistoryScreenState extends ConsumerState<CashHistoryScreen> {
                                     const SizedBox(width: 4),
                                     Text(
                                       history.isDeposited
-                                          ? 'Depositado en Banco'
+                                          ? 'Depositado en Banco: \$${history.depositAmount?.toStringAsFixed(2) ?? "0.00"}'
                                           : 'Pendiente de Depósito',
                                       style: TextStyle(
                                         color: history.isDeposited
@@ -193,7 +207,7 @@ class _CashHistoryScreenState extends ConsumerState<CashHistoryScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '\$${history.difference.abs().toStringAsFixed(2)}',
+                                  '\$${finalDifference.abs().toStringAsFixed(2)}',
                                   style: TextStyle(
                                     color: statusColor,
                                     fontWeight: FontWeight.w900,

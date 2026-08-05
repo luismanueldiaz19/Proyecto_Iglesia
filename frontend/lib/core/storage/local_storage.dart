@@ -2,6 +2,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorage {
   static const String _keyUsername = 'username';
+  static const String _keyName = 'name';
+  static const String _keyRole = 'role';
   static const String _keyLoginTimestamp = 'login_timestamp';
   static const String _keyApiToken = 'api_token';
 
@@ -9,8 +11,15 @@ class LocalStorage {
 
   LocalStorage(this._prefs);
 
-  Future<void> saveSession(String username, String token) async {
+  Future<void> saveSession(
+    String username,
+    String name,
+    String role,
+    String token,
+  ) async {
     await _prefs.setString(_keyUsername, username);
+    await _prefs.setString(_keyName, name);
+    await _prefs.setString(_keyRole, role);
     await _prefs.setString(_keyApiToken, token);
     await _prefs.setString(
       _keyLoginTimestamp,
@@ -20,6 +29,8 @@ class LocalStorage {
 
   Future<void> clearSession() async {
     await _prefs.remove(_keyUsername);
+    await _prefs.remove(_keyName);
+    await _prefs.remove(_keyRole);
     await _prefs.remove(_keyApiToken);
     await _prefs.remove(_keyLoginTimestamp);
   }
@@ -30,6 +41,14 @@ class LocalStorage {
 
   String? getUsername() {
     return _prefs.getString(_keyUsername);
+  }
+
+  String? getName() {
+    return _prefs.getString(_keyName);
+  }
+
+  String? getRole() {
+    return _prefs.getString(_keyRole);
   }
 
   bool isSessionValid() {

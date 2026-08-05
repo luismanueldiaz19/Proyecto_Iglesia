@@ -11,6 +11,7 @@ use App\Http\Controllers\AccountingReportController;
 use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\DenominationController;
 use App\Http\Controllers\CashTransactionController;
+use App\Http\Controllers\UserController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -22,6 +23,8 @@ Route::get('/cash-reconciliations/{id}/download-pdf', [CashReconciliationControl
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     
+    Route::apiResource('users', UserController::class);
+
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
@@ -45,6 +48,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/modules/{moduleId}/current-reconciliation', [CashReconciliationController::class, 'current']);
     Route::get('/denominations', [DenominationController::class, 'index']);
     
+    Route::get('/cash-reconciliations/all', [CashReconciliationController::class, 'all']);
+    Route::get('/cash-reconciliations/all/pdf', [CashReconciliationController::class, 'generateAllPdf']);
+    Route::get('/cash-reconciliations/all/pdf-url', [CashReconciliationController::class, 'getAllPdfUrl']);
     Route::get('/cash-reconciliations/{id}', [CashReconciliationController::class, 'show']);
     Route::get('/cash-reconciliations/{id}/pdf-url', [CashReconciliationController::class, 'getPdfUrl']);
     
@@ -54,4 +60,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cash-reconciliations/{id}/deposit', [CashReconciliationController::class, 'deposit']);
     
     Route::post('/cash-transactions', [CashTransactionController::class, 'store']);
+    
+    // Ingresos y Gastos Provisionales
+    Route::get('ingresos-provicionales-chart', [\App\Http\Controllers\IngresoProvicionalController::class, 'chartData']);
+    Route::apiResource('ingresos-provicionales', \App\Http\Controllers\IngresoProvicionalController::class);
+    Route::post('ingresos-provicionales/import', [\App\Http\Controllers\IngresoProvicionalController::class, 'importExcel']);
+    
+    Route::get('gastos-provicionales-chart', [\App\Http\Controllers\GastoProvicionalController::class, 'chartData']);
+    Route::apiResource('gastos-provicionales', \App\Http\Controllers\GastoProvicionalController::class);
+    Route::post('gastos-provicionales/import', [\App\Http\Controllers\GastoProvicionalController::class, 'importExcel']);
+    
+    // Dashboard y Reportes
+    Route::get('provicional-dashboard', [\App\Http\Controllers\ProvicionalDashboardController::class, 'index']);
+    Route::get('provicional-dashboard/pdf', [\App\Http\Controllers\ProvicionalDashboardController::class, 'exportPdf']);
+    Route::get('provicional-reportes', [\App\Http\Controllers\ProvicionalReportController::class, 'index']);
+    Route::get('provicional-reportes/pdf', [\App\Http\Controllers\ProvicionalReportController::class, 'exportPdf']);
+    Route::get('provicional-reportes/excel', [\App\Http\Controllers\ProvicionalReportController::class, 'exportExcel']);
 });

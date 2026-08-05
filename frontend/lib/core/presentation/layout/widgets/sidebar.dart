@@ -77,15 +77,45 @@ class Sidebar extends ConsumerWidget {
                     isSelected: currentPath == '/dashboard',
                     onTap: () => context.go('/dashboard'),
                   ),
+                  SidebarItem(
+                    icon: Icons.history_edu_rounded,
+                    title: 'Todos Cuadre',
+                    isSelected: currentPath == '/all-cash-history',
+                    onTap: () => context.go('/all-cash-history'),
+                  ),
                   const SizedBox(height: 16),
-                  _buildSectionHeader('Gestión'),
+                  _buildSectionHeader('Operaciones'),
                   SidebarItem(
                     icon: Icons.point_of_sale_rounded,
                     title: 'Cajero (Cuadre)',
                     isSelected: currentPath.startsWith('/cashier'),
                     onTap: () => context.go('/cashier'),
                   ),
+                  SidebarItem(
+                    icon: Icons.arrow_circle_down_rounded,
+                    title: 'Ingresos',
+                    isSelected: currentPath == '/provicional/ingresos',
+                    onTap: () => context.go('/provicional/ingresos'),
+                  ),
+                  SidebarItem(
+                    icon: Icons.arrow_circle_up_rounded,
+                    title: 'Gastos',
+                    isSelected: currentPath == '/provicional/gastos',
+                    onTap: () => context.go('/provicional/gastos'),
+                  ),
+                  SidebarItem(
+                    icon: Icons.dashboard_customize_rounded,
+                    title: 'Dashboard',
+                    isSelected: currentPath == '/provicional/dashboard',
+                    onTap: () => context.go('/provicional/dashboard'),
+                  ),
 
+                  // SidebarItem(
+                  //   icon: Icons.picture_as_pdf_rounded,
+                  //   title: 'Reportes',
+                  //   isSelected: currentPath == '/provicional/reportes',
+                  //   onTap: () => context.go('/provicional/reportes'),
+                  // ),
                   const SizedBox(height: 16),
                   _buildSectionHeader('Ingresos'),
                   SidebarItem(
@@ -101,33 +131,34 @@ class Sidebar extends ConsumerWidget {
                     onTap: () {},
                   ),
 
-                  const SizedBox(height: 16),
-                  _buildSectionHeader('Comercio y Stock'),
-                  SidebarItem(
-                    icon: Icons.storefront_rounded,
-                    title: 'Tienda / Librería',
-                    isSelected: currentPath.startsWith('/store'),
-                    onTap: () {},
-                  ),
-                  SidebarItem(
-                    icon: Icons.local_cafe_rounded,
-                    title: 'Cafetería',
-                    isSelected: currentPath.startsWith('/cafe'),
-                    onTap: () {},
-                  ),
-                  SidebarItem(
-                    icon: Icons.inventory_2_rounded,
-                    title: 'Inventario',
-                    isSelected: currentPath.startsWith('/inventory'),
-                    onTap: () {},
-                  ),
-
+                  // const SizedBox(height: 16),
+                  // _buildSectionHeader('Comercio y Stock'),
+                  // SidebarItem(
+                  //   icon: Icons.storefront_rounded,
+                  //   title: 'Tienda / Librería',
+                  //   isSelected: currentPath.startsWith('/store'),
+                  //   onTap: () {},
+                  // ),
+                  // SidebarItem(
+                  //   icon: Icons.local_cafe_rounded,
+                  //   title: 'Cafetería',
+                  //   isSelected: currentPath.startsWith('/cafe'),
+                  //   onTap: () {},
+                  // ),
+                  // SidebarItem(
+                  //   icon: Icons.inventory_2_rounded,
+                  //   title: 'Inventario',
+                  //   isSelected: currentPath.startsWith('/inventory'),
+                  //   onTap: () {},
+                  // ),
                   const SizedBox(height: 16),
                   _buildSectionHeader('Finanzas'),
                   SidebarItem(
                     icon: Icons.account_balance_rounded,
-                    title: 'Finanzas',
-                    isSelected: currentPath == '/finance' || currentPath.startsWith('/finance/'),
+                    title: 'Libros Contables',
+                    isSelected:
+                        currentPath == '/finance' ||
+                        currentPath.startsWith('/finance/'),
                     onTap: () => context.go('/finance'),
                   ),
                   SidebarItem(
@@ -139,12 +170,13 @@ class Sidebar extends ConsumerWidget {
 
                   const SizedBox(height: 16),
                   _buildSectionHeader('Administración'),
-                  SidebarItem(
-                    icon: Icons.settings_rounded,
-                    title: 'Configuración',
-                    isSelected: currentPath == '/settings',
-                    onTap: () {},
-                  ),
+                  if (ref.watch(authProvider.notifier).currentUser?.role == 'Administrador')
+                    SidebarItem(
+                      icon: Icons.settings_rounded,
+                      title: 'Gestión de Usuarios',
+                      isSelected: currentPath == '/settings/users',
+                      onTap: () => context.go('/settings/users'),
+                    ),
                   SidebarItem(
                     icon: Icons.settings_applications_rounded,
                     title: 'Config. Contable',

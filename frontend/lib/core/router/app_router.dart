@@ -11,9 +11,14 @@ import '../../features/accounting/presentation/screens/accounting_operations_scr
 import '../../features/cashier/presentation/screens/cashier_dashboard_screen.dart';
 import '../../features/cashier/presentation/screens/cash_reconciliation_screen.dart';
 import '../../features/cashier/presentation/screens/cash_history_screen.dart';
+import '../../features/cashier/presentation/screens/all_cash_history_screen.dart';
 import '../../features/finance/presentation/screens/finance_dashboard_screen.dart';
 import '../../features/finance/presentation/screens/journal_screen.dart';
 import '../../features/finance/presentation/screens/ledger_screen.dart';
+import '../../features/provicional/presentation/screens/ingreso_provicional_screen.dart';
+import '../../features/provicional/presentation/screens/gasto_provicional_screen.dart';
+import '../../features/provicional/presentation/screens/provicional_dashboard_screen.dart';
+import '../../features/users/presentation/screens/users_crud_screen.dart';
 import '../presentation/layout/main_layout.dart';
 
 // Clave del navegador raíz
@@ -105,6 +110,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const CashHistoryScreen(),
           ),
           GoRoute(
+            path: '/all-cash-history',
+            builder: (context, state) => const AllCashHistoryScreen(),
+          ),
+          GoRoute(
             path: '/finance',
             builder: (context, state) => const FinanceDashboardScreen(),
           ),
@@ -115,6 +124,22 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/finance/ledger',
             builder: (context, state) => const LedgerScreen(),
+          ),
+          GoRoute(
+            path: '/provicional/ingresos',
+            builder: (context, state) => const IngresoProvicionalScreen(),
+          ),
+          GoRoute(
+            path: '/provicional/gastos',
+            builder: (context, state) => const GastoProvicionalScreen(),
+          ),
+          GoRoute(
+            path: '/provicional/dashboard',
+            builder: (context, state) => const ProvicionalDashboardScreen(),
+          ),
+          GoRoute(
+            path: '/settings/users',
+            builder: (context, state) => const UsersCrudScreen(),
           ),
           // Más rutas irán aquí adentro de ShellRoute
         ],

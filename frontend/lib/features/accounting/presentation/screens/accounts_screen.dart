@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/theme/church_colors.dart';
+import '../../../../core/presentation/widgets/page_header.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../providers/accounting_provider.dart';
 import '../widgets/create_account_dialog.dart';
@@ -23,49 +24,30 @@ class AccountsScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Cabecera
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Catálogo de Cuentas',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w900,
-                        color: ChurchColors.black,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Administra las cuentas contables y bancos de la iglesia',
-                      style: TextStyle(color: ChurchColors.grey),
-                    ),
-                  ],
-                ),
-                ElevatedButton.icon(
-                  onPressed: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => const CreateAccountDialog(),
-                    );
-                  },
-                  icon: const Icon(Icons.add_rounded),
-                  label: const Text('Nueva Cuenta'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: ChurchColors.primary,
-                    foregroundColor: ChurchColors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+            PageHeader(
+              title: 'Catálogo de Cuentas',
+              subtitle: 'Administra las cuentas contables y bancos de la iglesia',
+              actionButton: ElevatedButton.icon(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => const CreateAccountDialog(),
+                  );
+                },
+                icon: const Icon(Icons.add),
+                label: const Text('Nueva Cuenta'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ChurchColors.primary,
+                  foregroundColor: ChurchColors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              ],
+              ),
             ),
             const SizedBox(height: 32),
 
@@ -172,8 +154,9 @@ class AccountsScreen extends ConsumerWidget {
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: _getTypeColor(account.type)
-                                            .withValues(alpha: 0.1),
+                                        color: _getTypeColor(
+                                          account.type,
+                                        ).withValues(alpha: 0.1),
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(

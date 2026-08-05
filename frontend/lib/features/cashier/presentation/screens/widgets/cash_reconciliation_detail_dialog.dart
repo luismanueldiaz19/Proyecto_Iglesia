@@ -476,16 +476,16 @@ class _CashReconciliationDetailDialogState
             label: const Text('Registrar Depósito Bancario'),
             onPressed: _showDepositDialog,
           ),
-        OutlinedButton.icon(
-          icon: const Icon(Icons.add),
-          label: const Text('Registrar Ingreso'),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (_) => _AddTransactionDialog(notifier: notifier),
-            );
-          },
-        ),
+        // OutlinedButton.icon(
+        //   icon: const Icon(Icons.add),
+        //   label: const Text('Registrar Ingreso'),
+        //   onPressed: () {
+        //     showDialog(
+        //       context: context,
+        //       builder: (_) => _AddTransactionDialog(notifier: notifier),
+        //     );
+        //   },
+        // ),
         if (!_isLoading && _error == null)
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(

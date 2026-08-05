@@ -24,6 +24,29 @@ class CashReconciliationController extends Controller
         return response()->json($reconciliations);
     }
 
+    public function all(Request $request)
+    {
+        $query = CashReconciliation::where('status', 'closed');
+
+        if ($request->has('module_id')) {
+            $query->where('module_id', $request->module_id);
+        }
+
+        if ($request->has('start_date')) {
+            $query->whereDate('date', '>=', $request->start_date);
+        }
+
+        if ($request->has('end_date')) {
+            $query->whereDate('date', '<=', $request->end_date);
+        }
+
+        $reconciliations = $query->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        return response()->json($reconciliations);
+    }
+
     public function show($id)
     {
         $reconciliation = CashReconciliation::with([
@@ -57,6 +80,53 @@ class CashReconciliationController extends Controller
         $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.cash_reconciliation', compact('reconciliation'));
         
         return $pdf->stream('cuadre_caja_'.$reconciliation->id.'.pdf');
+    }
+
+    public function getAllPdfUrl(Request $request)
+    {
+        $params = [];
+        if ($request->has('module_id') && $request->module_id !== 'null') {
+            $params['module_id'] = $request->module_id;
+        }
+        if ($request->has('start_date') && $request->start_date !== 'null') {
+            $params['start_date'] = $request->start_date;
+        }
+        if ($request->has('end_date') && $request->end_date !== 'null') {
+            $params['end_date'] = $request->end_date;
+        }
+
+        $url = URL::temporarySignedRoute(
+            'cash-reconciliation.all.pdf', 
+            now()->addMinutes(30), 
+            $params
+        );
+        return response()->json(['url' => $url]);
+    }
+
+    public function generateAllPdf(Request $request)
+    {
+        $query = CashReconciliation::where('status', 'closed');
+
+        if ($request->has('module_id') && $request->module_id !== 'null') {
+            $query->where('module_id', $request->module_id);
+        }
+
+        if ($request->has('start_date') && $request->start_date !== 'null') {
+            $query->whereDate('date', '>=', $request->start_date);
+        }
+
+        if ($request->has('end_date') && $request->end_date !== 'null') {
+            $query->whereDate('date', '<=', $request->end_date);
+        }
+
+        $reconciliations = $query->with('module')
+            ->orderBy('date', 'desc')
+            ->orderBy('id', 'desc')
+            ->get();
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.all_cash_history', compact('reconciliations', 'request'));
+        
+        return $pdf->stream('todos_los_cuadres.pdf');
     }
 
     public function current($moduleId)
