@@ -129,6 +129,22 @@ class CashReconciliationController extends Controller
         return $pdf->stream('todos_los_cuadres.pdf');
     }
 
+    public function getTemplatePdfUrl()
+    {
+        $url = URL::temporarySignedRoute(
+            'cash-reconciliation.template.pdf', 
+            now()->addMinutes(30)
+        );
+        return response()->json(['url' => $url]);
+    }
+
+    public function generateTemplatePdf()
+    {
+        $denominations = \App\Models\Denomination::orderBy('currency', 'desc')->orderBy('value', 'desc')->get();
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.cash_reconciliation_template', compact('denominations'));
+        return $pdf->stream('plantilla_cuadre_caja.pdf');
+    }
+
     public function current($moduleId)
     {
         $reconciliation = CashReconciliation::with('transactions')

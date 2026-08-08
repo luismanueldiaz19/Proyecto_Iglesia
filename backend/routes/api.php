@@ -12,12 +12,29 @@ use App\Http\Controllers\ModuleController;
 use App\Http\Controllers\DenominationController;
 use App\Http\Controllers\CashTransactionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\DonationController;
+use App\Http\Controllers\IngresoProvicionalController;
+use App\Http\Controllers\GastoProvicionalController;
+use App\Http\Controllers\ProvicionalDashboardController;
+use App\Http\Controllers\ProvicionalReportController;
+use App\Http\Controllers\Api\BankController;
+use App\Http\Controllers\Api\BankAccountController;
+use App\Http\Controllers\Api\BankTransactionController;
+use App\Http\Controllers\Api\BankReconciliationController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
 // Ruta pública para descargar PDF con URL firmada
+Route::get('/cash-reconciliations/template/download-pdf', [CashReconciliationController::class, 'generateTemplatePdf'])
+    ->name('cash-reconciliation.template.pdf')
+    ->middleware('signed');
+
 Route::get('/cash-reconciliations/{id}/download-pdf', [CashReconciliationController::class, 'generatePdf'])
     ->name('cash-reconciliation.pdf')
+    ->middleware('signed');
+
+Route::get('/donations/{id}/download-pdf', [DonationController::class, 'generatePdf'])
+    ->name('donation.pdf')
     ->middleware('signed');
 
 Route::middleware('auth:sanctum')->group(function () {
@@ -51,6 +68,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cash-reconciliations/all', [CashReconciliationController::class, 'all']);
     Route::get('/cash-reconciliations/all/pdf', [CashReconciliationController::class, 'generateAllPdf']);
     Route::get('/cash-reconciliations/all/pdf-url', [CashReconciliationController::class, 'getAllPdfUrl']);
+    
+    Route::get('/cash-reconciliations/template/pdf-url', [CashReconciliationController::class, 'getTemplatePdfUrl']);
+    
     Route::get('/cash-reconciliations/{id}', [CashReconciliationController::class, 'show']);
     Route::get('/cash-reconciliations/{id}/pdf-url', [CashReconciliationController::class, 'getPdfUrl']);
     
@@ -62,18 +82,34 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cash-transactions', [CashTransactionController::class, 'store']);
     
     // Ingresos y Gastos Provisionales
-    Route::get('ingresos-provicionales-chart', [\App\Http\Controllers\IngresoProvicionalController::class, 'chartData']);
-    Route::apiResource('ingresos-provicionales', \App\Http\Controllers\IngresoProvicionalController::class);
-    Route::post('ingresos-provicionales/import', [\App\Http\Controllers\IngresoProvicionalController::class, 'importExcel']);
+    Route::get('ingresos-provicionales-chart', [IngresoProvicionalController::class, 'chartData']);
+    Route::apiResource('ingresos-provicionales', IngresoProvicionalController::class);
+    Route::post('ingresos-provicionales/import', [IngresoProvicionalController::class, 'importExcel']);
     
-    Route::get('gastos-provicionales-chart', [\App\Http\Controllers\GastoProvicionalController::class, 'chartData']);
-    Route::apiResource('gastos-provicionales', \App\Http\Controllers\GastoProvicionalController::class);
-    Route::post('gastos-provicionales/import', [\App\Http\Controllers\GastoProvicionalController::class, 'importExcel']);
+    Route::get('gastos-provicionales-chart', [GastoProvicionalController::class, 'chartData']);
+    Route::apiResource('gastos-provicionales', GastoProvicionalController::class);
+    Route::post('gastos-provicionales/import', [GastoProvicionalController::class, 'importExcel']);
     
     // Dashboard y Reportes
-    Route::get('provicional-dashboard', [\App\Http\Controllers\ProvicionalDashboardController::class, 'index']);
-    Route::get('provicional-dashboard/pdf', [\App\Http\Controllers\ProvicionalDashboardController::class, 'exportPdf']);
-    Route::get('provicional-reportes', [\App\Http\Controllers\ProvicionalReportController::class, 'index']);
-    Route::get('provicional-reportes/pdf', [\App\Http\Controllers\ProvicionalReportController::class, 'exportPdf']);
-    Route::get('provicional-reportes/excel', [\App\Http\Controllers\ProvicionalReportController::class, 'exportExcel']);
+    Route::get('provicional-dashboard', [ProvicionalDashboardController::class, 'index']);
+    Route::get('provicional-dashboard/pdf', [ProvicionalDashboardController::class, 'exportPdf']);
+    Route::get('provicional-reportes', [ProvicionalReportController::class, 'index']);
+    Route::get('provicional-reportes/pdf', [ProvicionalReportController::class, 'exportPdf']);
+    Route::get('provicional-reportes/excel', [ProvicionalReportController::class, 'exportExcel']);
+
+    // Donaciones
+    Route::get('donations', [DonationController::class, 'index']);
+    Route::post('donations', [DonationController::class, 'store']);
+    Route::get('donations/{id}/pdf-url', [DonationController::class, 'getPdfUrl']);
+    
+    // Rutas para historial y reportes de donaciones
+    Route::get('donations-chart', [DonationController::class, 'chartData']);
+    Route::get('donations/export/pdf', [DonationController::class, 'exportPdf']);
+    Route::get('donations/export/excel', [DonationController::class, 'exportExcel']);
+
+    // Módulo de Bancos y Conciliaciones
+    Route::apiResource('banks', BankController::class);
+    Route::apiResource('bank-accounts', BankAccountController::class);
+    Route::apiResource('bank-transactions', BankTransactionController::class);
+    Route::apiResource('bank-reconciliations', BankReconciliationController::class);
 });

@@ -55,12 +55,34 @@ class IngresoProvicionalController extends Controller
             'fecha_ingreso' => 'required|date',
             'concepto' => 'required|string|max:255',
             'monto' => 'required|numeric|min:0.01',
+            'bank_account_id' => 'required|exists:bank_accounts,id',
         ]);
 
         // Aseguramos que se registra el usuario autenticado
         $validated['usuario_registro'] = $request->user()->id;
 
+        $bankAccountId = $validated['bank_account_id'];
+        unset($validated['bank_account_id']);
+
         $ingreso = IngresoProvicional::create($validated);
+
+        // Crear la transacción bancaria (Depósito Pendiente)
+        \App\Models\BankTransaction::create([
+            'bank_account_id' => $bankAccountId,
+            'date' => $ingreso->fecha_ingreso,
+            'type' => 'deposit',
+            'amount' => $ingreso->monto,
+            'reference' => 'ING-' . $ingreso->id,
+            'description' => $ingreso->concepto,
+            'status' => 'transit',
+        ]);
+
+        // Actualizar el balance actual de la cuenta bancaria / caja
+        $bankAccount = \App\Models\BankAccount::find($bankAccountId);
+        if ($bankAccount) {
+            $bankAccount->current_balance += $ingreso->monto;
+            $bankAccount->save();
+        }
 
         return response()->json($ingreso, 201);
     }
@@ -109,11 +131,12 @@ class IngresoProvicionalController extends Controller
     public function importExcel(Request $request)
     {
         $request->validate([
-            'file' => 'required|mimes:xlsx,xls,csv|max:10240'
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+            'bank_account_id' => 'required|exists:bank_accounts,id',
         ]);
         
         try {
-            Excel::import(new IngresoProvicionalImport($request->user()->id), $request->file('file'));
+            Excel::import(new IngresoProvicionalImport($request->user()->id, $request->bank_account_id), $request->file('file'));
             return response()->json(['message' => 'Importación exitosa'], 200);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Error en la importación: ' . $e->getMessage()], 400);

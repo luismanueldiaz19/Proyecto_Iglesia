@@ -21,6 +21,8 @@ class DatabaseSeeder extends Seeder
             DenominationSeeder::class,
             AccountingAccountSeeder::class,
             AccountingEngineConfigSeeder::class,
+            BankSeeder::class,
+            BankAccountSeeder::class,
         ]);
     }
 }
