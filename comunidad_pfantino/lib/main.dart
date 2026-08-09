@@ -33,7 +33,6 @@ class IglesiaApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Escuchamos el router que ya tiene la lógica de redirección basada en la sesión
     final router = ref.watch(routerProvider);
-
     return MaterialApp.router(
       title: AppInfo.name,
       debugShowCheckedModeBanner: false,
