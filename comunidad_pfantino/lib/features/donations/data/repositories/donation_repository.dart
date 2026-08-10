@@ -16,6 +16,7 @@ class DonationRepository {
     required String paymentMethod,
     required String concept,
     required double amount,
+    DateTime? date,
     required String token,
   }) async {
     final response = await http.post(
@@ -33,6 +34,7 @@ class DonationRepository {
         'payment_method': paymentMethod,
         'concept': concept,
         'amount': amount,
+        if (date != null) 'created_at': date.toIso8601String(),
       }),
     );
 

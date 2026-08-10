@@ -48,6 +48,7 @@ class GastosFilterWidget extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // Barra de búsqueda superior
+          // Barra de búsqueda superior
           Row(
             children: [
               Expanded(
@@ -57,19 +58,21 @@ class GastosFilterWidget extends StatelessWidget {
                     prefixIcon: const Icon(Icons.search, color: Colors.grey),
                     filled: true,
                     fillColor: Colors.grey.shade50,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 16.0),
+                    contentPadding: const EdgeInsets.symmetric(
+                      vertical: 16.0,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide.none,
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade300),
+                      borderSide: BorderSide(color: Colors.grey.shade200),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(
-                        color: Colors.blue,
+                      borderSide: BorderSide(
+                        color: Colors.teal.shade300,
                         width: 2,
                       ),
                     ),
@@ -78,39 +81,94 @@ class GastosFilterWidget extends StatelessWidget {
                   onSubmitted: (_) => onSearchSubmitted(),
                 ),
               ),
-              const SizedBox(width: 8),
-              IconButton(
-                icon: Icon(Icons.picture_as_pdf, color: Colors.red.shade400),
-                tooltip: 'Exportar a PDF',
+              const SizedBox(width: 12),
+              ElevatedButton(
+                onPressed: onSearchSubmitted,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal.shade600,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 16,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Buscar',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Import/Export / PDF
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            alignment: WrapAlignment.end,
+            children: [
+              OutlinedButton.icon(
                 onPressed: onDownloadPdf,
+                icon: const Icon(Icons.picture_as_pdf, color: Colors.red),
+                label: const Text('PDF'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.grey.shade800,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  side: BorderSide(color: Colors.grey.shade300),
+                ),
               ),
-              IconButton(
-                icon: Icon(Icons.table_chart, color: Colors.green.shade400),
-                tooltip: 'Exportar a Excel',
+              OutlinedButton.icon(
                 onPressed: onDownloadExcel,
+                icon: const Icon(Icons.table_chart, color: Colors.green),
+                label: const Text('Excel'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: Colors.grey.shade800,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  side: BorderSide(color: Colors.grey.shade300),
+                ),
               ),
-              IconButton(
-                icon: Icon(Icons.help_outline, color: Colors.blue.shade400),
-                tooltip: 'Formato Excel para Importar',
-                onPressed: onShowInfo,
+              ElevatedButton.icon(
+                onPressed: isUploading ? null : onUploadExcel,
+                icon: isUploading
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Icon(Icons.upload_file),
+                label: Text(isUploading ? 'Subiendo...' : 'Importar'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade600,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  elevation: 0,
+                ),
               ),
-              isUploading
-                  ? const Padding(
-                      padding: EdgeInsets.all(12.0),
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2),
-                      ),
-                    )
-                  : IconButton(
-                      icon: Icon(
-                        Icons.upload_file,
-                        color: Colors.orange.shade400,
-                      ),
-                      tooltip: 'Importar Excel',
-                      onPressed: onUploadExcel,
-                    ),
             ],
           ),
           const SizedBox(height: 16),

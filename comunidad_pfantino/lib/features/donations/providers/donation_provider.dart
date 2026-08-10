@@ -22,6 +22,7 @@ class DonationNotifier extends StateNotifier<AsyncValue<void>> {
     required String paymentMethod,
     required String concept,
     required double amount,
+    DateTime? date,
   }) async {
     try {
       state = const AsyncValue.loading();
@@ -39,6 +40,7 @@ class DonationNotifier extends StateNotifier<AsyncValue<void>> {
         paymentMethod: paymentMethod,
         concept: concept,
         amount: amount,
+        date: date,
         token: token,
       );
 

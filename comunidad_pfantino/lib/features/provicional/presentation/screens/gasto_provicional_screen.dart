@@ -245,9 +245,14 @@ class _GastoProvicionalScreenState extends State<GastoProvicionalScreen> {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['xlsx', 'xls', 'csv'],
+        withData: kIsWeb,
       );
 
-      if (result != null && result.files.single.path != null) {
+      if (result != null && result.files.isNotEmpty) {
+        final platformFile = result.files.first;
+        if (kIsWeb && platformFile.bytes == null) return;
+        if (!kIsWeb && platformFile.path == null) return;
+
         setState(() {
           _isUploading = true;
         });
@@ -267,9 +272,23 @@ class _GastoProvicionalScreenState extends State<GastoProvicionalScreen> {
 
         request.fields['bank_account_id'] = bankAccountId.toString();
 
-        request.files.add(
-          await http.MultipartFile.fromPath('file', result.files.single.path!),
-        );
+        if (kIsWeb) {
+          request.files.add(
+            http.MultipartFile.fromBytes(
+              'file',
+              platformFile.bytes!,
+              filename: platformFile.name,
+            ),
+          );
+        } else {
+          request.files.add(
+            await http.MultipartFile.fromPath(
+              'file',
+              platformFile.path!,
+              filename: platformFile.name,
+            ),
+          );
+        }
 
         var response = await request.send();
 

@@ -2,8 +2,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../../../../core/theme/church_colors.dart';
 import '../../providers/donation_provider.dart';
@@ -24,7 +25,14 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
   final _conceptController = TextEditingController();
   final _amountController = TextEditingController();
 
+  DateTime? _selectedDate;
   bool _withReceipt = false;
+
+  final _phoneFormatter = MaskTextInputFormatter(
+    mask: '###-###-####',
+    filter: {"#": RegExp(r'[0-9]')},
+    type: MaskAutoCompletionType.lazy,
+  );
   String _paymentMethod = 'Efectivo';
 
   @override
@@ -52,6 +60,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
           paymentMethod: _paymentMethod,
           concept: _conceptController.text.trim(),
           amount: double.tryParse(_amountController.text) ?? 0,
+          date: _selectedDate,
         );
 
     print(donationId);
@@ -76,6 +85,7 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
       setState(() {
         _withReceipt = false;
         _paymentMethod = 'Efectivo';
+        _selectedDate = null;
       });
 
       // Descargar PDF
@@ -94,53 +104,17 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
 
   Future<void> _downloadPdf(String url, String donorName) async {
     try {
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        if (kIsWeb) {
-          // Lógica para web si aplica
-        } else if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-          final now = DateTime.now();
-          final timestamp =
-              '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}';
-
-          String initials = '';
-          if (donorName.isNotEmpty) {
-            List<String> words = donorName.trim().split(RegExp(r'\s+'));
-            if (words.length == 1) {
-              initials = '${words[0].substring(0, 1).toUpperCase()}-';
-            } else {
-              initials =
-                  '${words[0].substring(0, 1).toUpperCase()}${words[1].substring(0, 1).toUpperCase()}-';
-            }
-          }
-
-          String? outputFile = await FilePicker.platform.saveFile(
-            dialogTitle: 'Guardar Recibo de Donación',
-            fileName: '${initials}recibo_donacion_$timestamp.pdf',
-            type: FileType.custom,
-            allowedExtensions: ['pdf'],
-          );
-
-          if (outputFile != null) {
-            final file = File(outputFile);
-            await file.writeAsBytes(response.bodyBytes);
-            if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Recibo PDF guardado exitosamente'),
-                ),
-              );
-            }
-          }
-        }
+      final uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        throw Exception('Error en respuesta HTTP: ${response.statusCode}');
+        throw Exception('No se pudo abrir el enlace del recibo.');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al descargar el PDF: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al abrir el PDF: $e')));
       }
     }
   }
@@ -194,8 +168,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                         Expanded(
                           child: TextFormField(
                             controller: _donorPhoneController,
+                            inputFormatters: [_phoneFormatter],
+                            keyboardType: TextInputType.phone,
                             decoration: const InputDecoration(
                               labelText: 'Teléfono',
+                              hintText: '809-000-0000',
                               border: OutlineInputBorder(),
                             ),
                           ),
@@ -241,6 +218,38 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                                 v!.isEmpty ? 'Campo requerido' : null,
                           ),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: InkWell(
+                            onTap: () async {
+                              final date = await showDatePicker(
+                                context: context,
+                                initialDate: _selectedDate ?? DateTime.now(),
+                                firstDate: DateTime(2000),
+                                lastDate: DateTime.now(),
+                              );
+                              if (date != null) {
+                                setState(() => _selectedDate = date);
+                              }
+                            },
+                            child: InputDecorator(
+                              decoration: const InputDecoration(
+                                labelText: 'Fecha de Donación',
+                                border: OutlineInputBorder(),
+                              ),
+                              child: Text(
+                                _selectedDate == null
+                                    ? 'Hoy (Por defecto)'
+                                    : '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}',
+                              ),
+                            ),
+                          ),
+                        ),
                         const SizedBox(width: 16),
                         Expanded(
                           flex: 1,
@@ -256,8 +265,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                             ),
                             validator: (v) {
                               if (v!.isEmpty) return 'Campo requerido';
-                              if (double.tryParse(v) == null)
+                              if (double.tryParse(v) == null) {
                                 return 'Monto inválido';
+                              }
                               return null;
                             },
                           ),

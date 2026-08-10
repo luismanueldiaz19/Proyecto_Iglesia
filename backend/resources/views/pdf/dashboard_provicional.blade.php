@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <title>Dashboard de Provisionales</title>
     <style>
-        body { font-family: sans-serif; font-size: 12px; color: #333; margin: 0; padding: 20px; }
+        body { font-family: 'Helvetica', 'Arial', sans-serif; font-size: 12px; color: #374151; margin: 0; padding: 20px; background-color: #ffffff; }
         .header {
             width: 100%;
-            border-bottom: 2px solid #0B2E6B;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            border-bottom: 3px solid #1e40af;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
         }
         .header-table {
             width: 100%;
@@ -21,57 +21,85 @@
             padding: 0 !important;
         }
         .header-logo {
-            width: 100px;
+            width: 110px;
             text-align: left;
         }
         .header-logo img {
-            max-width: 90px;
-            max-height: 90px;
+            max-width: 95px;
+            max-height: 95px;
             object-fit: contain;
         }
         .header-text {
             text-align: center;
         }
         .header-text h1 {
-            color: #0B2E6B;
+            color: #1e3a8a;
             margin: 0;
-            font-size: 26px;
+            font-size: 28px;
             font-weight: 900;
-            letter-spacing: 1px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
         .header-text h2 {
-            color: #374151;
-            margin: 4px 0 0;
+            color: #4b5563;
+            margin: 6px 0 0;
             font-size: 16px;
             font-weight: bold;
         }
         .header-text p.desc {
-            margin: 4px 0 0;
-            color: #6B7280;
-            font-size: 11px;
+            margin: 6px 0 0;
+            color: #6b7280;
+            font-size: 12px;
         }
         .header-text p.report-title {
-            margin: 15px 0 0;
-            color: #0B2E6B;
-            font-size: 18px;
+            margin: 20px 0 0;
+            color: #1e40af;
+            font-size: 20px;
             font-weight: bold;
             text-transform: uppercase;
         }
+        .badge {
+            background-color: #eff6ff;
+            color: #1e40af;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: 1px solid #bfdbfe;
+        }
+        .summary-boxes-table { width: 100%; margin-top: 35px; margin-bottom: 35px; border-collapse: collapse; border: none !important; }
+        .summary-boxes-table td { border: none !important; vertical-align: top; }
+        .summary-box { 
+            background-color: #f8fafc; 
+            border-top: 4px solid #94a3b8 !important; 
+            padding: 20px 10px !important; 
+            text-align: center;
+            width: 32%;
+        }
+        .summary-box.income { border-top-color: #22c55e !important; background-color: #f0fdf4; }
+        .summary-box.expense { border-top-color: #ef4444 !important; background-color: #fef2f2; }
+        .summary-box.balance { border-top-color: #3b82f6 !important; background-color: #eff6ff; }
         
-        .summary-boxes { width: 100%; margin-bottom: 20px; text-align: center; }
-        .summary-box { display: inline-block; width: 30%; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; box-sizing: border-box; }
-        .summary-box h3 { margin: 0 0 10px 0; font-size: 13px; color: #475569; }
-        .summary-box .amount { font-size: 18px; font-weight: bold; }
-        .text-green { color: #16a34a; }
-        .text-red { color: #dc2626; }
-        .text-blue { color: #2563eb; }
+        .summary-box h3 { margin: 0 0 12px 0; font-size: 14px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
+        .summary-box .amount { font-size: 22px; font-weight: bold; }
+        
+        .text-green { color: #15803d; }
+        .text-red { color: #b91c1c; }
+        .text-blue { color: #1d4ed8; }
 
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 11px; }
-        th, td { border: 1px solid #ddd; padding: 8px 12px; text-align: left; }
-        th { background-color: #f1f5f9; color: #1e293b; font-weight: bold; text-transform: uppercase; }
-        td.amount { text-align: right; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; font-size: 12px; }
+        th, td { border: 1px solid #e2e8f0; padding: 12px 15px; text-align: left; }
+        th { 
+            background-color: #1e40af; 
+            color: #ffffff; 
+            font-weight: bold; 
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+        }
+        td.amount { text-align: right; font-weight: bold; }
         tr:nth-child(even) { background-color: #f8fafc; }
-        .footer { text-align: center; font-size: 10px; color: #94a3b8; border-top: 1px solid #ddd; padding-top: 10px; margin-top: 30px; }
+        
+        .footer { text-align: center; font-size: 11px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 40px; }
     </style>
 </head>
 <body>
@@ -97,7 +125,7 @@
                     <h1>PARROQUIA</h1>
                     <h2>Centro de Evangelización</h2>
                     <p class="desc">Sistema integrado para la gestión de cuadres, intenciones y administración general.</p>
-                    <p class="report-title">Dashboard - Provisionales</p>
+                    <p class="report-title"><span class="badge">Dashboard - Provisionales</span></p>
                     <p style="font-size: 11px; margin-top: 5px; color: #4B5563;">
                         @if($startDate && $endDate)
                             Período: <b>{{ $startDate }} al {{ $endDate }}</b>
@@ -111,20 +139,6 @@
         </table>
     </div>
 
-    <div class="summary-boxes">
-        <div class="summary-box">
-            <h3>Total Ingresos</h3>
-            <div class="amount text-green">${{ number_format($totalIngresos, 2) }}</div>
-        </div>
-        <div class="summary-box">
-            <h3>Total Gastos</h3>
-            <div class="amount text-red">${{ number_format($totalGastos, 2) }}</div>
-        </div>
-        <div class="summary-box">
-            <h3>Balance (Saldo)</h3>
-            <div class="amount text-blue">${{ number_format($balance, 2) }}</div>
-        </div>
-    </div>
 
     <table>
         <thead>
@@ -152,6 +166,25 @@
                 </tr>
             @endif
         </tbody>
+    </table>
+
+    <table class="summary-boxes-table">
+        <tr>
+            <td class="summary-box income">
+                <h3>Total Ingresos</h3>
+                <div class="amount text-green">${{ number_format($totalIngresos, 2) }}</div>
+            </td>
+            <td style="width: 2%;"></td>
+            <td class="summary-box expense">
+                <h3>Total Gastos</h3>
+                <div class="amount text-red">${{ number_format($totalGastos, 2) }}</div>
+            </td>
+            <td style="width: 2%;"></td>
+            <td class="summary-box balance">
+                <h3>Balance (Saldo)</h3>
+                <div class="amount text-blue">${{ number_format($balance, 2) }}</div>
+            </td>
+        </tr>
     </table>
 
     <div class="footer">

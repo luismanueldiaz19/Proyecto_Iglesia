@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/network/api_config.dart';
@@ -297,8 +298,40 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
       }
     } finally {
+      if (mounted) setState(() => _isDownloading = false);
+    }
+  }
+
+  Future<void> _printDonation(int donationId, String donorName) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('api_token');
+
+      // 1. Obtener la URL del PDF firmada
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/donations/$donationId/pdf-url'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final url = data['url'];
+
+        // 2. Abrir la URL firmada directamente en el navegador
+        final uri = Uri.parse(url);
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        } else {
+          throw Exception('No se pudo abrir el enlace del recibo.');
+        }
+      } else {
+        throw Exception('Error al obtener URL del PDF');
+      }
+    } catch (e) {
       if (mounted) {
-        setState(() => _isDownloading = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al procesar el recibo: $e')),
+        );
       }
     }
   }
@@ -378,6 +411,7 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
                     child: DonationsTableWidget(
                       isLoading: _isLoading,
                       donations: _donations,
+                      onPrint: _printDonation,
                     ),
                   ),
                   const SizedBox(width: 16),
