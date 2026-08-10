@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <!--
     If you are serving your web app in a path other than the root, change the
@@ -18,20 +19,30 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description"
+    content="Sistema integrado para la gestión de cuadres, intenciones y administración general.">
+
+  <!-- Open Graph / WhatsApp / Facebook meta tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Centro de Evangelización">
+  <meta property="og:description"
+    content="Sistema integrado para la gestión de cuadres, intenciones y administración general.">
+  <meta property="og:site_name" content="Parroquia Padre Fantino">
+  <meta property="og:image" content="icons/Icon-192.png">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="comunidad_pfantino">
+  <meta name="apple-mobile-web-app-title" content="Centro de Evangelización">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/png" href="favicon.png" />
 
-  <title>comunidad_pfantino</title>
+  <title>Centro de Evangelización</title>
   <link rel="manifest" href="manifest.json">
 </head>
+
 <body>
   <!--
     You can customize the "flutter_bootstrap.js" script.
@@ -43,4 +54,5 @@
   -->
   <script src="flutter_bootstrap.js" async></script>
 </body>
+
 </html>

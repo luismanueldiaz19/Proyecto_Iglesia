@@ -170,7 +170,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 24),
 
-                        // SWITCHER DE LLENADO RÁPIDO (SOLO PARA PRUEBAS)
+                        // SWITCHER DE LLENADO RÁPIDO (SOLO PARA PRUEBAS) - COMENTADO A PETICIÓN
+                        /*
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
@@ -275,6 +276,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
+                        */
 
                         if (authState == AuthState.error)
                           Container(

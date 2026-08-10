@@ -6,78 +6,110 @@
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            color: #333;
+            color: #111827;
             font-size: 14px;
             margin: 0;
             padding: 20px;
         }
-        .header {
+        .report-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
             width: 100%;
-            border-bottom: 2px solid #0B2E6B;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            margin: 0 auto;
         }
         .header-table {
             width: 100%;
+            background-color: #0B2E6B;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
             border-collapse: collapse;
         }
         .header-table td {
+            padding: 28px 32px;
             vertical-align: middle;
-            border: none !important;
-            padding: 0 !important;
         }
-        .header-logo {
-            width: 100px;
-            text-align: left;
-        }
-        .header-logo img {
-            max-width: 90px;
-            max-height: 90px;
-            object-fit: contain;
-        }
-        .header-text {
+        .header-icon {
             text-align: center;
+            display: inline-block;
         }
-        .header-text h1 {
-            color: #0B2E6B;
+        .header-title-small {
             margin: 0;
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: 1px;
-        }
-        .header-text h2 {
-            color: #374151;
-            margin: 4px 0 0;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .header-text p.desc {
-            margin: 4px 0 0;
-            color: #6B7280;
             font-size: 11px;
-        }
-        .header-text p.report-title {
-            margin: 15px 0 0;
-            color: #0B2E6B;
-            font-size: 18px;
-            font-weight: bold;
+            letter-spacing: 1.5px;
+            color: #B7CFC3;
             text-transform: uppercase;
         }
-        .info-grid {
+        .header-title-large {
+            margin: 2px 0 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+        .header-receipt-text {
+            margin: 0;
+            font-size: 11px;
+            color: #B7CFC3;
+            text-align: right;
+        }
+        .header-receipt-number {
+            margin: 2px 0 0;
+            font-size: 16px;
+            font-weight: bold;
+            color: #D4A017;
+            text-align: right;
+        }
+        .body-section {
+            padding: 24px 32px 32px 32px;
+        }
+        .title-table {
             width: 100%;
+            border-collapse: collapse;
+            border-bottom: 1px solid #e5e7eb;
             margin-bottom: 20px;
         }
-        .info-grid td {
-            padding: 5px;
-            vertical-align: top;
+        .title-table td {
+            padding-bottom: 16px;
+            vertical-align: bottom;
         }
-        .info-label {
+        .title-text {
+            margin: 0;
+            font-size: 20px;
             font-weight: bold;
-            color: #6B7280;
+            color: #111827;
+            text-transform: uppercase;
         }
-        .status-perfect { color: #10B981; font-weight: bold; }
-        .status-faltante { color: #EF4444; font-weight: bold; }
-        .status-sobrante { color: #F59E0B; font-weight: bold; }
+        .date-text {
+            font-size: 12px;
+            color: #6b7280;
+            text-align: right;
+        }
+        .grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 22px;
+        }
+        .grid-table td {
+            width: 25%;
+            vertical-align: top;
+            padding-bottom: 10px;
+        }
+        .label-text {
+            margin: 0 0 4px;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+        .value-text {
+            margin: 0;
+            font-size: 15px;
+            font-weight: bold;
+            color: #111827;
+        }
+        .status-perfect { color: #10B981; }
+        .status-faltante { color: #EF4444; }
+        .status-sobrante { color: #F59E0B; }
         
         table.data-table {
             width: 100%;
@@ -124,119 +156,173 @@
             font-size: 18px;
             color: #0B2E6B;
         }
+        h3 {
+            color: #111827;
+            font-size: 16px;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 5px;
+        }
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 40px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 20px;
+        }
+        .footer-table td {
+            vertical-align: bottom;
+            padding-top: 20px;
+        }
+        .signature-line {
+            width: 180px;
+            border-bottom: 1px solid #d1d5db;
+            height: 28px;
+        }
+        .signature-text {
+            margin: 4px 0 0;
+            font-size: 11px;
+            color: #6b7280;
+        }
+        .address-text {
+            margin: 0;
+            font-size: 11px;
+            color: #6b7280;
+            line-height: 1.5;
+            text-align: right;
+        }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <table class="header-table">
-            <tr>
-                <td class="header-logo">
-                    @php
-                        $logoPath = public_path('logo_app.jpeg');
-                        $logoData = '';
-                        if(file_exists($logoPath)) {
-                            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-                            $data = file_get_contents($logoPath);
-                            $logoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                        }
-                    @endphp
-                    @if($logoData)
-                        <img src="{{ $logoData }}" alt="Logo Parroquia">
-                    @endif
-                </td>
-                <td class="header-text">
-                    <h1>PARROQUIA</h1>
-                    <h2>Centro de Evangelización</h2>
-                    <p class="desc">Sistema integrado para la gestión de cuadres, intenciones y administración general.</p>
-                    <p class="report-title">Reporte Oficial de Cuadre de Caja</p>
-                </td>
-                <td style="width: 100px;"></td> <!-- Espaciador para centrar el texto -->
-            </tr>
-        </table>
-    </div>
-
-    <table class="info-grid">
+<div class="report-card">
+    <!-- Header -->
+    <table class="header-table">
         <tr>
-            <td class="info-label" width="15%">No. Cuadre:</td>
-            <td width="35%">{{ str_pad($reconciliation->id, 6, '0', STR_PAD_LEFT) }}</td>
-            <td class="info-label" width="15%">Fecha:</td>
-            <td width="35%">{{ $reconciliation->date }}</td>
-        </tr>
-        <tr>
-            <td class="info-label">Módulo:</td>
-            <td>{{ $reconciliation->module ? $reconciliation->module->name : 'N/A' }}</td>
-            <td class="info-label">Estado:</td>
-            <td>
-                @if($reconciliation->difference == 0)
-                    <span class="status-perfect">CUADRE PERFECTO</span>
-                @elseif($reconciliation->difference < 0)
-                    <span class="status-faltante">FALTANTE DE CAJA</span>
+            <td style="width: 70px;">
+                @php
+                    $logoPath = public_path('logo_app.jpeg');
+                    $logoData = '';
+                    if(file_exists($logoPath)) {
+                        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+                        $data = file_get_contents($logoPath);
+                        $logoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                    }
+                @endphp
+                @if($logoData)
+                    <img src="{{ $logoData }}" style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #D4A017; object-fit: cover; background-color: white; vertical-align: middle; display: inline-block;" alt="Logo">
                 @else
-                    <span class="status-sobrante">SOBRANTE DE CAJA</span>
+                    <div style="width: 52px; height: 52px; background-color: #D4A017; border-radius: 50%; text-align: center; line-height: 52px; color: #0B2E6B; font-size: 26px; font-weight: bold; display: inline-block;">+</div>
                 @endif
+            </td>
+            <td>
+                <p class="header-title-small">Centro de evangelización</p>
+                <p class="header-title-large">Padre Fantino</p>
+            </td>
+            <td>
+                <p class="header-receipt-text">Cuadre de Caja</p>
+                <p class="header-receipt-number">No. {{ str_pad($reconciliation->id, 6, '0', STR_PAD_LEFT) }}</p>
             </td>
         </tr>
     </table>
 
-    <h3>Transacciones del Turno</h3>
-    <table class="data-table">
-        <thead>
+    <div class="body-section">
+        <table class="title-table">
             <tr>
-                <th>ID</th>
-                <th>Concepto</th>
-                <th>Tipo</th>
-                <th class="right">Monto</th>
+                <td>
+                    <h1 class="title-text">Reporte Oficial de Cuadre</h1>
+                </td>
+                <td class="date-text">
+                    Generado: {{ now()->format('d M Y, h:i a') }}
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @forelse($reconciliation->transactions as $tx)
-                <tr>
-                    <td>{{ $tx->id }}</td>
-                    <td>{{ $tx->description }}</td>
-                    <td>{{ $tx->type == 'income' ? 'Ingreso' : 'Gasto' }}</td>
-                    <td class="right">${{ number_format($tx->amount, 2) }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="4" style="text-align:center; color:#9ca3af;">No hay transacciones registradas</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+        </table>
 
-    <h3>Desglose Físico (Billetes y Monedas)</h3>
-    <table class="data-table">
-        <thead>
+        <!-- Info Grid (Bottom Head) -->
+        <table class="grid-table">
             <tr>
-                <th>Moneda / Denominación</th>
-                <th class="right">Cantidad</th>
-                <th class="right">Total (Calculado)</th>
+                <td>
+                    <p class="label-text">Fecha de Cuadre</p>
+                    <p class="value-text">{{ $reconciliation->date }}</p>
+                </td>
+                <td>
+                    <p class="label-text">Módulo</p>
+                    <p class="value-text">{{ $reconciliation->module ? $reconciliation->module->name : 'N/A' }}</p>
+                </td>
+                <td colspan="2">
+                    <p class="label-text">Estado del Cuadre</p>
+                    <p class="value-text">
+                        @if($reconciliation->difference == 0)
+                            <span class="status-perfect">CUADRE PERFECTO</span>
+                        @elseif($reconciliation->difference < 0)
+                            <span class="status-faltante">FALTANTE DE CAJA (RD$ {{ number_format(abs($reconciliation->difference), 2) }})</span>
+                        @else
+                            <span class="status-sobrante">SOBRANTE DE CAJA (RD$ {{ number_format($reconciliation->difference, 2) }})</span>
+                        @endif
+                    </p>
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @forelse($reconciliation->denominations as $den)
-                <tr>
-                    <td>{{ $den->denomination->currency }} - {{ number_format($den->denomination->value, 0) }}</td>
-                    <td class="right">{{ $den->quantity }}</td>
-                    <td class="right">${{ number_format($den->total, 2) }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="3" style="text-align:center; color:#9ca3af;">No hay desglose físico registrado</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
+        </table>
 
-    <div class="summary-box">
-        <div class="summary-row">
-            <span class="label">Ingresos Calculados:</span>
-            <span class="val">${{ number_format($reconciliation->transactions->where('type', 'income')->sum('amount'), 2) }}</span>
-        </div>
-        <div class="summary-row">
-            <span class="label">Gastos Calculados:</span>
-            <span class="val">-${{ number_format($reconciliation->transactions->where('type', 'expense')->sum('amount'), 2) }}</span>
+        <h3>Transacciones del Turno</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Concepto</th>
+                    <th>Tipo</th>
+                    <th class="right">Monto</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($reconciliation->transactions as $tx)
+                    <tr>
+                        <td>{{ $tx->id }}</td>
+                        <td>{{ $tx->description }}</td>
+                        <td>{{ $tx->type == 'income' ? 'Ingreso' : 'Gasto' }}</td>
+                        <td class="right">${{ number_format($tx->amount, 2) }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="4" style="text-align:center; color:#9ca3af;">No hay transacciones registradas</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+
+        <h3>Desglose Físico (Billetes y Monedas)</h3>
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Moneda / Denominación</th>
+                    <th class="right">Cantidad</th>
+                    <th class="right">Total (Calculado)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @forelse($reconciliation->denominations as $den)
+                    <tr>
+                        <td>{{ $den->denomination->currency }} - {{ number_format($den->denomination->value, 0) }}</td>
+                        <td class="right">{{ $den->quantity }}</td>
+                        <td class="right">${{ number_format($den->total, 2) }}</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="3" style="text-align:center; color:#9ca3af;">No hay desglose físico registrado</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+
+        <div class="summary-box">
+            <div class="summary-row">
+                <span class="label">Ingresos Calculados:</span>
+                <span class="val">${{ number_format($reconciliation->transactions->where('type', 'income')->sum('amount'), 2) }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Gastos Calculados:</span>
+                <span class="val">-${{ number_format($reconciliation->transactions->where('type', 'expense')->sum('amount'), 2) }}</span>
         </div>
         <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 10px 0;">
         <div class="summary-row" style="margin-top: 15px;">
@@ -263,10 +349,21 @@
         @endif
     </div>
 
-    <div style="margin-top: 50px; text-align: center; color: #9ca3af;">
-        <p>_____________________________________</p>
-        <p>Firma Responsable / Cajero</p>
-        <p style="font-size: 12px; margin-top: 20px;">Generado por Sistema de Gestión de Iglesia el {{ now()->format('d/m/Y H:i:s') }}</p>
+        <table class="footer-table">
+            <tr>
+                <td style="width: 40%;">
+                    <div class="signature-line"></div>
+                    <p class="signature-text">Firma Responsable / Cajero</p>
+                </td>
+                <td style="width: 60%;">
+                    <p class="address-text">
+                        Av. Presidente Antonio Guzmán Fernández<br/>
+                        Jamo Las Vegas, tramo Controba - San Francisco de Macorís<br/>
+                        Tel (809) 697-8028 · RNC 3-30-37238-2
+                    </p>
+                </td>
+            </tr>
+        </table>
     </div>
 
 </body>

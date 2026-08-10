@@ -11,129 +11,187 @@
             margin: 0;
             padding: 20px;
         }
-        .header {
+        .receipt-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
             width: 100%;
-            border-bottom: 2px solid #0B2E6B;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
+            margin: 0 auto;
         }
         .header-table {
             width: 100%;
+            background-color: #0B2E6B;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
             border-collapse: collapse;
         }
         .header-table td {
+            padding: 28px 32px;
             vertical-align: middle;
-            border: none !important;
-            padding: 0 !important;
         }
-        .header-logo {
-            width: 100px;
-            text-align: left;
-        }
-        .header-logo img {
-            max-width: 90px;
-            max-height: 90px;
-            object-fit: contain;
-        }
-        .header-text {
+        .header-icon {
+            width: 52px;
+            height: 52px;
+            background-color: #D4A017;
+            border-radius: 50%;
             text-align: center;
-        }
-        .header-text h1 {
+            line-height: 52px;
             color: #0B2E6B;
-            margin: 0;
             font-size: 26px;
-            font-weight: 900;
-            letter-spacing: 1px;
-        }
-        .header-text h2 {
-            color: #374151;
-            margin: 4px 0 0;
-            font-size: 16px;
             font-weight: bold;
+            display: inline-block;
         }
-        .header-text p.desc {
-            margin: 4px 0 0;
-            color: #6B7280;
+        .header-title-small {
+            margin: 0;
             font-size: 11px;
-        }
-        .header-text p.report-title {
-            margin: 15px 0 0;
-            color: #0B2E6B;
-            font-size: 18px;
-            font-weight: bold;
+            letter-spacing: 1.5px;
+            color: #B7CFC3;
             text-transform: uppercase;
         }
-        .info-section {
-            width: 100%;
-            margin-bottom: 30px;
+        .header-title-large {
+            margin: 2px 0 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #FFFFFF;
         }
-        .info-table {
+        .header-receipt-text {
+            margin: 0;
+            font-size: 11px;
+            color: #B7CFC3;
+            text-align: right;
+        }
+        .header-receipt-number {
+            margin: 2px 0 0;
+            font-size: 16px;
+            font-weight: bold;
+            color: #D4A017;
+            text-align: right;
+        }
+        .body-section {
+            padding: 24px 32px 32px 32px;
+        }
+        .title-table {
             width: 100%;
             border-collapse: collapse;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 20px;
         }
-        .info-table td {
-            padding: 8px 0;
+        .title-table td {
+            padding-bottom: 16px;
+            vertical-align: bottom;
+        }
+        .title-text {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #111827;
+        }
+        .date-text {
+            font-size: 12px;
+            color: #6b7280;
+            text-align: right;
+        }
+        .grid-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 22px;
+        }
+        .grid-table td {
+            width: 50%;
             vertical-align: top;
         }
-        .info-label {
+        .label-text {
+            margin: 0 0 4px;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+        .value-text {
+            margin: 0;
+            font-size: 15px;
             font-weight: bold;
-            color: #555;
-            width: 30%;
+            color: #111827;
         }
-        .info-value {
-            color: #000;
-            border-bottom: 1px dotted #ccc;
-        }
-        .amount-section {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
+        .amount-table {
+            width: 100%;
+            background-color: #f9fafb;
+            border-collapse: collapse;
+            margin-bottom: 24px;
             border-radius: 8px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 40px;
         }
-        .amount-title {
-            font-size: 16px;
-            color: #555;
-            margin-bottom: 10px;
+        .amount-table td {
+            padding: 16px 20px;
+            vertical-align: middle;
+        }
+        .amount-label {
+            font-size: 13px;
+            color: #4b5563;
         }
         .amount-value {
-            font-size: 32px;
+            font-size: 26px;
             font-weight: bold;
             color: #0B2E6B;
+            text-align: right;
         }
-        .signature-section {
+        .details-table {
             width: 100%;
-            margin-bottom: 30px;
-            margin-top: 80px;
+            font-size: 13px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-        .signature-table {
-            width: 100%;
-            text-align: center;
+        .details-table td {
+            padding: 10px 0;
         }
-        .signature-line {
-            width: 80%;
-            margin: 0 auto;
-            border-top: 1px solid #333;
-            padding-top: 5px;
+        .details-label {
+            color: #4b5563;
+            width: 40%;
+        }
+        .details-value {
+            text-align: right;
+            color: #111827;
             font-weight: bold;
         }
-        .footer {
-            margin-top: 50px;
-            text-align: center;
+        .border-top {
+            border-top: 1px solid #e5e7eb;
+        }
+        .footer-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 20px;
+        }
+        .footer-table td {
+            vertical-align: bottom;
+            padding-top: 20px;
+        }
+        .signature-line {
+            width: 150px;
+            border-bottom: 1px solid #d1d5db;
+            height: 28px;
+        }
+        .signature-text {
+            margin: 4px 0 0;
             font-size: 11px;
-            color: #999;
-            border-top: 1px solid #eee;
-            padding-top: 10px;
+            color: #6b7280;
+        }
+        .address-text {
+            margin: 0;
+            font-size: 11px;
+            color: #6b7280;
+            line-height: 1.5;
+            text-align: right;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
+    <div class="receipt-card">
+        <!-- Header -->
         <table class="header-table">
             <tr>
-                <td class="header-logo">
+                <td style="width: 70px;">
                     @php
                         $logoPath = public_path('logo_app.jpeg');
                         $logoData = '';
@@ -144,94 +202,111 @@
                         }
                     @endphp
                     @if($logoData)
-                        <img src="{{ $logoData }}" alt="Logo Parroquia">
+                        <img src="{{ $logoData }}" style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #D4A017; object-fit: cover; background-color: white; vertical-align: middle; display: inline-block;" alt="Logo">
                     @else
-                        <!-- Fallback si no hay logo -->
-                        <div style="width: 80px; height: 80px; background-color: #0B2E6B; color: white; text-align: center; line-height: 80px; font-weight: bold; font-size: 10px; border-radius: 8px;">
-                            LOGO IGLESIA
-                        </div>
+                        <div class="header-icon">+</div>
                     @endif
                 </td>
-                <td class="header-text">
-                    <h1>PARROQUIA</h1>
-                    <h2>Centro de Evangelización</h2>
-                    <p class="desc">Sistema integrado para la gestión de cuadres, intenciones y administración general.</p>
-                    <p class="report-title">RECIBO DE DONACIÓN</p>
-                    <p style="font-size: 12px; color: #666; margin-top: 5px;">
-                        No. {{ str_pad($donation->id, 5, '0', STR_PAD_LEFT) }} | Fecha: {{ $donation->created_at->format('d/m/Y h:i A') }}
-                    </p>
+                <td>
+                    <p class="header-title-small">Centro de evangelización</p>
+                    <p class="header-title-large">Padre Fantino</p>
                 </td>
-                <td style="width: 100px;"></td> <!-- Espaciador -->
-            </tr>
-        </table>
-    </div>
-
-    <div class="info-section">
-        <table class="info-table">
-            <tr>
-                <td class="info-label">Recibido de:</td>
-                <td class="info-value">{{ $donation->donor_name }}</td>
-            </tr>
-            <tr>
-                <td class="info-label">Teléfono:</td>
-                <td class="info-value">{{ $donation->donor_phone ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <td class="info-label">Cédula:</td>
-                <td class="info-value">{{ $donation->donor_cedula ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <td class="info-label">RNC:</td>
-                <td class="info-value">{{ $donation->donor_rnc ?? 'N/A' }}</td>
-            </tr>
-            <tr>
-                <td class="info-label">Concepto:</td>
-                <td class="info-value">{{ $donation->concept }}</td>
-            </tr>
-            <tr>
-                <td class="info-label">Método de Pago:</td>
-                <td class="info-value">{{ $donation->payment_method }}</td>
-            </tr>
-            <tr>
-                <td class="info-label">Tipo de Recibo:</td>
-                <td class="info-value">
-                    @if($donation->with_receipt)
-                        <strong>Válido para Crédito Fiscal (Con Comprobante)</strong>
-                    @else
-                        Consumidor Final (Sin Comprobante)
-                    @endif
+                <td>
+                    <p class="header-receipt-text">Recibo</p>
+                    <p class="header-receipt-number">No. {{ str_pad($donation->id, 5, '0', STR_PAD_LEFT) }}</p>
                 </td>
             </tr>
         </table>
-    </div>
 
-    <div class="amount-section">
-        <div class="amount-title">Monto Recibido</div>
-        <div class="amount-value">RD$ {{ number_format($donation->amount, 2) }}</div>
-    </div>
+        <!-- Body -->
+        <div class="body-section">
+            <table class="title-table">
+                <tr>
+                    <td>
+                        <h1 class="title-text">Comprobante de donación</h1>
+                    </td>
+                    <td class="date-text">
+                        {{ $donation->created_at->format('d M Y, h:i a') }}
+                    </td>
+                </tr>
+            </table>
 
-    <div class="signature-section">
-        <table class="signature-table">
-            <tr>
-                <td style="width: 50%;">
-                    <div class="signature-line">Firma del Donante</div>
-                </td>
-                <td style="width: 50%;">
-                    <div class="signature-line">
-                        Firma Autorizada / Sello
-                        <br>
-                        <span style="font-size: 10px; font-weight: normal;">
-                            {{ $donation->user ? $donation->user->name : 'Administración' }}
-                        </span>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
+            <table class="grid-table">
+                <tr>
+                    <td>
+                        <p class="label-text">Recibido de</p>
+                        <p class="value-text">{{ $donation->donor_name }}</p>
+                    </td>
+                    <td>
+                        <p class="label-text">Concepto</p>
+                        <p class="value-text">{{ $donation->concept }}</p>
+                    </td>
+                </tr>
+            </table>
 
-    <div class="footer">
-        Este documento es un comprobante de donación. ¡Que Dios multiplique su ofrenda!<br>
-        Generado el {{ now()->format('d/m/Y h:i A') }}
+            @if($donation->donor_cedula || $donation->donor_rnc)
+            <table class="grid-table" style="margin-top: -10px;">
+                <tr>
+                    <td>
+                        @if($donation->donor_cedula)
+                            <p class="label-text">Cédula</p>
+                            <p class="value-text">{{ $donation->donor_cedula }}</p>
+                        @endif
+                    </td>
+                    <td>
+                        @if($donation->donor_rnc)
+                            <p class="label-text">RNC</p>
+                            <p class="value-text">{{ $donation->donor_rnc }}</p>
+                        @endif
+                    </td>
+                </tr>
+            </table>
+            @endif
+
+            <table class="amount-table">
+                <tr>
+                    <td class="amount-label">Monto recibido</td>
+                    <td class="amount-value">RD$ {{ number_format($donation->amount, 2) }}</td>
+                </tr>
+            </table>
+
+            <table class="details-table">
+                <tr>
+                    <td class="details-label">Método de pago</td>
+                    <td class="details-value">{{ $donation->payment_method }}</td>
+                </tr>
+                <tr class="border-top">
+                    <td class="details-label">Recibido por</td>
+                    <td class="details-value">{{ $donation->user ? $donation->user->name : 'Administración' }}</td>
+                </tr>
+                <tr class="border-top">
+                    <td class="details-label">Tipo de Recibo</td>
+                    <td class="details-value">
+                        @if($donation->with_receipt)
+                            Válido para Crédito Fiscal
+                        @else
+                            Consumidor Final
+                        @endif
+                    </td>
+                </tr>
+            </table>
+
+            <table class="footer-table">
+                <tr>
+                    <td style="width: 40%;">
+                        <div class="signature-line"></div>
+                        <p class="signature-text">Firma autorizada</p>
+                    </td>
+                    <td style="width: 60%;">
+                        <p class="address-text">
+                            Av. Presidente Antonio Guzmán Fernández<br/>
+                            Jamo Las Vegas, tramo Controba - San Francisco de Macorís<br/>
+                            Tel (809) 697-8028 · RNC 3-30-37238-2
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 
 </body>

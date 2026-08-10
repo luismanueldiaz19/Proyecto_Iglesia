@@ -11,58 +11,7 @@
             margin: 0;
             padding: 20px;
         }
-        .header {
-            width: 100%;
-            border-bottom: 2px solid #0B2E6B;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .header-table td {
-            vertical-align: middle;
-            border: none !important;
-            padding: 0 !important;
-        }
-        .header-logo {
-            width: 100px;
-            text-align: left;
-        }
-        .header-logo img {
-            max-width: 90px;
-            max-height: 90px;
-            object-fit: contain;
-        }
-        .header-text {
-            text-align: center;
-        }
-        .header-text h1 {
-            color: #0B2E6B;
-            margin: 0;
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: 1px;
-        }
-        .header-text h2 {
-            color: #374151;
-            margin: 4px 0 0;
-            font-size: 16px;
-            font-weight: bold;
-        }
-        .header-text p.desc {
-            margin: 4px 0 0;
-            color: #6B7280;
-            font-size: 11px;
-        }
-        .header-text p.report-title {
-            margin: 15px 0 0;
-            color: #0B2E6B;
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
+
         .info-grid {
             width: 100%;
             margin-bottom: 20px;
@@ -155,33 +104,10 @@
 </head>
 <body>
 
-    <div class="header">
-        <table class="header-table">
-            <tr>
-                <td class="header-logo">
-                    @php
-                        $logoPath = public_path('logo_app.jpeg');
-                        $logoData = '';
-                        if(file_exists($logoPath)) {
-                            $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-                            $data = file_get_contents($logoPath);
-                            $logoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                        }
-                    @endphp
-                    @if($logoData)
-                        <img src="{{ $logoData }}" alt="Logo Parroquia">
-                    @endif
-                </td>
-                <td class="header-text">
-                    <h1>PARROQUIA</h1>
-                    <h2>Centro de Evangelización</h2>
-                    <p class="desc">Sistema integrado para la gestión de cuadres, intenciones y administración general.</p>
-                    <p class="report-title">Plantilla de Cuadre de Caja Físico</p>
-                </td>
-                <td style="width: 100px;"></td> <!-- Espaciador -->
-            </tr>
-        </table>
-    </div>
+    @include('pdf.components.header', [
+        'title' => 'Plantilla de Cuadre de Caja Físico'
+    ])
+
 
     <table class="info-grid">
         <tr>
