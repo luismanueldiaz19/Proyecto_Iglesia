@@ -165,8 +165,7 @@
                 @endif
             </td>
             <td>
-                <p class="header-title-small">Centro de evangelización</p>
-                <p class="header-title-large">Padre Fantino</p>
+                <p class="header-title-large" style="margin: 0; font-size: 16px; text-transform: uppercase; line-height: 1.3;">Fundación Centro de Evangelización<br>Padre Fantino</p>
             </td>
             <td>
                 <p class="header-receipt-text">Dashboard Provisionales</p>

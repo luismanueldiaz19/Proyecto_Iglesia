@@ -15,8 +15,7 @@
             @endif
         </td>
         <td style="text-align: center; vertical-align: middle; border: none; padding: 0;">
-            <h1 style="color: #1e3a8a; margin: 0; font-size: 24px; font-weight: 900; letter-spacing: 1.5px; text-transform: uppercase;">Centro de Evangelización</h1>
-            <h2 style="color: #4b5563; margin: 4px 0 0; font-size: 16px; font-weight: bold;">Padre Fantino</h2>
+            <h1 style="color: #1e3a8a; margin: 0; font-size: 20px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase;">Fundación Centro de Evangelización<br>Padre Fantino</h1>
             <p style="margin: 6px 0 0; color: #6b7280; font-size: 11px; line-height: 1.4;">
                 RNC: 3-30-37238-2 | Tel: (809) 697-8028<br>
                 Av. Presidente Antonio Guzmán Fernández, Jamo Las Vegas,<br>

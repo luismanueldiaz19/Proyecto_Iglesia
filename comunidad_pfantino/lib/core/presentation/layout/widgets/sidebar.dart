@@ -63,7 +63,6 @@ class Sidebar extends ConsumerWidget {
           ),
 
           const SizedBox(height: 16),
-
           // Menú Principal
           Expanded(
             child: SingleChildScrollView(
