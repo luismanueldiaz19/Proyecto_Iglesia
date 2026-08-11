@@ -1,7 +1,7 @@
 class AppInfo {
   AppInfo._(); // Prevenir instanciación
 
-  static const String name = 'Centro de Evangelización';
+  static const String name = 'Fundación Centro de Evangelización';
   static const String subtitle = 'Padre Fantino';
   static const String description =
       'Sistema integrado para la gestión de cuadres, intenciones y administración general.';

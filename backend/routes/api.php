@@ -21,8 +21,12 @@ use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\BankAccountController;
 use App\Http\Controllers\Api\BankTransactionController;
 use App\Http\Controllers\Api\BankReconciliationController;
+use App\Http\Controllers\Api\IntentionController;
 
 Route::post('/login', [AuthController::class, 'login']);
+
+// Webhook para Chatbot (público por ahora, se puede asegurar con un API Key después)
+Route::post('/webhook/intentions', [IntentionController::class, 'store']);
 
 // Ruta pública para descargar PDF con URL firmada
 Route::get('/cash-reconciliations/template/download-pdf', [CashReconciliationController::class, 'generateTemplatePdf'])
@@ -112,4 +116,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('bank-accounts', BankAccountController::class);
     Route::apiResource('bank-transactions', BankTransactionController::class);
     Route::apiResource('bank-reconciliations', BankReconciliationController::class);
+
+    // Intenciones
+    Route::get('intentions', [IntentionController::class, 'index']);
+    Route::put('intentions/{id}/approve', [IntentionController::class, 'approve']);
 });
