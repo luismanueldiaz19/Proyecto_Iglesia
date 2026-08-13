@@ -88,10 +88,12 @@ Route::middleware('auth:sanctum')->group(function () {
     // Ingresos y Gastos Provisionales
     Route::get('ingresos-provicionales-chart', [IngresoProvicionalController::class, 'chartData']);
     Route::apiResource('ingresos-provicionales', IngresoProvicionalController::class);
+    Route::post('ingresos-provicionales/preview-import', [IngresoProvicionalController::class, 'previewImportExcel']);
     Route::post('ingresos-provicionales/import', [IngresoProvicionalController::class, 'importExcel']);
     
     Route::get('gastos-provicionales-chart', [GastoProvicionalController::class, 'chartData']);
     Route::apiResource('gastos-provicionales', GastoProvicionalController::class);
+    Route::post('gastos-provicionales/preview-import', [GastoProvicionalController::class, 'previewImportExcel']);
     Route::post('gastos-provicionales/import', [GastoProvicionalController::class, 'importExcel']);
     
     // Dashboard y Reportes

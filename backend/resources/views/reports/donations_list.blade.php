@@ -81,8 +81,8 @@
                     @endif
                 </td>
                 <td class="header-text">
-                    <h1>PARROQUIA</h1>
-                    <h2>Centro de Evangelización</h2>
+                    <h1 style="color: #0B2E6B; margin: 0; font-size: 26px; font-weight: 900; letter-spacing: 1px;">FUNDACION CENTRO DE EVANGELIZACION</h1>
+                    <h2 style="color: #374151; margin: 4px 0 0; font-size: 16px; font-weight: bold;">Padre Fantino</h2>
                     <p class="desc">Sistema integrado para la gestión de cuadres, intenciones y administración general.</p>
                     <p class="report-title">Historial de Donaciones</p>
                 </td>

@@ -61,7 +61,6 @@ class Sidebar extends ConsumerWidget {
               ],
             ),
           ),
-
           const SizedBox(height: 16),
           // Menú Principal
           Expanded(
@@ -203,7 +202,6 @@ class Sidebar extends ConsumerWidget {
               ),
             ),
           ),
-
           // Footer del Sidebar (Perfil de usuario y Logout)
           Container(
             padding: const EdgeInsets.all(16),

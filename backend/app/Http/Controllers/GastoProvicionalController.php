@@ -147,4 +147,23 @@ class GastoProvicionalController extends Controller
             return response()->json(['message' => 'Error en la importación: ' . $e->getMessage()], 400);
         }
     }
+
+    public function previewImportExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ]);
+        
+        try {
+            $import = new \App\Imports\PreviewGastoProvicionalImport();
+            \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+            
+            return response()->json([
+                'data' => $import->parsedData,
+                'total' => $import->totalAmount
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error en la lectura: ' . $e->getMessage()], 400);
+        }
+    }
 }

@@ -10,5 +10,5 @@ class AppInfo {
   static const String address =
       "Av. Presidente Antonio Guzmán Fernande, junumucu Las Vegas, tramo Controba-San Francisco de Macoris";
   static const String phone = "(809) 697-8028";
-  static const String rnc = "3-30-37238-2";
+  static const String rnc = "43-30-37238-2";
 }

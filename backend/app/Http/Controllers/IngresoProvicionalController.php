@@ -139,7 +139,26 @@ class IngresoProvicionalController extends Controller
             Excel::import(new IngresoProvicionalImport($request->user()->id, $request->bank_account_id), $request->file('file'));
             return response()->json(['message' => 'Importación exitosa'], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Error en la importación: ' . $e->getMessage()], 400);
+            return response()->json(['message' => 'Error en la importaciA3n: ' . $e->getMessage()], 400);
+        }
+    }
+
+    public function previewImportExcel(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240',
+        ]);
+        
+        try {
+            $import = new \App\Imports\PreviewIngresoProvicionalImport();
+            \Maatwebsite\Excel\Facades\Excel::import($import, $request->file('file'));
+            
+            return response()->json([
+                'data' => $import->parsedData,
+                'total' => $import->totalAmount
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Error en la lectura: ' . $e->getMessage()], 400);
         }
     }
 }

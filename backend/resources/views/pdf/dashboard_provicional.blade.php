@@ -249,7 +249,7 @@
                     <p class="address-text">
                         Av. Presidente Antonio Guzmán Fernández<br/>
                         Jamo Las Vegas, tramo Controba - San Francisco de Macorís<br/>
-                        Tel (809) 697-8028 · RNC 3-30-37238-2
+                        Tel (809) 697-8028 · RNC 43-30-37238-2
                     </p>
                 </td>
             </tr>

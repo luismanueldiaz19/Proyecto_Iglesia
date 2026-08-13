@@ -17,6 +17,7 @@ import '../widgets/ingresos_table_widget.dart';
 import '../widgets/ingresos_filter_widget.dart';
 import '../widgets/total_summary_widget.dart';
 import '../widgets/nuevo_ingreso_dialog.dart';
+import '../widgets/excel_preview_dialog.dart';
 
 class IngresoProvicionalScreen extends StatefulWidget {
   const IngresoProvicionalScreen({super.key});
@@ -251,6 +252,77 @@ class _IngresoProvicionalScreenState extends State<IngresoProvicionalScreen> {
 
         final prefs = await SharedPreferences.getInstance();
         final token = prefs.getString('api_token');
+
+        // First, get the preview
+        var previewRequest = http.MultipartRequest(
+          'POST',
+          Uri.parse(
+            '${ApiConfig.baseUrl}/ingresos-provicionales/preview-import',
+          ),
+        );
+
+        previewRequest.headers.addAll({
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        });
+
+        if (kIsWeb) {
+          previewRequest.files.add(
+            http.MultipartFile.fromBytes(
+              'file',
+              platformFile.bytes!,
+              filename: platformFile.name,
+            ),
+          );
+        } else {
+          previewRequest.files.add(
+            await http.MultipartFile.fromPath(
+              'file',
+              platformFile.path!,
+              filename: platformFile.name,
+            ),
+          );
+        }
+
+        var previewResponse = await previewRequest.send();
+
+        if (previewResponse.statusCode != 200) {
+          final respStr = await previewResponse.stream.bytesToString();
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error al leer el archivo: $respStr')),
+            );
+            setState(() {
+              _isUploading = false;
+            });
+          }
+          return;
+        }
+
+        final previewBodyStr = await previewResponse.stream.bytesToString();
+        final previewData = jsonDecode(previewBodyStr);
+        final List<dynamic> rows = previewData['data'] ?? [];
+        final double total = (previewData['total'] ?? 0).toDouble();
+
+        if (mounted) {
+          setState(() {
+            _isUploading = false;
+          });
+
+          final bool? confirm = await ExcelPreviewDialog.show(
+            context,
+            rows,
+            total,
+          );
+
+          if (confirm != true) {
+            return; // User cancelled the import
+          }
+
+          setState(() {
+            _isUploading = true;
+          });
+        }
 
         var request = http.MultipartRequest(
           'POST',
