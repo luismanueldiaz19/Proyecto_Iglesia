@@ -34,6 +34,10 @@ Route::get('/cash-reconciliations/template/download-pdf', [CashReconciliationCon
     ->name('cash-reconciliation.template.pdf')
     ->middleware('signed');
 
+Route::get('/cash-reconciliations/all/download-pdf', [CashReconciliationController::class, 'generateAllPdf'])
+    ->name('cash-reconciliation.all.pdf')
+    ->middleware('signed');
+
 Route::get('/cash-reconciliations/{id}/download-pdf', [CashReconciliationController::class, 'generatePdf'])
     ->name('cash-reconciliation.pdf')
     ->middleware('signed');
@@ -42,9 +46,7 @@ Route::get('/donations/{id}/download-pdf', [DonationController::class, 'generate
     ->name('donation.pdf')
     ->middleware('signed');
 
-Route::get('/cash-reconciliations/all/download-pdf', [CashReconciliationController::class, 'generateAllPdf'])
-    ->name('cash-reconciliation.all.pdf')
-    ->middleware('signed');
+
 
 // Rutas protegidas por Sanctum
 Route::middleware('auth:sanctum')->group(function () {
