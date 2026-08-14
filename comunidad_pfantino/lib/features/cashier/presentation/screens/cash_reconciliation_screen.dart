@@ -1,13 +1,13 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
-import 'package:file_picker/file_picker.dart';
+
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/church_colors.dart';
+import '../../../../core/presentation/widgets/custom_text_field.dart';
 import '../../../../core/presentation/widgets/church_confirm_dialog.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../auth/providers/auth_provider.dart';
@@ -30,6 +30,14 @@ class _CashReconciliationScreenState
   double usdRate = 58.0;
   double eurRate = 65.0;
 
+  final TextEditingController _notesController = TextEditingController();
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
+
   @override
   void initState() {
     super.initState();
@@ -50,54 +58,15 @@ class _CashReconciliationScreenState
       final url = await repo.getTemplatePdfUrl(token);
       final uri = Uri.parse(url);
 
-      final response = await http.get(
-        uri,
-        headers: {'Authorization': 'Bearer $token'},
-      );
-
-      if (response.statusCode == 200) {
-        final now = DateTime.now();
-        final timestamp =
-            '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
-
-        String? outputFile = await FilePicker.platform.saveFile(
-          dialogTitle: 'Guardar Plantilla PDF',
-          fileName: 'plantilla_cuadre_caja_$timestamp.pdf',
-          type: FileType.custom,
-          allowedExtensions: ['pdf'],
-          bytes: response.bodyBytes,
-        );
-
-        if (outputFile != null && !kIsWeb) {
-          if (!outputFile.endsWith('.pdf')) {
-            outputFile += '.pdf';
-          }
-          final file = File(outputFile);
-          await file.writeAsBytes(response.bodyBytes);
-        }
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Plantilla PDF descargada exitosamente'),
-            ),
-          );
-        }
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Error al descargar Plantilla: ${response.statusCode}',
-              ),
-            ),
-          );
-        }
+        throw Exception('No se pudo abrir el enlace de la plantilla.');
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al generar Plantilla: $e')),
+          SnackBar(content: Text('Error al abrir la plantilla PDF: $e')),
         );
       }
     }
@@ -454,6 +423,12 @@ class _CashReconciliationScreenState
                   //   ),
                   // ),
                   const Spacer(),
+                  CustomTextField(
+                    controller: _notesController,
+                    labelText: 'Notas u Observaciones (Opcional)',
+                    hintText: 'Ej. Faltante por compra de botellón de agua...',
+                  ),
+                  const SizedBox(height: 16),
 
                   if (state.isLoading)
                     const Center(child: CircularProgressIndicator())
@@ -506,6 +481,9 @@ class _CashReconciliationScreenState
                                 .closeReconciliation(
                                   payloadDenoms,
                                   physicalTotal,
+                                  notes: _notesController.text.trim().isNotEmpty
+                                      ? _notesController.text.trim()
+                                      : null,
                                 );
                             if (context.mounted) {
                               context.pop(); // Volver al dashboard

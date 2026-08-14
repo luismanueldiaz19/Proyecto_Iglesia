@@ -22,6 +22,7 @@ use App\Http\Controllers\Api\BankAccountController;
 use App\Http\Controllers\Api\BankTransactionController;
 use App\Http\Controllers\Api\BankReconciliationController;
 use App\Http\Controllers\Api\IntentionController;
+use App\Http\Controllers\ProfileController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -41,6 +42,11 @@ Route::get('/donations/{id}/download-pdf', [DonationController::class, 'generate
     ->name('donation.pdf')
     ->middleware('signed');
 
+Route::get('/cash-reconciliations/all/download-pdf', [CashReconciliationController::class, 'generateAllPdf'])
+    ->name('cash-reconciliation.all.pdf')
+    ->middleware('signed');
+
+// Rutas protegidas por Sanctum
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     
@@ -49,6 +55,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    // Perfil
+    Route::put('/profile', [ProfileController::class, 'updateProfile']);
+    Route::put('/profile/password', [ProfileController::class, 'changePassword']);
+    Route::post('/profile/photo', [ProfileController::class, 'uploadPhoto']);
+    Route::get('/profile/photo/{filename}', [ProfileController::class, 'getPhoto']);
+    Route::get('/profile/sessions', [ProfileController::class, 'getSessions']);
+    Route::get('/profile/permissions', [ProfileController::class, 'getPermissions']);
 
     // Contabilidad
     Route::get('/accounts', [AccountingAccountController::class, 'index']);

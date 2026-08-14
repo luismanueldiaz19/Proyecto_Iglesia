@@ -213,6 +213,12 @@ class Sidebar extends ConsumerWidget {
             child: Column(
               children: [
                 SidebarItem(
+                  icon: Icons.person_outline_rounded,
+                  title: 'Mi Perfil',
+                  isSelected: currentPath == '/profile',
+                  onTap: () => context.go('/profile'),
+                ),
+                SidebarItem(
                   icon: Icons.logout_rounded,
                   title: 'Cerrar Sesión',
                   onTap: () {

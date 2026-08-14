@@ -1,8 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
-import 'package:file_picker/file_picker.dart' as file_picker;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../../core/network/api_config.dart';
@@ -128,7 +129,7 @@ class AllCashHistoryNotifier extends StateNotifier<AllCashHistoryState> {
       }
 
       final uri = Uri.parse(
-        '${ApiConfig.baseUrl}/cash-reconciliations/all/pdf',
+        '${ApiConfig.baseUrl}/cash-reconciliations/all/pdf-url',
       ).replace(queryParameters: queryParams);
 
       final response = await http.get(
@@ -137,25 +138,18 @@ class AllCashHistoryNotifier extends StateNotifier<AllCashHistoryState> {
       );
 
       if (response.statusCode == 200) {
-        String? outputFile = await file_picker.FilePicker.platform.saveFile(
-          dialogTitle: 'Guardar reporte PDF',
-          fileName: 'historial_cuadres.pdf',
-          type: file_picker.FileType.custom,
-          allowedExtensions: ['pdf'],
-          bytes: response.bodyBytes,
-        );
+        final data = jsonDecode(response.body);
+        final pdfUrl = data['url'];
+        final pdfUri = Uri.parse(pdfUrl);
 
-        if (outputFile != null && !kIsWeb) {
-          if (!outputFile.endsWith('.pdf')) {
-            outputFile += '.pdf';
-          }
-          final file = File(outputFile);
-          await file.writeAsBytes(response.bodyBytes);
-          return outputFile;
+        if (await canLaunchUrl(pdfUri)) {
+          await launchUrl(pdfUri, mode: LaunchMode.externalApplication);
+          return null;
+        } else {
+          throw Exception('No se pudo abrir el enlace del reporte.');
         }
-        return outputFile ?? 'Descargado en Web';
       } else {
-        throw Exception('Error al generar PDF: ${response.statusCode}');
+        throw Exception('Error: ${response.statusCode}');
       }
     } catch (e) {
       state = state.copyWith(error: e.toString());

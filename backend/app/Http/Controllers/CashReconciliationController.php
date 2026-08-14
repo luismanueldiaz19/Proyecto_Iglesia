@@ -163,6 +163,7 @@ class CashReconciliationController extends Controller
     {
         $request->validate([
             'module_id' => 'required|exists:modules,id',
+            'date' => 'nullable|date|before_or_equal:today',
         ]);
 
         $exists = CashReconciliation::where('module_id', $request->module_id)
@@ -175,7 +176,7 @@ class CashReconciliationController extends Controller
 
         $reconciliation = CashReconciliation::create([
             'module_id' => $request->module_id,
-            'date' => now()->toDateString(),
+            'date' => $request->date ?? now()->toDateString(),
             'status' => 'draft',
             'user_id' => $request->user()->id,
         ]);
@@ -191,6 +192,7 @@ class CashReconciliationController extends Controller
             'denominations.*.quantity' => 'required|integer|min:0',
             'denominations.*.total' => 'required|numeric|min:0',
             'total_general' => 'required|numeric|min:0',
+            'notes' => 'nullable|string',
         ]);
 
         return DB::transaction(function () use ($request, $id, $accounting) {
@@ -227,6 +229,7 @@ class CashReconciliationController extends Controller
                     'total_expenses' => $theoreticalExpense,
                     'difference' => $difference,
                     'status' => 'closed',
+                    'notes' => $request->notes,
                 ]);
             } else {
                  $reconciliation->update([
@@ -235,6 +238,7 @@ class CashReconciliationController extends Controller
                     'total_expenses' => $theoreticalExpense,
                     'difference' => $difference,
                     'status' => 'closed',
+                    'notes' => $request->notes,
                 ]);
             }
 

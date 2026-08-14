@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/church_colors.dart';
 import '../../../auth/domain/entities/user_entity.dart';
+import '../../../auth/providers/auth_provider.dart';
 import '../../providers/users_provider.dart';
+import '../../../../core/presentation/widgets/custom_text_field.dart';
+import '../../../../core/presentation/widgets/custom_dropdown_field.dart';
+import '../../../../core/presentation/widgets/primary_button.dart';
 
 class UsersCrudScreen extends ConsumerWidget {
   const UsersCrudScreen({super.key});
@@ -71,6 +75,46 @@ class UsersCrudScreen extends ConsumerWidget {
     );
   }
 
+  void _showProfilePhotoDialog(
+    BuildContext context,
+    String imageUrl,
+    WidgetRef ref,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(16),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                  headers: {
+                    'Authorization':
+                        'Bearer ${ref.read(authProvider.notifier).getToken()}',
+                  },
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: IconButton(
+                  icon: const Icon(Icons.close, color: Colors.white, size: 30),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildUsersTable(
     BuildContext context,
     WidgetRef ref,
@@ -82,7 +126,7 @@ class UsersCrudScreen extends ConsumerWidget {
 
     return SingleChildScrollView(
       child: DataTable(
-        headingRowColor: MaterialStateProperty.all(ChurchColors.background),
+        headingRowColor: WidgetStateProperty.all(ChurchColors.background),
         columns: const [
           DataColumn(label: Text('ID')),
           DataColumn(label: Text('Nombre')),
@@ -94,7 +138,54 @@ class UsersCrudScreen extends ConsumerWidget {
           return DataRow(
             cells: [
               DataCell(Text(user.id?.toString() ?? '-')),
-              DataCell(Text(user.name)),
+              DataCell(
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        if (user.profilePhotoUrl != null) {
+                          _showProfilePhotoDialog(
+                            context,
+                            user.profilePhotoUrl!,
+                            ref,
+                          );
+                        }
+                      },
+                      child: ClipOval(
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          color: ChurchColors.primary,
+                          child: user.profilePhotoUrl != null
+                              ? Image.network(
+                                  user.profilePhotoUrl!,
+                                  fit: BoxFit.cover,
+                                  headers: {
+                                    'Authorization':
+                                        'Bearer ${ref.read(authProvider.notifier).getToken()}',
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const Icon(
+                                      Icons.person,
+                                      size: 20,
+                                      color: Colors.white,
+                                    );
+                                  },
+                                )
+                              : const Icon(
+                                  Icons.person,
+                                  size: 20,
+                                  color: Colors.white,
+                                ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Text(user.name),
+                  ],
+                ),
+              ),
               DataCell(Text(user.username)),
               DataCell(
                 Container(
@@ -133,7 +224,10 @@ class UsersCrudScreen extends ConsumerWidget {
                     ),
                     if (user.role != 'Administrador')
                       IconButton(
-                        icon: const Icon(Icons.delete_rounded, color: Colors.red),
+                        icon: const Icon(
+                          Icons.delete_rounded,
+                          color: Colors.red,
+                        ),
                         onPressed: () => _confirmDelete(context, ref, user),
                         tooltip: 'Eliminar',
                       ),
@@ -305,42 +399,41 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextFormField(
+              CustomTextField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Nombre Completo'),
-                validator: (v) => v!.isEmpty ? 'Requerido' : null,
+                labelText: 'Nombre Completo',
+                prefixIcon: Icons.person,
+                validator: (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
               ),
-              const SizedBox(height: 12),
-              TextFormField(
+              const SizedBox(height: 16),
+              CustomTextField(
                 controller: _usernameController,
-                decoration: const InputDecoration(
-                  labelText: 'Nombre de Usuario',
-                ),
-                validator: (v) => v!.isEmpty ? 'Requerido' : null,
+                labelText: 'Nombre de Usuario',
+                prefixIcon: Icons.alternate_email,
+                validator: (v) => (v == null || v.isEmpty) ? 'Requerido' : null,
               ),
-              const SizedBox(height: 12),
-              TextFormField(
+              const SizedBox(height: 16),
+              CustomTextField(
                 controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: widget.user == null
-                      ? 'Contraseña'
-                      : 'Nueva Contraseña (Opcional)',
-                ),
+                labelText: widget.user == null
+                    ? 'Contraseña'
+                    : 'Nueva Contraseña (Opcional)',
+                prefixIcon: Icons.lock,
                 obscureText: true,
                 validator: (v) {
-                  if (widget.user == null && v!.isEmpty) {
+                  if (widget.user == null && (v == null || v.isEmpty)) {
                     return 'Requerida';
                   }
-                  if (v!.isNotEmpty && v.length < 6) {
+                  if (v != null && v.isNotEmpty && v.length < 6) {
                     return 'Mínimo 6 caracteres';
                   }
                   return null;
                 },
               ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
+              const SizedBox(height: 16),
+              CustomDropdownField<String>(
                 value: _selectedRole,
-                decoration: const InputDecoration(labelText: 'Rol'),
+                labelText: 'Rol',
                 items: const [
                   DropdownMenuItem(
                     value: 'Administrador',
@@ -359,26 +452,18 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        PrimaryButton(
           onPressed: _isLoading ? null : () => Navigator.pop(context),
-          child: const Text('Cancelar'),
+          text: 'Cancelar',
+          isOutlined: true,
+          width: null,
         ),
-        ElevatedButton(
+        PrimaryButton(
           onPressed: _isLoading ? null : _submit,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: ChurchColors.primary,
-            foregroundColor: Colors.white,
-          ),
-          child: _isLoading
-              ? const SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    color: Colors.white,
-                    strokeWidth: 2,
-                  ),
-                )
-              : const Text('Guardar'),
+          text: 'Guardar',
+          isLoading: _isLoading,
+          width: null,
+          icon: Icons.save,
         ),
       ],
     );

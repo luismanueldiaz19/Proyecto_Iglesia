@@ -69,16 +69,9 @@ class AllCashHistoryScreen extends ConsumerWidget {
                     tooltip: 'Generar PDF',
                     onPressed: () async {
                       try {
-                        final outputFile = await ref
+                        await ref
                             .read(allCashHistoryProvider.notifier)
                             .downloadPdf();
-                        if (outputFile != null && context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Reporte guardado en: $outputFile'),
-                            ),
-                          );
-                        }
                       } catch (e) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(

@@ -1,10 +1,8 @@
-import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
-import 'package:file_picker/file_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/theme/church_colors.dart';
 import '../../../../core/presentation/widgets/custom_text_field.dart';
@@ -25,54 +23,15 @@ class CashierDashboardScreen extends ConsumerWidget {
       final url = await repo.getTemplatePdfUrl(token);
       final uri = Uri.parse(url);
 
-      final response = await http.get(
-        uri,
-        headers: {'Authorization': 'Bearer $token'},
-      );
-
-      if (response.statusCode == 200) {
-        // Formatear el nombre del archivo con fecha y hora
-        final cleanName = moduleName.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '_').toLowerCase();
-        
-        final now = DateTime.now();
-        final timestamp = '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}_${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}${now.second.toString().padLeft(2, '0')}';
-
-        String? outputFile = await FilePicker.platform.saveFile(
-          dialogTitle: 'Guardar Plantilla PDF',
-          fileName: 'plantilla_cuadre_${cleanName}_$timestamp.pdf',
-          type: FileType.custom,
-          allowedExtensions: ['pdf'],
-          bytes: response.bodyBytes,
-        );
-
-        if (outputFile != null && !kIsWeb) {
-          if (!outputFile.endsWith('.pdf')) {
-            outputFile += '.pdf';
-          }
-          final file = File(outputFile);
-          await file.writeAsBytes(response.bodyBytes);
-        }
-
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Plantilla PDF descargada exitosamente'),
-            ),
-          );
-        }
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error al descargar Plantilla: ${response.statusCode}'),
-            ),
-          );
-        }
+        throw Exception('No se pudo abrir el enlace de la plantilla.');
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al generar Plantilla: $e')),
+          SnackBar(content: Text('Error al abrir la plantilla PDF: $e')),
         );
       }
     }
@@ -245,8 +204,33 @@ class CashierDashboardScreen extends ConsumerWidget {
                             vertical: 16,
                           ),
                         ),
-                        onPressed: () {
-                          notifier.openReconciliation();
+                        onPressed: () async {
+                          final now = DateTime.now();
+                          final selectedDate = await showDatePicker(
+                            context: context,
+                            initialDate: now,
+                            firstDate: DateTime(2020),
+                            lastDate: now,
+                            helpText: 'SELECCIONA LA FECHA DE APERTURA',
+                            cancelText: 'CANCELAR',
+                            confirmText: 'ABRIR CAJA',
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.light(
+                                    primary: ChurchColors.primary,
+                                    onPrimary: Colors.white,
+                                    onSurface: Colors.black,
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            },
+                          );
+
+                          if (selectedDate != null) {
+                            notifier.openReconciliation(date: selectedDate);
+                          }
                         },
                       ),
                     ],

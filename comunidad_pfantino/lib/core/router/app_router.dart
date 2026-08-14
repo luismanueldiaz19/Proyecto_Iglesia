@@ -24,6 +24,7 @@ import '../../features/users/presentation/screens/users_crud_screen.dart';
 import '../../features/finance/bank/presentation/screens/bank_accounts_screen.dart';
 import '../../features/finance/bank/presentation/screens/bank_account_detail_screen.dart';
 import '../../features/finance/bank/presentation/screens/bank_reconciliation_screen.dart';
+import '../../features/users/presentation/screens/profile_screen.dart';
 import '../presentation/layout/main_layout.dart';
 
 // Clave del navegador raíz
@@ -41,8 +42,16 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isSplash = state.matchedLocation == '/splash';
       final isGoingToLogin = state.matchedLocation == '/login';
 
-      // Si está inicializando la app o comprobando la sesión, mostrar el splash
-      if (authState == AuthState.loading || authState == AuthState.initial) {
+      // Si está inicializando la app, siempre mostrar el splash
+      if (authState == AuthState.initial) {
+        return isSplash ? null : '/splash';
+      }
+
+      // Si está cargando (ej. revisando sesión o haciendo login)
+      if (authState == AuthState.loading) {
+        // Si ya estamos en la pantalla de login, NO queremos ir al splash.
+        // Queremos quedarnos aquí para que se vea el ChurchLoadingDialog.
+        if (isGoingToLogin) return null;
         return isSplash ? null : '/splash';
       }
 
@@ -174,6 +183,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/settings/users',
             builder: (context, state) => const UsersCrudScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
           ),
           // Más rutas irán aquí adentro de ShellRoute
         ],

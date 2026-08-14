@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'username',
         'password',
+        'profile_photo_path',
     ];
 
     /**
@@ -37,6 +38,15 @@ class User extends Authenticatable
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = [
+        'profile_photo_url',
+    ];
+
+    /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
@@ -46,5 +56,15 @@ class User extends Authenticatable
         return [
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the full URL for the user's profile photo.
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        return $this->profile_photo_path 
+            ? url('/api/profile/photo/' . basename($this->profile_photo_path)) 
+            : null;
     }
 }

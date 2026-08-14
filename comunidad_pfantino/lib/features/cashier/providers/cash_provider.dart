@@ -122,15 +122,21 @@ class CashNotifier extends StateNotifier<CashState> {
     }
   }
 
-  Future<void> openReconciliation() async {
+  Future<void> openReconciliation({DateTime? date}) async {
     if (state.selectedModule == null) return;
 
     state = state.copyWith(isLoading: true);
     try {
       final token = await _getToken();
+      String? formattedDate;
+      if (date != null) {
+        formattedDate = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+      }
+
       final reconciliation = await _repository.openCashReconciliation(
         token!,
         state.selectedModule!.id,
+        date: formattedDate,
       );
       state = state.copyWith(
         isLoading: false,
@@ -143,8 +149,9 @@ class CashNotifier extends StateNotifier<CashState> {
 
   Future<void> closeReconciliation(
     List<Map<String, dynamic>> denominations,
-    double totalGeneral,
-  ) async {
+    double totalGeneral, {
+    String? notes,
+  }) async {
     if (state.activeReconciliation == null) return;
 
     state = state.copyWith(isLoading: true);
@@ -155,6 +162,7 @@ class CashNotifier extends StateNotifier<CashState> {
         state.activeReconciliation!.id,
         denominations,
         totalGeneral,
+        notes: notes,
       );
 
       // Una vez cerrado, limpiamos la caja activa

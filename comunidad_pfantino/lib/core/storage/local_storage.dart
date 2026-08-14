@@ -7,6 +7,8 @@ class LocalStorage {
   static const String _keyLoginTimestamp = 'login_timestamp';
   static const String _keyApiToken = 'api_token';
 
+  static const String _keyProfilePhoto = 'profile_photo_url';
+
   final SharedPreferences _prefs;
 
   LocalStorage(this._prefs);
@@ -15,12 +17,18 @@ class LocalStorage {
     String username,
     String name,
     String role,
-    String token,
-  ) async {
+    String token, {
+    String? profilePhotoUrl,
+  }) async {
     await _prefs.setString(_keyUsername, username);
     await _prefs.setString(_keyName, name);
     await _prefs.setString(_keyRole, role);
     await _prefs.setString(_keyApiToken, token);
+    if (profilePhotoUrl != null) {
+      await _prefs.setString(_keyProfilePhoto, profilePhotoUrl);
+    } else {
+      await _prefs.remove(_keyProfilePhoto);
+    }
     await _prefs.setString(
       _keyLoginTimestamp,
       DateTime.now().toIso8601String(),
@@ -32,7 +40,12 @@ class LocalStorage {
     await _prefs.remove(_keyName);
     await _prefs.remove(_keyRole);
     await _prefs.remove(_keyApiToken);
+    await _prefs.remove(_keyProfilePhoto);
     await _prefs.remove(_keyLoginTimestamp);
+  }
+
+  String? getProfilePhotoUrl() {
+    return _prefs.getString(_keyProfilePhoto);
   }
 
   String? getToken() {

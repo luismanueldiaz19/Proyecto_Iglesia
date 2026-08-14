@@ -47,6 +47,7 @@ class UsersRepositoryImpl implements UsersRepository {
           name: json['name'],
           username: json['username'],
           role: role.toString(),
+          profilePhotoUrl: json['profile_photo_url'],
         );
       }).toList();
     } else {
@@ -86,6 +87,7 @@ class UsersRepositoryImpl implements UsersRepository {
         name: data['name'],
         username: data['username'],
         role: userRole.toString(),
+        profilePhotoUrl: data['profile_photo_url'],
       );
     } else {
       final errorData = jsonDecode(response.body);
@@ -126,6 +128,7 @@ class UsersRepositoryImpl implements UsersRepository {
         name: data['name'],
         username: data['username'],
         role: userRole.toString(),
+        profilePhotoUrl: data['profile_photo_url'],
       );
     } else {
       final errorData = jsonDecode(response.body);

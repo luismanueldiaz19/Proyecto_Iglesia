@@ -25,6 +25,7 @@ class CashReconciliation extends Model
         'deposit_date',
         'deposit_amount',
         'deposit_difference',
+        'notes',
     ];
 
     protected $casts = [

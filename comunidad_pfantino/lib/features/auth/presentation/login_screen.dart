@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/presentation/widgets/church_loading_dialog.dart';
 import '../providers/auth_provider.dart';
 import '../../../../core/theme/church_colors.dart';
 import '../../../../core/config/app_info.dart';
@@ -26,10 +27,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     super.dispose();
   }
 
-  void _onLogin() {
-    ref
+  Future<void> _onLogin() async {
+    FocusScope.of(context).unfocus();
+
+    ChurchLoadingDialog.show(
+      context,
+      title: 'Iniciando Sesión',
+      message: 'Verificando credenciales...',
+    );
+
+    // Guardamos referencia al navigator para cerrarlo de forma segura
+    final nav = Navigator.of(context, rootNavigator: true);
+
+    // Retraso artificial para que se pueda apreciar la animación de carga
+    await Future.delayed(const Duration(seconds: 2));
+
+    await ref
         .read(authProvider.notifier)
         .login(_usernameController.text, _passwordController.text);
+
+    if (nav.canPop()) {
+      nav.pop();
+    }
   }
 
   @override
@@ -171,7 +190,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 24),
 
                         // SWITCHER DE LLENADO RÁPIDO (SOLO PARA PRUEBAS) - COMENTADO A PETICIÓN
-                        /*
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
@@ -276,7 +294,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           ),
                         ),
                         const SizedBox(height: 24),
-                        */
 
                         if (authState == AuthState.error)
                           Container(
@@ -324,7 +341,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 24),
+                        const SizedBox(height: 32),
 
                         PrimaryButton(
                           onPressed: authState == AuthState.loading

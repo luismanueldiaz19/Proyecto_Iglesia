@@ -348,6 +348,13 @@
         @endif
     </div>
 
+    @if($reconciliation->notes)
+    <div style="margin-top: 20px; padding: 10px; background-color: #F3F4F6; border-radius: 8px;">
+        <h4 style="margin: 0 0 5px 0; color: #374151; font-size: 14px;">Notas / Observaciones</h4>
+        <p style="margin: 0; color: #4B5563; font-size: 13px;">{{ $reconciliation->notes }}</p>
+    </div>
+    @endif
+
         <table class="footer-table">
             <tr>
                 <td style="width: 40%;">

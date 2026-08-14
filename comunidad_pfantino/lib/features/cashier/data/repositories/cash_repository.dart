@@ -208,12 +208,18 @@ class CashRepository {
 
   Future<CashReconciliationModel> openCashReconciliation(
     String token,
-    int moduleId,
-  ) async {
+    int moduleId, {
+    String? date,
+  }) async {
+    final Map<String, dynamic> body = {'module_id': moduleId};
+    if (date != null) {
+      body['date'] = date;
+    }
+
     final response = await http.post(
       Uri.parse('$_baseUrl/cash-reconciliations'),
       headers: await _getHeaders(token),
-      body: jsonEncode({'module_id': moduleId}),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 201) {
@@ -227,15 +233,21 @@ class CashRepository {
     String token,
     int reconciliationId,
     List<Map<String, dynamic>> denominations,
-    double totalGeneral,
-  ) async {
+    double totalGeneral, {
+    String? notes,
+  }) async {
+    final Map<String, dynamic> body = {
+      'denominations': denominations,
+      'total_general': totalGeneral,
+    };
+    if (notes != null) {
+      body['notes'] = notes;
+    }
+
     final response = await http.post(
       Uri.parse('$_baseUrl/cash-reconciliations/$reconciliationId/close'),
       headers: await _getHeaders(token),
-      body: jsonEncode({
-        'denominations': denominations,
-        'total_general': totalGeneral,
-      }),
+      body: jsonEncode(body),
     );
 
     if (response.statusCode == 200) {

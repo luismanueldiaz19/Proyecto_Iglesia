@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../theme/church_colors.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -10,6 +11,10 @@ class CustomTextField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final void Function(String)? onChanged;
+  final String? Function(String?)? validator;
+  final List<TextInputFormatter>? inputFormatters;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   const CustomTextField({
     super.key,
@@ -21,6 +26,10 @@ class CustomTextField extends StatelessWidget {
     this.obscureText = false,
     this.keyboardType,
     this.onChanged,
+    this.validator,
+    this.inputFormatters,
+    this.readOnly = false,
+    this.onTap,
   });
 
   @override
@@ -31,17 +40,23 @@ class CustomTextField extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: ChurchColors.lightGrey, width: 1.5),
       ),
-      child: TextField(
+      child: TextFormField(
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
         onChanged: onChanged,
+        validator: validator,
+        inputFormatters: inputFormatters,
+        readOnly: readOnly,
+        onTap: onTap,
         decoration: InputDecoration(
           hintText: hintText,
           labelText: labelText,
           prefixText: prefixText,
           hintStyle: const TextStyle(color: ChurchColors.grey, fontSize: 14),
-          prefixIcon: prefixIcon != null ? Icon(prefixIcon, color: ChurchColors.primary, size: 20) : null,
+          prefixIcon: prefixIcon != null
+              ? Icon(prefixIcon, color: ChurchColors.primary, size: 20)
+              : null,
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
             vertical: 16,

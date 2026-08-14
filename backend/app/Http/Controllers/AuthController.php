@@ -34,6 +34,7 @@ class AuthController extends Controller
                 'username' => $user->username,
                 'name' => $user->name,
                 'roles' => $user->getRoleNames(),
+                'profile_photo_url' => $user->profile_photo_url,
             ]
         ]);
     }

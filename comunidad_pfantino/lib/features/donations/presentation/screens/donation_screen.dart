@@ -7,6 +7,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
 import '../../../../core/theme/church_colors.dart';
+import '../../../../core/presentation/widgets/custom_text_field.dart';
+import '../../../../core/presentation/widgets/custom_dropdown_field.dart';
+import '../../../../core/presentation/widgets/primary_button.dart';
 import '../../providers/donation_provider.dart';
 
 class DonationScreen extends ConsumerStatefulWidget {
@@ -154,27 +157,22 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: TextFormField(
+                          child: CustomTextField(
                             controller: _donorNameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nombre del Donante *',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) =>
-                                v!.isEmpty ? 'Campo requerido' : null,
+                            labelText: 'Nombre del Donante *',
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? 'Campo requerido'
+                                : null,
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: TextFormField(
+                          child: CustomTextField(
                             controller: _donorPhoneController,
                             inputFormatters: [_phoneFormatter],
                             keyboardType: TextInputType.phone,
-                            decoration: const InputDecoration(
-                              labelText: 'Teléfono',
-                              hintText: '809-000-0000',
-                              border: OutlineInputBorder(),
-                            ),
+                            labelText: 'Teléfono',
+                            hintText: '809-000-0000',
                           ),
                         ),
                       ],
@@ -183,22 +181,16 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: TextFormField(
+                          child: CustomTextField(
                             controller: _donorCedulaController,
-                            decoration: const InputDecoration(
-                              labelText: 'Cédula',
-                              border: OutlineInputBorder(),
-                            ),
+                            labelText: 'Cédula',
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
-                          child: TextFormField(
+                          child: CustomTextField(
                             controller: _donorRncController,
-                            decoration: const InputDecoration(
-                              labelText: 'RNC',
-                              border: OutlineInputBorder(),
-                            ),
+                            labelText: 'RNC',
                           ),
                         ),
                       ],
@@ -208,14 +200,12 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                       children: [
                         Expanded(
                           flex: 2,
-                          child: TextFormField(
+                          child: CustomTextField(
                             controller: _conceptController,
-                            decoration: const InputDecoration(
-                              labelText: 'Concepto de la Donación *',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) =>
-                                v!.isEmpty ? 'Campo requerido' : null,
+                            labelText: 'Concepto de la Donación *',
+                            validator: (v) => (v == null || v.isEmpty)
+                                ? 'Campo requerido'
+                                : null,
                           ),
                         ),
                       ],
@@ -225,7 +215,14 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                       children: [
                         Expanded(
                           flex: 1,
-                          child: InkWell(
+                          child: CustomTextField(
+                            controller: TextEditingController(
+                              text: _selectedDate == null
+                                  ? 'Hoy (Por defecto)'
+                                  : '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}',
+                            ),
+                            labelText: 'Fecha de Donación',
+                            readOnly: true,
                             onTap: () async {
                               final date = await showDatePicker(
                                 context: context,
@@ -237,34 +234,21 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                                 setState(() => _selectedDate = date);
                               }
                             },
-                            child: InputDecorator(
-                              decoration: const InputDecoration(
-                                labelText: 'Fecha de Donación',
-                                border: OutlineInputBorder(),
-                              ),
-                              child: Text(
-                                _selectedDate == null
-                                    ? 'Hoy (Por defecto)'
-                                    : '${_selectedDate!.day.toString().padLeft(2, '0')}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.year}',
-                              ),
-                            ),
                           ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
                           flex: 1,
-                          child: TextFormField(
+                          child: CustomTextField(
                             controller: _amountController,
-                            decoration: const InputDecoration(
-                              labelText: 'Monto *',
-                              border: OutlineInputBorder(),
-                              prefixText: 'RD\$ ',
-                            ),
+                            labelText: 'Monto *',
+                            prefixText: 'RD\$ ',
                             keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
                             validator: (v) {
-                              if (v!.isEmpty) return 'Campo requerido';
+                              if (v == null || v.isEmpty)
+                                return 'Campo requerido';
                               if (double.tryParse(v) == null) {
                                 return 'Monto inválido';
                               }
@@ -278,12 +262,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: DropdownButtonFormField<String>(
+                          child: CustomDropdownField<String>(
                             value: _paymentMethod,
-                            decoration: const InputDecoration(
-                              labelText: 'Método de Pago',
-                              border: OutlineInputBorder(),
-                            ),
+                            labelText: 'Método de Pago',
                             items: const [
                               DropdownMenuItem(
                                 value: 'Efectivo',
@@ -302,8 +283,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                                 child: Text('Tarjeta'),
                               ),
                             ],
-                            onChanged: (v) =>
-                                setState(() => _paymentMethod = v!),
+                            onChanged: (v) {
+                              if (v != null) {
+                                setState(() => _paymentMethod = v);
+                              }
+                            },
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -319,29 +303,11 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                       ],
                     ),
                     const SizedBox(height: 32),
-                    SizedBox(
-                      height: 50,
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ChurchColors.primary,
-                          foregroundColor: Colors.white,
-                        ),
-                        onPressed: isLoading ? null : _submit,
-                        icon: isLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
-                              )
-                            : const Icon(Icons.print),
-                        label: const Text(
-                          'Registrar e Imprimir Recibo',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ),
+                    PrimaryButton(
+                      onPressed: isLoading ? null : _submit,
+                      text: 'Registrar e Imprimir Recibo',
+                      isLoading: isLoading,
+                      icon: Icons.print,
                     ),
                   ],
                 ),
