@@ -13,7 +13,11 @@ import '../../providers/cash_provider.dart';
 class CashierDashboardScreen extends ConsumerWidget {
   const CashierDashboardScreen({super.key});
 
-  Future<void> _openTemplatePdf(BuildContext context, WidgetRef ref, String moduleName) async {
+  Future<void> _openTemplatePdf(
+    BuildContext context,
+    WidgetRef ref,
+    String moduleName,
+  ) async {
     try {
       final repo = ref.read(cashRepositoryProvider);
       final token = ref.read(authProvider.notifier).getToken();
@@ -97,7 +101,11 @@ class CashierDashboardScreen extends ConsumerWidget {
                           icon: const Icon(Icons.print),
                           tooltip: 'Imprimir Plantilla',
                           color: ChurchColors.primary,
-                          onPressed: () => _openTemplatePdf(context, ref, state.selectedModule!.name),
+                          onPressed: () => _openTemplatePdf(
+                            context,
+                            ref,
+                            state.selectedModule!.name,
+                          ),
                         ),
                       ],
                     ],
@@ -296,11 +304,32 @@ class CashierDashboardScreen extends ConsumerWidget {
                               //       context: context,
                               //       builder: (_) => _AddTransactionDialog(
                               //         notifier: notifier,
+                              //         transactionType: 'income',
                               //       ),
                               //     );
                               //   },
                               // ),
-                              // const SizedBox(width: 16),
+                              // const SizedBox(width: 8),
+                              OutlinedButton.icon(
+                                icon: const Icon(
+                                  Icons.remove,
+                                  color: Colors.red,
+                                ),
+                                label: const Text(
+                                  'Registrar Gasto',
+                                  style: TextStyle(color: Colors.red),
+                                ),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => _AddTransactionDialog(
+                                      notifier: notifier,
+                                      transactionType: 'expense',
+                                    ),
+                                  );
+                                },
+                              ),
+                              const SizedBox(width: 16),
                               ElevatedButton.icon(
                                 icon: const Icon(Icons.calculate_rounded),
                                 label: const Text('Cuadrar y Cerrar Caja'),
@@ -390,7 +419,11 @@ class CashierDashboardScreen extends ConsumerWidget {
 
 class _AddTransactionDialog extends StatefulWidget {
   final CashNotifier notifier;
-  const _AddTransactionDialog({required this.notifier});
+  final String transactionType; // 'income' or 'expense'
+  const _AddTransactionDialog({
+    required this.notifier,
+    required this.transactionType,
+  });
 
   @override
   State<_AddTransactionDialog> createState() => _AddTransactionDialogState();
@@ -425,8 +458,10 @@ class _AddTransactionDialogState extends State<_AddTransactionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isIncome = widget.transactionType == 'income';
+
     return AlertDialog(
-      title: const Text('Registrar Ingreso'),
+      title: Text(isIncome ? 'Registrar Ingreso' : 'Registrar Gasto'),
       content: SizedBox(
         width: 400,
         child: Column(
@@ -494,7 +529,7 @@ class _AddTransactionDialogState extends State<_AddTransactionDialog> {
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
-            backgroundColor: ChurchColors.primary,
+            backgroundColor: isIncome ? ChurchColors.primary : Colors.red,
             foregroundColor: Colors.white,
           ),
           onPressed: () {
@@ -512,11 +547,13 @@ class _AddTransactionDialogState extends State<_AddTransactionDialog> {
                     '[$symbol${rawAmount.toStringAsFixed(2)} @ $rate] $finalDesc';
               }
 
-              // 15 es el ID temporal de la cuenta "Diezmos/Ofrendas" (Ingreso)
+              // ID 15 para Ingresos, ID 16 para Gastos (ejemplo genérico)
+              final accountId = isIncome ? 15 : 16;
+
               widget.notifier.addTransaction(
-                15,
+                accountId,
                 finalAmount,
-                'income',
+                widget.transactionType,
                 finalDesc,
               );
               Navigator.pop(context);

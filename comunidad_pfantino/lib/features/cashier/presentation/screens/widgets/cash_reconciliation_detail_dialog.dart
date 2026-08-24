@@ -388,31 +388,94 @@ class _CashReconciliationDetailDialogState
                       ),
                     ),
                     const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Total Gastos:'),
-                        Text(
-                          '\$${_reconciliation!.totalExpenses.toStringAsFixed(2)}',
-                        ),
-                      ],
-                    ),
-                    const Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Efectivo Físico Contado:',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          '\$${_reconciliation!.totalGeneral.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ],
+                    Builder(
+                      builder: (context) {
+                        final totalIngresos = _reconciliation!.transactions
+                            .where((t) => t.type == 'income')
+                            .fold(0.0, (sum, t) => sum + t.amount);
+                        final expected = totalIngresos - _reconciliation!.totalExpenses;
+                        final difference = _reconciliation!.difference;
+                        final isFaltante = difference < 0;
+                        final isSobrante = difference > 0;
+
+                        return Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Ingresos Registrados:'),
+                                Text(
+                                  '\$${totalIngresos.toStringAsFixed(2)}',
+                                  style: const TextStyle(color: Colors.green),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Total Gastos:'),
+                                Text(
+                                  '\$${_reconciliation!.totalExpenses.toStringAsFixed(2)}',
+                                  style: const TextStyle(color: Colors.red),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text('Saldo Teórico Esperado:'),
+                                Text(
+                                  '\$${expected.toStringAsFixed(2)}',
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                            const Divider(),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Efectivo Físico Contado:',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                Text(
+                                  '\$${_reconciliation!.totalGeneral.toStringAsFixed(2)}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            if (isFaltante || isSobrante) ...[
+                              const SizedBox(height: 8),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    isFaltante ? 'Faltante en Caja:' : 'Sobrante en Caja:',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: isFaltante ? Colors.red : Colors.orange,
+                                    ),
+                                  ),
+                                  Text(
+                                    '\$${difference.abs().toStringAsFixed(2)}',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: isFaltante ? Colors.red : Colors.orange,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ],
+                        );
+                      }
                     ),
                     if (_reconciliation!.isDeposited) ...[
                       const Divider(),

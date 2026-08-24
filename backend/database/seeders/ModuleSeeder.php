@@ -10,7 +10,7 @@ class ModuleSeeder extends Seeder
     public function run(): void
     {
         $modules = [
-            ['name' => 'Caja General', 'is_active' => true],
+            ['name' => 'Caja General', 'is_active' => false],
             ['name' => 'Intenciones', 'is_active' => true],
             ['name' => 'Ofrenda', 'is_active' => true],
             ['name' => 'Tienda', 'is_active' => true],
