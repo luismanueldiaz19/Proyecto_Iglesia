@@ -5,6 +5,7 @@ class DashboardFilterWidget extends StatelessWidget {
   final Function(String) onQuickFilterChanged;
   final VoidCallback onDateRangeSelected;
   final Function(int) onMonthSelected;
+  final VoidCallback refresh;
 
   const DashboardFilterWidget({
     super.key,
@@ -12,6 +13,7 @@ class DashboardFilterWidget extends StatelessWidget {
     required this.onQuickFilterChanged,
     required this.onDateRangeSelected,
     required this.onMonthSelected,
+    required this.refresh,
   });
 
   @override
@@ -19,6 +21,12 @@ class DashboardFilterWidget extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        InkWell(
+          onTap: refresh,
+          borderRadius: BorderRadius.circular(10),
+          child: _buildIconContainer(Icons.refresh, Colors.purple.shade700),
+        ),
+        const SizedBox(width: 8),
         // Quick filter
         Tooltip(
           message: 'Filtro rápido ($selectedQuickFilter)',
@@ -28,44 +36,57 @@ class DashboardFilterWidget extends StatelessWidget {
               tooltip: '',
               offset: const Offset(0, 48),
               onSelected: onQuickFilterChanged,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              itemBuilder: (BuildContext context) => [
-                'Hoy',
-                'Ayer',
-                'Esta semana',
-                'Este mes',
-                'Mes pasado',
-                'Este año',
-                'Personalizado',
-              ].map((String value) {
-                return PopupMenuItem<String>(
-                  value: value,
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      fontWeight: selectedQuickFilter == value ? FontWeight.bold : FontWeight.normal,
-                      color: selectedQuickFilter == value ? Colors.teal.shade700 : Colors.black87,
-                    ),
-                  ),
-                );
-              }).toList(),
-              child: _buildIconContainer(Icons.filter_alt_outlined, Colors.teal.shade600),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              itemBuilder: (BuildContext context) =>
+                  [
+                    'Hoy',
+                    'Ayer',
+                    'Esta semana',
+                    'Este mes',
+                    'Mes pasado',
+                    'Este año',
+                    'Personalizado',
+                  ].map((String value) {
+                    return PopupMenuItem<String>(
+                      value: value,
+                      child: Text(
+                        value,
+                        style: TextStyle(
+                          fontWeight: selectedQuickFilter == value
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: selectedQuickFilter == value
+                              ? Colors.teal.shade700
+                              : Colors.black87,
+                        ),
+                      ),
+                    );
+                  }).toList(),
+              child: _buildIconContainer(
+                Icons.filter_alt_outlined,
+                Colors.teal.shade600,
+              ),
             ),
           ),
         ),
         const SizedBox(width: 8),
-        
+
         // Date range
         Tooltip(
           message: 'Seleccionar rango de fechas',
           child: InkWell(
             onTap: onDateRangeSelected,
             borderRadius: BorderRadius.circular(10),
-            child: _buildIconContainer(Icons.date_range_outlined, Colors.blue.shade700),
+            child: _buildIconContainer(
+              Icons.date_range_outlined,
+              Colors.blue.shade700,
+            ),
           ),
         ),
         const SizedBox(width: 8),
-        
+
         // Month filter
         Tooltip(
           message: 'Buscar por mes',
@@ -75,7 +96,9 @@ class DashboardFilterWidget extends StatelessWidget {
               tooltip: '',
               offset: const Offset(0, 48),
               onSelected: onMonthSelected,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
               itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
                 const PopupMenuItem<int>(value: 1, child: Text('Enero')),
                 const PopupMenuItem<int>(value: 2, child: Text('Febrero')),
@@ -90,7 +113,10 @@ class DashboardFilterWidget extends StatelessWidget {
                 const PopupMenuItem<int>(value: 11, child: Text('Noviembre')),
                 const PopupMenuItem<int>(value: 12, child: Text('Diciembre')),
               ],
-              child: _buildIconContainer(Icons.calendar_month_outlined, Colors.blue.shade700),
+              child: _buildIconContainer(
+                Icons.calendar_month_outlined,
+                Colors.blue.shade700,
+              ),
             ),
           ),
         ),
@@ -114,9 +140,7 @@ class DashboardFilterWidget extends StatelessWidget {
           ),
         ],
       ),
-      child: Center(
-        child: Icon(icon, color: color, size: 20),
-      ),
+      child: Center(child: Icon(icon, color: color, size: 20)),
     );
   }
 }

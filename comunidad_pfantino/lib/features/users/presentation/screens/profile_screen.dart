@@ -337,7 +337,7 @@ class ProfileScreen extends ConsumerWidget {
                       end: Alignment.bottomCenter,
                       colors: [
                         Colors.transparent,
-                        Colors.black.withOpacity(0.8),
+                        Colors.black.withValues(alpha: 0.8),
                       ],
                     ),
                   ),
@@ -487,10 +487,10 @@ class ProfileScreen extends ConsumerWidget {
                               vertical: 4,
                             ),
                             decoration: BoxDecoration(
-                              color: ChurchColors.primary.withOpacity(0.9),
+                              color: ChurchColors.primary.withValues(alpha: 0.9),
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
-                                color: ChurchColors.primary.withOpacity(0.5),
+                                color: ChurchColors.primary.withValues(alpha: 0.5),
                               ),
                             ),
                             child: Text(
@@ -629,10 +629,10 @@ class ProfileScreen extends ConsumerWidget {
                                 return Chip(
                                   label: Text(permission),
                                   backgroundColor: ChurchColors.primary
-                                      .withOpacity(0.05),
+                                      .withValues(alpha: 0.05),
                                   side: BorderSide(
-                                    color: ChurchColors.primary.withOpacity(
-                                      0.2,
+                                    color: ChurchColors.primary.withValues(
+                                      alpha: 0.2,
                                     ),
                                   ),
                                 );

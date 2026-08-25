@@ -125,8 +125,9 @@ class DashboardChartWidget extends StatelessWidget {
                     sideTitles: SideTitles(
                       showTitles: true,
                       getTitlesWidget: (value, meta) {
-                        if (value < 0 || value >= chartData.length)
+                        if (value < 0 || value >= chartData.length) {
                           return const SizedBox.shrink();
+                        }
                         
                         final dataItem = chartData[value.toInt()];
                         final mesStr = dataItem['mes'].toString();

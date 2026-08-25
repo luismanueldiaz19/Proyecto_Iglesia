@@ -261,7 +261,7 @@ class _NuevoIngresoDialogState extends State<NuevoIngresoDialog> {
               else
                 DropdownButtonFormField<int>(
                   isExpanded: true,
-                  value: _selectedBankAccountId,
+                  initialValue: _selectedBankAccountId,
                   decoration: InputDecoration(
                     labelText: 'Destino (Cuenta o Caja)',
                     hintText: 'Seleccione dónde ingresó el dinero',

@@ -316,13 +316,17 @@
 
         <div class="summary-box">
             <div class="summary-row">
-                <span class="label">Ingresos Calculados:</span>
-                <span class="val">${{ number_format($reconciliation->transactions->where('type', 'income')->sum('amount'), 2) }}</span>
+                <span class="label">Cuadre:</span>
+                <span class="val">${{ number_format($reconciliation->total_general, 2) }}</span>
             </div>
             <div class="summary-row">
-                <span class="label">Gastos Calculados:</span>
-                <span class="val">-${{ number_format($reconciliation->transactions->where('type', 'expense')->sum('amount'), 2) }}</span>
-        </div>
+                <span class="label">Gastos Registrados:</span>
+                <span class="val">-${{ number_format($reconciliation->total_expenses, 2) }}</span>
+            </div>
+            <div class="summary-row">
+                <span class="label">Neto:</span>
+                <span class="val">${{ number_format($reconciliation->total_general - $reconciliation->total_expenses, 2) }}</span>
+            </div>
         <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 10px 0;">
         <div class="summary-row" style="margin-top: 15px;">
             <span class="label">Efectivo Físico Contado (Ingreso del Turno):</span>
@@ -335,7 +339,7 @@
             <span class="val total" style="color: #10B981;">${{ number_format($reconciliation->deposit_amount, 2) }}</span>
         </div>
         <div class="summary-row" style="margin-top: 15px;">
-            <span class="label">Diferencia Final (Depósito vs Físico):</span>
+            <span class="label">Diferencia Final (Depósito vs Neto):</span>
             <span class="val 
                 @if($reconciliation->deposit_difference == 0) status-perfect 
                 @elseif($reconciliation->deposit_difference < 0) status-faltante 

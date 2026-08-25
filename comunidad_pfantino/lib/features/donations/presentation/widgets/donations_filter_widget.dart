@@ -35,7 +35,7 @@ class DonationsFilterWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             blurRadius: 10,
             spreadRadius: 2,
             offset: const Offset(0, 4),
@@ -281,7 +281,7 @@ class DonationsFilterWidget extends StatelessWidget {
                       Container(
                         width: 1,
                         height: 30,
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha: 0.3),
                       ),
                       Theme(
                         data: Theme.of(context).copyWith(),

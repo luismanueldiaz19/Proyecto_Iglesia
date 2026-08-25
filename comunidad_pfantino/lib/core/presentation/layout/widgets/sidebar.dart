@@ -39,7 +39,7 @@ class Sidebar extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         AppInfo.name,
                         style: TextStyle(
                           fontSize: 18,
@@ -48,7 +48,7 @@ class Sidebar extends ConsumerWidget {
                           letterSpacing: 1,
                         ),
                       ),
-                      const Text(
+                      Text(
                         AppInfo.subtitle,
                         style: TextStyle(
                           fontSize: 11,

@@ -126,7 +126,7 @@ class _BankAccountFormDialogState extends State<BankAccountFormDialog> {
                 ),
                 const SizedBox(height: 24),
                 DropdownButtonFormField<int>(
-                  value: _selectedBankId,
+                  initialValue: _selectedBankId,
                   decoration: const InputDecoration(
                     labelText: 'Institución Bancaria',
                     border: OutlineInputBorder(),
@@ -166,7 +166,7 @@ class _BankAccountFormDialogState extends State<BankAccountFormDialog> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: DropdownButtonFormField<String>(
-                        value: _currency,
+                        initialValue: _currency,
                         decoration: const InputDecoration(
                           labelText: 'Moneda',
                           border: OutlineInputBorder(),
@@ -185,7 +185,7 @@ class _BankAccountFormDialogState extends State<BankAccountFormDialog> {
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<int>(
-                  value: _selectedAccountingAccountId,
+                  initialValue: _selectedAccountingAccountId,
                   decoration: const InputDecoration(
                     labelText: 'Cuenta Contable (Enlace)',
                     border: OutlineInputBorder(),

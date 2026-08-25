@@ -1,8 +1,5 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 
@@ -66,7 +63,6 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
           date: _selectedDate,
         );
 
-    print(donationId);
     if (donationId != null && mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -247,8 +243,9 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                               decimal: true,
                             ),
                             validator: (v) {
-                              if (v == null || v.isEmpty)
+                              if (v == null || v.isEmpty) {
                                 return 'Campo requerido';
+                              }
                               if (double.tryParse(v) == null) {
                                 return 'Monto inválido';
                               }

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:url_launcher/url_launcher.dart';
 
@@ -13,6 +12,8 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../providers/cash_provider.dart';
 import '../../data/models/denomination_model.dart';
+import 'widgets/cash_reconciliation_detail_dialog.dart';
+import 'widgets/reconciliation_detail/add_transaction_dialog.dart';
 
 class CashReconciliationScreen extends ConsumerStatefulWidget {
   const CashReconciliationScreen({super.key});
@@ -29,6 +30,8 @@ class _CashReconciliationScreenState
 
   double usdRate = 58.0;
   double eurRate = 65.0;
+
+  bool _hasExpenses = false;
 
   final TextEditingController _notesController = TextEditingController();
 
@@ -120,7 +123,7 @@ class _CashReconciliationScreenState
     final physicalTotal = _calculateTotal(state.denominations);
     final difference = physicalTotal - theoreticalTotal;
 
-    final isSobrante = difference > 0;
+    // final isSobrante = difference > 0;
     final isFaltante = difference < 0;
     final isPerfect = difference == 0;
 
@@ -159,9 +162,11 @@ class _CashReconciliationScreenState
                       Expanded(
                         child: TextFormField(
                           initialValue: usdRate.toString(),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Tasa USD',
                             prefixText: 'RD\$ ',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
@@ -177,9 +182,11 @@ class _CashReconciliationScreenState
                       Expanded(
                         child: TextFormField(
                           initialValue: eurRate.toString(),
-                          decoration: const InputDecoration(
+                          decoration: InputDecoration(
                             labelText: 'Tasa EUR',
                             prefixText: 'RD\$ ',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                           ),
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
@@ -250,25 +257,39 @@ class _CashReconciliationScreenState
                                   final symbol = _getCurrencySymbol(d.currency);
 
                                   return Card(
-                                    margin: const EdgeInsets.only(bottom: 8),
+                                    elevation: 0,
+                                    margin: const EdgeInsets.only(bottom: 12),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                      side: BorderSide(
+                                          color: Colors.grey.withValues(alpha: 0.2)),
+                                    ),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
+                                        horizontal: 20,
+                                        vertical: 12,
                                       ),
                                       child: Row(
                                         children: [
-                                          Icon(
-                                            d.type == 'bill'
-                                                ? Icons.money
-                                                : Icons.monetization_on,
-                                            color: ChurchColors.primary,
+                                          Container(
+                                            padding: const EdgeInsets.all(8),
+                                            decoration: BoxDecoration(
+                                              color: ChurchColors.primary
+                                                  .withValues(alpha: 0.1),
+                                              borderRadius: BorderRadius.circular(8),
+                                            ),
+                                            child: Icon(
+                                              d.type == 'bill'
+                                                  ? Icons.money
+                                                  : Icons.monetization_on,
+                                              color: ChurchColors.primary,
+                                            ),
                                           ),
                                           const SizedBox(width: 16),
                                           SizedBox(
                                             width: 100,
                                             child: Text(
-                                              '$symbol${d.value.toStringAsFixed(0)}',
+                                              '$symbol${CurrencyFormatter.formatAmount(d.value)}',
                                               style: const TextStyle(
                                                 fontSize: 18,
                                                 fontWeight: FontWeight.bold,
@@ -294,7 +315,7 @@ class _CashReconciliationScreenState
                                                   MainAxisAlignment.center,
                                               children: [
                                                 Text(
-                                                  '= $symbol${rawTotal.toStringAsFixed(2)}',
+                                                  '= $symbol${CurrencyFormatter.formatAmount(rawTotal)}',
                                                   textAlign: TextAlign.right,
                                                   style: const TextStyle(
                                                     fontSize: 18,
@@ -304,7 +325,7 @@ class _CashReconciliationScreenState
                                                 ),
                                                 if (d.currency != 'DOP')
                                                   Text(
-                                                    'RD\$${convertedTotal.toStringAsFixed(2)}',
+                                                    'RD\$${CurrencyFormatter.formatAmount(convertedTotal)}',
                                                     style: const TextStyle(
                                                       fontSize: 12,
                                                       color: ChurchColors.grey,
@@ -356,6 +377,64 @@ class _CashReconciliationScreenState
                     theoreticalExpense,
                     Colors.red,
                   ),
+                  const SizedBox(height: 8),
+                  Material(
+                    color: Colors.transparent,
+                    child: SwitchListTile(
+                      title: const Text(
+                        '¿Hubo gastos en este turno?',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      value: _hasExpenses,
+                      onChanged: (val) {
+                        setState(() {
+                          _hasExpenses = val;
+                        });
+                      },
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ),
+                  if (_hasExpenses) ...[
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: OutlinedButton.icon(
+                        icon: const Icon(Icons.add, size: 20),
+                        label: const Text(
+                          'Registrar Gasto',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          side: BorderSide(
+                            color: Colors.red.withValues(alpha: 0.5),
+                          ),
+                        ),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => AddTransactionDialog(
+                              reconciliationId: active.id,
+                            ),
+                          ).then((_) {
+                            ref
+                                .read(cashProvider.notifier)
+                                .checkActiveReconciliation(active.moduleId);
+                          });
+                        },
+                      ),
+                    ),
+                  ],
                   const Divider(height: 32),
 
                   _buildSummaryRow(
@@ -463,10 +542,12 @@ class _CashReconciliationScreenState
                                   (x) => x.id == id,
                                 );
                                 double convertedTotal = q * d.value;
-                                if (d.currency == 'USD')
+                                if (d.currency == 'USD') {
                                   convertedTotal *= usdRate;
-                                if (d.currency == 'EUR')
+                                }
+                                if (d.currency == 'EUR') {
                                   convertedTotal *= eurRate;
+                                }
 
                                 payloadDenoms.add({
                                   'id': id,
@@ -589,43 +670,71 @@ class _DenominationCounterState extends State<_DenominationCounter> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        IconButton(
-          icon: const Icon(Icons.remove_circle_outline),
-          onPressed: widget.initialValue > 0
-              ? () {
-                  widget.onChanged(widget.initialValue - 1);
-                }
-              : null,
-        ),
-        SizedBox(
-          width: 60,
-          child: TextField(
-            controller: _controller,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            decoration: const InputDecoration(
-              isDense: true,
-              contentPadding: EdgeInsets.symmetric(vertical: 8),
-              border: OutlineInputBorder(),
+    return Container(
+      decoration: BoxDecoration(
+        color: ChurchColors.background,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            InkWell(
+              onTap: widget.initialValue > 0
+                  ? () => widget.onChanged(widget.initialValue - 1)
+                  : null,
+              borderRadius:
+                  const BorderRadius.horizontal(left: Radius.circular(8)),
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Icon(
+                  Icons.remove,
+                  size: 20,
+                  color: widget.initialValue > 0
+                      ? ChurchColors.black
+                      : Colors.grey,
+                ),
+              ),
             ),
-            onChanged: (val) {
-              final newVal = int.tryParse(val) ?? 0;
-              widget.onChanged(newVal);
-            },
-          ),
+            Container(
+              width: 50,
+              alignment: Alignment.center,
+              child: TextField(
+                controller: _controller,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.bold),
+                decoration: const InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                  border: InputBorder.none,
+                ),
+                onChanged: (val) {
+                  final newVal = int.tryParse(val) ?? 0;
+                  widget.onChanged(newVal);
+                },
+              ),
+            ),
+            InkWell(
+              onTap: () => widget.onChanged(widget.initialValue + 1),
+              borderRadius:
+                  const BorderRadius.horizontal(right: Radius.circular(8)),
+              child: const Padding(
+                padding: EdgeInsets.all(10.0),
+                child: Icon(
+                  Icons.add,
+                  size: 20,
+                  color: ChurchColors.primary,
+                ),
+              ),
+            ),
+          ],
         ),
-        IconButton(
-          icon: const Icon(Icons.add_circle_outline),
-          onPressed: () {
-            widget.onChanged(widget.initialValue + 1);
-          },
-        ),
-      ],
+      ),
     );
   }
 }

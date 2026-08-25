@@ -283,4 +283,30 @@ class CashRepository {
       throw Exception('Error al registrar transacción: ${response.body}');
     }
   }
+
+  Future<CashTransactionModel> updateTransaction(
+    String token,
+    int transactionId,
+    int accountId,
+    double amount,
+    String type,
+    String description,
+  ) async {
+    final response = await http.put(
+      Uri.parse('$_baseUrl/cash-transactions/$transactionId'),
+      headers: await _getHeaders(token),
+      body: jsonEncode({
+        'account_id': accountId,
+        'amount': amount,
+        'type': type,
+        'description': description,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return CashTransactionModel.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Error al actualizar transacción: ${response.body}');
+    }
+  }
 }

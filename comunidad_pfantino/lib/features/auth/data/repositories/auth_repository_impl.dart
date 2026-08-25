@@ -24,7 +24,7 @@ class AuthRepositoryImpl implements AuthRepository {
       // "password": "199512"
       // }
 
-      print('${ApiConfig.baseUrl}/login');
+      // print('${ApiConfig.baseUrl}/login');
 
       final response = await http.post(
         Uri.parse('${ApiConfig.baseUrl}/login'),
@@ -34,8 +34,6 @@ class AuthRepositoryImpl implements AuthRepository {
         },
         body: jsonEncode({'username': username, 'password': password}),
       );
-
-      print(response.body);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -57,10 +55,10 @@ class AuthRepositoryImpl implements AuthRepository {
 
         // Guardamos la sesión (24 horas) con el token real y los datos del usuario
         await _localStorage.saveSession(
-          username, 
-          name, 
-          role, 
-          token, 
+          username,
+          name,
+          role,
+          token,
           profilePhotoUrl: profilePhotoUrl,
         );
 
@@ -116,8 +114,8 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (username != null) {
         return UserEntity(
-          name: name, 
-          username: username, 
+          name: name,
+          username: username,
           role: role,
           profilePhotoUrl: profilePhotoUrl,
         );
@@ -154,7 +152,7 @@ class AuthRepositoryImpl implements AuthRepository {
       final user = data['user'];
       final username = user['username'];
       final newName = user['name'];
-      
+
       final userRoles = user['roles'] as List<dynamic>;
       String role = 'Usuario';
       if (userRoles.isNotEmpty) {
@@ -169,9 +167,9 @@ class AuthRepositoryImpl implements AuthRepository {
       final profilePhotoUrl = user['profile_photo_url'];
 
       await _localStorage.saveSession(
-        username, 
-        newName, 
-        role, 
+        username,
+        newName,
+        role,
         token,
         profilePhotoUrl: profilePhotoUrl,
       );
@@ -190,7 +188,11 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<void> changePassword(String currentPassword, String newPassword, String newPasswordConfirmation) async {
+  Future<void> changePassword(
+    String currentPassword,
+    String newPassword,
+    String newPasswordConfirmation,
+  ) async {
     final token = _localStorage.getToken();
     if (token == null) throw Exception('No hay sesión activa');
 
@@ -221,10 +223,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/profile/sessions'),
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {
@@ -241,10 +240,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
     final response = await http.get(
       Uri.parse('${ApiConfig.baseUrl}/profile/permissions'),
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
+      headers: {'Accept': 'application/json', 'Authorization': 'Bearer $token'},
     );
 
     if (response.statusCode == 200) {
@@ -255,7 +251,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<UserEntity> uploadProfilePhoto(List<int> fileBytes, String fileName) async {
+  Future<UserEntity> uploadProfilePhoto(
+    List<int> fileBytes,
+    String fileName,
+  ) async {
     final token = _localStorage.getToken();
     if (token == null) throw Exception('No hay sesión activa');
 

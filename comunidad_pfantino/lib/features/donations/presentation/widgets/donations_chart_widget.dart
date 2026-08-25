@@ -47,7 +47,7 @@ class DonationsChartWidget extends StatelessWidget {
                         barTouchData: BarTouchData(
                           enabled: false, // Habilitado para mostrar tooltip
                           touchTooltipData: BarTouchTooltipData(
-                            getTooltipColor: (group) => Colors.white.withOpacity(0.9),
+                            getTooltipColor: (group) => Colors.white.withValues(alpha: 0.9),
                             tooltipPadding: const EdgeInsets.all(8),
                             tooltipMargin: 4,
                             getTooltipItem: (group, groupIndex, rod, rodIndex) {

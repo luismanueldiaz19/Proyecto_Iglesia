@@ -5,18 +5,19 @@ import '../../../../core/theme/church_colors.dart';
 import '../../providers/accounting_engine_config_provider.dart';
 import '../../providers/accounting_provider.dart';
 import '../../data/models/accounting_engine_config_model.dart';
-import '../../data/models/accounting_account_model.dart';
 
 class CreateOperationConfigDialog extends ConsumerStatefulWidget {
   const CreateOperationConfigDialog({super.key});
 
   @override
-  ConsumerState<CreateOperationConfigDialog> createState() => _CreateOperationConfigDialogState();
+  ConsumerState<CreateOperationConfigDialog> createState() =>
+      _CreateOperationConfigDialogState();
 }
 
-class _CreateOperationConfigDialogState extends ConsumerState<CreateOperationConfigDialog> {
+class _CreateOperationConfigDialogState
+    extends ConsumerState<CreateOperationConfigDialog> {
   final _formKey = GlobalKey<FormState>();
-  
+
   String _operationCode = '';
   String _name = '';
   int? _debitAccountId;
@@ -57,7 +58,8 @@ class _CreateOperationConfigDialogState extends ConsumerState<CreateOperationCon
                     border: OutlineInputBorder(),
                   ),
                   textCapitalization: TextCapitalization.characters,
-                  validator: (value) => value == null || value.isEmpty ? 'Requerido' : null,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Requerido' : null,
                   onSaved: (value) => _operationCode = value!.toUpperCase(),
                 ),
                 const SizedBox(height: 16),
@@ -66,7 +68,8 @@ class _CreateOperationConfigDialogState extends ConsumerState<CreateOperationCon
                     labelText: 'Nombre de la Operación',
                     border: OutlineInputBorder(),
                   ),
-                  validator: (value) => value == null || value.isEmpty ? 'Requerido' : null,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Requerido' : null,
                   onSaved: (value) => _name = value!,
                 ),
                 const SizedBox(height: 16),
@@ -75,10 +78,14 @@ class _CreateOperationConfigDialogState extends ConsumerState<CreateOperationCon
                     labelText: 'Cuenta de Débito (Aumenta Activos/Gastos)',
                     border: OutlineInputBorder(),
                   ),
-                  items: allAccounts.map((a) => DropdownMenuItem(
-                    value: a.id,
-                    child: Text('${a.code} - ${a.name}'),
-                  )).toList(),
+                  items: allAccounts
+                      .map(
+                        (a) => DropdownMenuItem(
+                          value: a.id,
+                          child: Text('${a.code} - ${a.name}'),
+                        ),
+                      )
+                      .toList(),
                   validator: (value) => value == null ? 'Requerido' : null,
                   onChanged: (value) => setState(() => _debitAccountId = value),
                 ),
@@ -88,12 +95,17 @@ class _CreateOperationConfigDialogState extends ConsumerState<CreateOperationCon
                     labelText: 'Cuenta de Crédito (Aumenta Pasivos/Ingresos)',
                     border: OutlineInputBorder(),
                   ),
-                  items: allAccounts.map((a) => DropdownMenuItem(
-                    value: a.id,
-                    child: Text('${a.code} - ${a.name}'),
-                  )).toList(),
+                  items: allAccounts
+                      .map(
+                        (a) => DropdownMenuItem(
+                          value: a.id,
+                          child: Text('${a.code} - ${a.name}'),
+                        ),
+                      )
+                      .toList(),
                   validator: (value) => value == null ? 'Requerido' : null,
-                  onChanged: (value) => setState(() => _creditAccountId = value),
+                  onChanged: (value) =>
+                      setState(() => _creditAccountId = value),
                 ),
                 const SizedBox(height: 16),
                 DropdownButtonFormField<int>(
@@ -101,13 +113,18 @@ class _CreateOperationConfigDialogState extends ConsumerState<CreateOperationCon
                     labelText: 'Cuenta de Impuestos (ITBIS) - Opcional',
                     border: OutlineInputBorder(),
                   ),
-                  value: _taxAccountId,
+                  initialValue: _taxAccountId,
                   items: [
-                    const DropdownMenuItem<int>(value: null, child: Text('Sin Impuestos')),
-                    ...allAccounts.map((a) => DropdownMenuItem(
-                      value: a.id,
-                      child: Text('${a.code} - ${a.name}'),
-                    )),
+                    const DropdownMenuItem<int>(
+                      value: null,
+                      child: Text('Sin Impuestos'),
+                    ),
+                    ...allAccounts.map(
+                      (a) => DropdownMenuItem(
+                        value: a.id,
+                        child: Text('${a.code} - ${a.name}'),
+                      ),
+                    ),
                   ],
                   onChanged: (value) => setState(() => _taxAccountId = value),
                 ),
@@ -118,9 +135,14 @@ class _CreateOperationConfigDialogState extends ConsumerState<CreateOperationCon
                       labelText: 'Porcentaje de Impuesto (%)',
                       border: OutlineInputBorder(),
                     ),
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
                     initialValue: '18.00',
-                    validator: (value) => value == null || double.tryParse(value) == null ? 'Inválido' : null,
+                    validator: (value) =>
+                        value == null || double.tryParse(value) == null
+                        ? 'Inválido'
+                        : null,
                     onSaved: (value) => _taxPercentage = double.parse(value!),
                   ),
                 ],
@@ -141,7 +163,14 @@ class _CreateOperationConfigDialogState extends ConsumerState<CreateOperationCon
             foregroundColor: ChurchColors.white,
           ),
           child: _isLoading
-              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
               : const Text('Guardar'),
         ),
       ],
@@ -164,19 +193,27 @@ class _CreateOperationConfigDialogState extends ConsumerState<CreateOperationCon
       taxPercentage: _taxAccountId != null ? _taxPercentage : 0.0,
     );
 
-    final success = await ref.read(accountingEngineConfigProvider.notifier).createConfig(newConfig);
+    final success = await ref
+        .read(accountingEngineConfigProvider.notifier)
+        .createConfig(newConfig);
 
     if (mounted) {
       setState(() => _isLoading = false);
       if (success) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Operación guardada exitosamente'), backgroundColor: Colors.green),
+          const SnackBar(
+            content: Text('Operación guardada exitosamente'),
+            backgroundColor: Colors.green,
+          ),
         );
       } else {
         final error = ref.read(accountingEngineConfigProvider).error;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error ?? 'Error al guardar'), backgroundColor: Colors.red),
+          SnackBar(
+            content: Text(error ?? 'Error al guardar'),
+            backgroundColor: Colors.red,
+          ),
         );
         ref.read(accountingEngineConfigProvider.notifier).clearError();
       }

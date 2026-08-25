@@ -216,16 +216,20 @@ class CashReconciliationController extends Controller
             $theoreticalIncome = $reconciliation->transactions->where('type', 'income')->sum('amount');
             $theoreticalExpense = $reconciliation->transactions->where('type', 'expense')->sum('amount');
             
-            // Asumimos saldo inicial de 0 para simplicidad de esta iteración
-            $theoreticalTotal = $theoreticalIncome - $theoreticalExpense;
+            // El usuario espera que el efectivo físico ingresado represente el INGRESO BRUTO,
+            // por lo tanto, no restamos los gastos del total teórico esperado.
+            $theoreticalTotal = $theoreticalIncome;
             
             $physicalTotal = $request->total_general;
             $difference = $physicalTotal - $theoreticalTotal;
+            
+            // The Gross Income should be the theoretical income plus any positive difference (unreported income)
+            $grossIncome = $theoreticalIncome + ($difference > 0 ? $difference : 0);
 
             if (abs($difference) > 0) {
                 $reconciliation->update([
                     'total_local_currency' => $physicalTotal,
-                    'total_general' => $physicalTotal,
+                    'total_general' => $grossIncome,
                     'total_expenses' => $theoreticalExpense,
                     'difference' => $difference,
                     'status' => 'closed',
@@ -234,7 +238,7 @@ class CashReconciliationController extends Controller
             } else {
                  $reconciliation->update([
                     'total_local_currency' => $physicalTotal,
-                    'total_general' => $physicalTotal,
+                    'total_general' => $grossIncome,
                     'total_expenses' => $theoreticalExpense,
                     'difference' => $difference,
                     'status' => 'closed',
@@ -319,8 +323,9 @@ class CashReconciliationController extends Controller
             $sobranteAccountId = 21;
             $faltanteAccountId = 27;
 
-            // Diferencia entre lo que se debía depositar (físico del cuadre) y lo que se depositó realmente
-            $depositDifference = $amountToDeposit - $reconciliation->total_general;
+            // Diferencia entre lo que se debía depositar (Neto: físico - gastos) y lo que se depositó realmente
+            $expectedDeposit = $reconciliation->total_general - $reconciliation->total_expenses;
+            $depositDifference = $amountToDeposit - $expectedDeposit;
 
             if ($amountToDeposit > 0) {
                 $lines = [

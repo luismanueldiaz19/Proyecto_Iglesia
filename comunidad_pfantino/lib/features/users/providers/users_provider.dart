@@ -27,7 +27,7 @@ class UsersNotifier extends StateNotifier<AsyncValue<List<UserEntity>>> {
 
     state = const AsyncValue.loading();
     try {
-      final users = await _repository.getUsers(_token!);
+      final users = await _repository.getUsers(_token);
       state = AsyncValue.data(users);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -43,7 +43,7 @@ class UsersNotifier extends StateNotifier<AsyncValue<List<UserEntity>>> {
     if (_token == null) throw Exception('No autenticado');
 
     try {
-      await _repository.createUser(_token!, name, username, password, role);
+      await _repository.createUser(_token, name, username, password, role);
       await loadUsers();
     } catch (e) {
       rethrow;
@@ -60,7 +60,7 @@ class UsersNotifier extends StateNotifier<AsyncValue<List<UserEntity>>> {
     if (_token == null) throw Exception('No autenticado');
 
     try {
-      await _repository.updateUser(_token!, id, name, username, password, role);
+      await _repository.updateUser(_token, id, name, username, password, role);
       await loadUsers();
     } catch (e) {
       rethrow;
@@ -71,7 +71,7 @@ class UsersNotifier extends StateNotifier<AsyncValue<List<UserEntity>>> {
     if (_token == null) throw Exception('No autenticado');
 
     try {
-      await _repository.deleteUser(_token!, id);
+      await _repository.deleteUser(_token, id);
       await loadUsers();
     } catch (e) {
       rethrow;

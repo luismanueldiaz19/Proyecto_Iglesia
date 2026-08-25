@@ -115,7 +115,7 @@ class _BankTransactionFormDialogState extends State<BankTransactionFormDialog> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<String>(
-                      value: _transactionType,
+                      initialValue: _transactionType,
                       decoration: const InputDecoration(
                         labelText: 'Tipo de Transacción',
                         border: OutlineInputBorder(),

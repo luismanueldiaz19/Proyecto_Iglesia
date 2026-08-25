@@ -154,6 +154,29 @@ class _CashHistoryScreenState extends ConsumerState<CashHistoryScreen> {
                                     ),
                                   ],
                                 ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: [
+                                    _buildSummaryChip(
+                                      'Cuadre',
+                                      history.totalGeneral,
+                                      Colors.green,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    _buildSummaryChip(
+                                      'Gastos',
+                                      history.totalExpenses,
+                                      Colors.red,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    _buildSummaryChip(
+                                      'A Depositar',
+                                      history.totalGeneral -
+                                          history.totalExpenses,
+                                      Colors.blue,
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
@@ -183,40 +206,69 @@ class _CashHistoryScreenState extends ConsumerState<CashHistoryScreen> {
                           ),
                           // Diferencia
                           const SizedBox(width: 32),
-                          Container(
-                            width: 140,
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 16,
-                            ),
-                            decoration: BoxDecoration(
-                              color: statusColor.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: statusColor, width: 1),
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  statusText,
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: statusColor,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 12,
+                          !history.isDeposited
+                              ? Container(
+                                  width: 120,
+                                  alignment: Alignment.center,
+                                  child: const Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.warning_amber_rounded,
+                                        color: Colors.orange,
+                                        size: 28,
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'SIN DEPOSITAR',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: Colors.orange,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 10,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : Container(
+                                  width: 140,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                    horizontal: 16,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: statusColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(
+                                      color: statusColor,
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        statusText,
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                          color: statusColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        '\$${finalDifference.abs().toStringAsFixed(2)}',
+                                        style: TextStyle(
+                                          color: statusColor,
+                                          fontWeight: FontWeight.w900,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '\$${finalDifference.abs().toStringAsFixed(2)}',
-                                  style: TextStyle(
-                                    color: statusColor,
-                                    fontWeight: FontWeight.w900,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -224,6 +276,41 @@ class _CashHistoryScreenState extends ConsumerState<CashHistoryScreen> {
                 );
               },
             ),
+    );
+  }
+
+  Widget _buildSummaryChip(String label, double amount, Color color) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: color.withValues(alpha: 0.3)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 10,
+                color: color,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            Text(
+              '\$${amount.toStringAsFixed(2)}',
+              style: TextStyle(
+                fontSize: 12,
+                color: color,
+                fontWeight: FontWeight.w900,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

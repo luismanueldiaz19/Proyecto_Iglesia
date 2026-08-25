@@ -262,7 +262,7 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
               else
                 DropdownButtonFormField<int>(
                   isExpanded: true,
-                  value: _selectedBankAccountId,
+                  initialValue: _selectedBankAccountId,
                   decoration: InputDecoration(
                     labelText: 'Origen (Cuenta o Caja)',
                     hintText: 'Seleccione de dónde salió el dinero',

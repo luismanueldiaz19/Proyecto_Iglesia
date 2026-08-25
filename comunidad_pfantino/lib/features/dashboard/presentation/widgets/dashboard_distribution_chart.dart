@@ -1,6 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import '../../../../core/utils/currency_formatter.dart';
 
 class DashboardDistributionChart extends StatelessWidget {
   final double totalFisico;
@@ -159,34 +158,7 @@ class DashboardDistributionChart extends StatelessWidget {
     );
   }
 
-  List<PieChartSectionData> _buildSections(double depositado, double enCaja) {
-    final List<PieChartSectionData> sections = [];
-    final radius = 20.0;
-    final titleStyle = const TextStyle(
-      fontSize: 0, // Ocultar el texto dentro del pastel para que sea más limpio
-    );
 
-    if (depositado > 0) {
-      sections.add(PieChartSectionData(
-        color: Colors.green.shade500,
-        value: depositado,
-        title: '',
-        radius: radius,
-        titleStyle: titleStyle,
-      ));
-    }
-    if (enCaja > 0) {
-      sections.add(PieChartSectionData(
-        color: Colors.orange.shade500,
-        value: enCaja,
-        title: '',
-        radius: radius,
-        titleStyle: titleStyle,
-      ));
-    }
-
-    return sections;
-  }
 
   Widget _buildLegendItem(Color color, String text, double value, double total) {
     if (value <= 0) return const SizedBox.shrink();
@@ -207,12 +179,11 @@ class DashboardDistributionChart extends StatelessWidget {
               color: Colors.grey.shade700,
               fontWeight: FontWeight.w500,
             ),
-            maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
         Text(
-          '${percentage}%',
+          '$percentage%',
           style: const TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.bold,

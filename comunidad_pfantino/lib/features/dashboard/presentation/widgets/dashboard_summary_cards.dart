@@ -30,13 +30,15 @@ class DashboardSummaryCards extends StatelessWidget {
                   ? 3
                   : (constraints.maxWidth > 400 ? 2 : 1));
 
-        return GridView.count(
-          crossAxisCount: crossAxisCount,
+        return GridView(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 2.5, // Más compactas verticalmente
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            mainAxisExtent: 116, // Altura fija para evitar el bottom overflow
+          ),
           children: [
             _buildCard(
               title: 'Total Físico',
@@ -164,16 +166,19 @@ class DashboardSummaryCards extends StatelessWidget {
                   ],
                 ),
                 const Spacer(),
-                Text(
-                  '\$${CurrencyFormatter.formatAmount(amount)}',
-                  style: TextStyle(
-                    color: color,
-                    fontSize: 20, // Reducido de 28
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
+                FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    '\$${CurrencyFormatter.formatAmount(amount)}',
+                    style: TextStyle(
+                      color: color,
+                      fontSize: 20, // Reducido de 28
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.5,
+                    ),
+                    maxLines: 1,
                   ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),

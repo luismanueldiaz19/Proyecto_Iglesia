@@ -65,7 +65,7 @@ class CashNotifier extends StateNotifier<CashState> {
   }
 
   Future<String?> _getToken() async {
-    return await _ref.read(authProvider.notifier).getToken();
+    return _ref.read(authProvider.notifier).getToken();
   }
 
   Future<void> _init() async {
@@ -176,43 +176,74 @@ class CashNotifier extends StateNotifier<CashState> {
     int accountId,
     double amount,
     String type,
-    String description,
-  ) async {
-    if (state.activeReconciliation == null) return;
+    String description, {
+    int? reconciliationId,
+  }) async {
+    final targetId = reconciliationId ?? state.activeReconciliation?.id;
+    if (targetId == null) return;
 
     state = state.copyWith(isLoading: true);
     try {
       final token = await _getToken();
       final transaction = await _repository.addTransaction(
         token!,
-        state.activeReconciliation!.id,
+        targetId,
         accountId,
         amount,
         type,
         description,
       );
 
-      // Agregar la transacción a la lista actual localmente para no hacer otra petición GET
-      final updatedReconciliation = CashReconciliationModel(
-        id: state.activeReconciliation!.id,
-        moduleId: state.activeReconciliation!.moduleId,
-        date: state.activeReconciliation!.date,
-        status: state.activeReconciliation!.status,
-        totalGeneral: state.activeReconciliation!.totalGeneral,
-        totalExpenses: state.activeReconciliation!.totalExpenses,
-        difference: state.activeReconciliation!.difference,
-        transactions: [
-          ...state.activeReconciliation!.transactions,
-          transaction,
-        ],
-      );
+      if (reconciliationId == null && state.activeReconciliation != null) {
+        final updatedReconciliation = CashReconciliationModel(
+          id: state.activeReconciliation!.id,
+          moduleId: state.activeReconciliation!.moduleId,
+          date: state.activeReconciliation!.date,
+          status: state.activeReconciliation!.status,
+          totalGeneral: state.activeReconciliation!.totalGeneral,
+          totalExpenses: state.activeReconciliation!.totalExpenses,
+          difference: state.activeReconciliation!.difference,
+          transactions: [
+            ...state.activeReconciliation!.transactions,
+            transaction,
+          ],
+        );
 
-      state = state.copyWith(
-        isLoading: false,
-        activeReconciliation: updatedReconciliation,
-      );
+        state = state.copyWith(
+          isLoading: false,
+          activeReconciliation: updatedReconciliation,
+        );
+      } else {
+        state = state.copyWith(isLoading: false);
+      }
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+      rethrow;
+    }
+  }
+
+  Future<void> updateTransaction(
+    int transactionId,
+    int accountId,
+    double amount,
+    String type,
+    String description,
+  ) async {
+    state = state.copyWith(isLoading: true);
+    try {
+      final token = await _getToken();
+      await _repository.updateTransaction(
+        token!,
+        transactionId,
+        accountId,
+        amount,
+        type,
+        description,
+      );
+      state = state.copyWith(isLoading: false);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      rethrow;
     }
   }
 

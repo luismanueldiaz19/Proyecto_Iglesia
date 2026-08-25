@@ -29,18 +29,44 @@ class DashboardScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '¡Bienvenido, ${user?.username ?? 'Usuario'}!',
-            style: const TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.w900,
-              color: ChurchColors.black,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Rol actual: ${user?.role ?? 'Desconocido'}',
-            style: const TextStyle(fontSize: 16, color: ChurchColors.grey),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '¡Bienvenido, ${user?.username ?? 'Usuario'}!',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.w900,
+                        color: ChurchColors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Rol actual: ${user?.role ?? 'Desconocido'}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: ChurchColors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // IconButton(
+              //   onPressed: () => dashboardNotifier.fetchDashboardData(),
+              //   icon: const Icon(Icons.refresh),
+              //   tooltip: 'Refrescar datos',
+              //   style: IconButton.styleFrom(
+              //     backgroundColor: ChurchColors.primary.withOpacity(0.1),
+              //     foregroundColor: ChurchColors.primary,
+              //     padding: const EdgeInsets.all(12),
+              //   ),
+              // ),
+            ],
           ),
           const SizedBox(height: 32),
 
@@ -64,6 +90,7 @@ class DashboardScreen extends ConsumerWidget {
               }
             },
             onMonthSelected: (month) => dashboardNotifier.setMonth(month),
+            refresh: () => dashboardNotifier.fetchDashboardData(),
           ),
 
           const SizedBox(height: 24),

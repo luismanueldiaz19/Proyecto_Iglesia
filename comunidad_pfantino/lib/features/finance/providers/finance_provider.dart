@@ -55,7 +55,7 @@ class FinanceNotifier extends StateNotifier<FinanceState> {
   FinanceNotifier(this._repository, this._ref) : super(FinanceState());
 
   Future<String?> _getToken() async {
-    return await _ref.read(authProvider.notifier).getToken();
+    return _ref.read(authProvider.notifier).getToken();
   }
 
   Future<void> fetchJournalEntries() async {

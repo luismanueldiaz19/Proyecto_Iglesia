@@ -160,7 +160,7 @@ class _CreateAccountDialogState extends ConsumerState<CreateAccountDialog> {
             const SizedBox(height: 16),
 
             DropdownButtonFormField<String>(
-              value: _selectedType,
+              initialValue: _selectedType,
               decoration: InputDecoration(
                 filled: true,
                 fillColor: ChurchColors.lightGrey.withValues(alpha: 0.2),

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/theme/church_colors.dart';
 import '../../../../core/presentation/widgets/custom_text_field.dart';
 import '../../../../core/presentation/widgets/custom_dropdown_field.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../providers/cash_provider.dart';
 
@@ -311,13 +311,29 @@ class CashierDashboardScreen extends ConsumerWidget {
                               // ),
                               // const SizedBox(width: 8),
                               OutlinedButton.icon(
+                                style: OutlinedButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  side: BorderSide(
+                                    color: Colors.red.withValues(alpha: 0.5),
+                                  ),
+                                ),
                                 icon: const Icon(
                                   Icons.remove,
                                   color: Colors.red,
+                                  size: 20,
                                 ),
                                 label: const Text(
                                   'Registrar Gasto',
-                                  style: TextStyle(color: Colors.red),
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 onPressed: () {
                                   showDialog(
@@ -331,11 +347,25 @@ class CashierDashboardScreen extends ConsumerWidget {
                               ),
                               const SizedBox(width: 16),
                               ElevatedButton.icon(
-                                icon: const Icon(Icons.calculate_rounded),
-                                label: const Text('Cuadrar y Cerrar Caja'),
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: ChurchColors.primary,
                                   foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 24,
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  elevation: 0,
+                                ),
+                                icon: const Icon(
+                                  Icons.calculate_rounded,
+                                  size: 20,
+                                ),
+                                label: const Text(
+                                  'Cuadrar y Cerrar Caja',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
                                 onPressed: () {
                                   context.push('/cashier/reconciliation');
@@ -373,8 +403,19 @@ class CashierDashboardScreen extends ConsumerWidget {
                                     .transactions[index];
                                 final isIncome = tx.type == 'income';
                                 return Card(
+                                  elevation: 0,
                                   margin: const EdgeInsets.only(bottom: 8),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                    side: BorderSide(
+                                      color: Colors.grey.withValues(alpha: 0.2),
+                                    ),
+                                  ),
                                   child: ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 4,
+                                    ),
                                     leading: CircleAvatar(
                                       backgroundColor: isIncome
                                           ? Colors.green.withValues(alpha: 0.1)
@@ -386,14 +427,25 @@ class CashierDashboardScreen extends ConsumerWidget {
                                         color: isIncome
                                             ? Colors.green
                                             : Colors.red,
+                                        size: 20,
                                       ),
                                     ),
-                                    title: Text(tx.description),
+                                    title: Text(
+                                      tx.description,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
                                     subtitle: Text(
                                       'Cuenta ID: ${tx.accountId}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: ChurchColors.grey,
+                                      ),
                                     ),
                                     trailing: Text(
-                                      '${isIncome ? '+' : '-'} \$${tx.amount.toStringAsFixed(2)}',
+                                      '${isIncome ? '+' : '-'} RD\$${CurrencyFormatter.formatAmount(tx.amount)}',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
                                         color: isIncome

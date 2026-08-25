@@ -112,7 +112,7 @@ class _JournalScreenState extends ConsumerState<JournalScreen> {
                                           ),
                                         ],
                                       );
-                                    }).toList(),
+                                    }),
                                   ],
                                 ),
                               ],

@@ -100,6 +100,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cash-reconciliations/{id}/deposit', [CashReconciliationController::class, 'deposit']);
     
     Route::post('/cash-transactions', [CashTransactionController::class, 'store']);
+    Route::put('/cash-transactions/{id}', [CashTransactionController::class, 'update']);
     
     // Ingresos y Gastos Provisionales
     Route::get('ingresos-provicionales-chart', [IngresoProvicionalController::class, 'chartData']);

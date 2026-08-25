@@ -28,7 +28,7 @@ class CustomDropdownField<T> extends StatelessWidget {
         border: Border.all(color: ChurchColors.lightGrey, width: 1.5),
       ),
       child: DropdownButtonFormField<T>(
-        value: value,
+        initialValue: value,
         items: items,
         onChanged: onChanged,
         validator: validator,

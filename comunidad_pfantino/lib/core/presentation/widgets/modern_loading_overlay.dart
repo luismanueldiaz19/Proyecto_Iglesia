@@ -22,7 +22,7 @@ class ModernLoadingOverlay extends StatelessWidget {
           Positioned.fill(
             child: Container(
               // Este fondo absorbe los clicks y oscurece la pantalla ligeramente
-              color: Colors.black.withOpacity(0.3),
+              color: Colors.black.withValues(alpha: 0.3),
               child: Center(
                 child: TweenAnimationBuilder<double>(
                   tween: Tween(begin: 0.0, end: 1.0),
@@ -40,7 +40,7 @@ class ModernLoadingOverlay extends StatelessWidget {
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
+                                color: Colors.black.withValues(alpha: 0.15),
                                 blurRadius: 20,
                                 spreadRadius: 5,
                                 offset: const Offset(0, 4),
@@ -57,7 +57,7 @@ class ModernLoadingOverlay extends StatelessWidget {
                                   strokeWidth: 4.5,
                                   strokeCap: StrokeCap.round,
                                   valueColor: const AlwaysStoppedAnimation<Color>(ChurchColors.primary),
-                                  backgroundColor: ChurchColors.primary.withOpacity(0.15),
+                                  backgroundColor: ChurchColors.primary.withValues(alpha: 0.15),
                                 ),
                               ),
                               if (message != null) ...[

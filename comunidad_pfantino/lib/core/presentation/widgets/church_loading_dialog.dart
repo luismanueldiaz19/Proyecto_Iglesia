@@ -92,8 +92,8 @@ class _ChurchLoadingDialogState extends State<ChurchLoadingDialog>
                   gradient: SweepGradient(
                     colors: [
                       Colors.transparent,
-                      ChurchColors.gold.withOpacity(0.1),
-                      ChurchColors.gold.withOpacity(0.8),
+                      ChurchColors.gold.withValues(alpha: 0.1),
+                      ChurchColors.gold.withValues(alpha: 0.8),
                       ChurchColors.gold,
                     ],
                     stops: const [0.0, 0.5, 0.95, 1.0],
@@ -201,7 +201,7 @@ class _CandlesLoadingIndicatorState extends State<CandlesLoadingIndicator>
               boxShadow: isLit
                   ? [
                       BoxShadow(
-                        color: ChurchColors.gold.withOpacity(0.1),
+                        color: ChurchColors.gold.withValues(alpha: 0.1),
                         blurRadius: 8,
                         spreadRadius: 1,
                       ),

@@ -239,6 +239,7 @@ class GastosChartWidget extends StatelessWidget {
       final int monthIndex = int.parse(item['mes'].toString()) - 1;
       final double total = double.parse(item['total'].toString());
       final double displayValue = math.sqrt(total);
+      // ignore: unused_local_variable
       final int checks =
           int.tryParse(item['num_checks']?.toString() ?? '0') ?? 0;
 

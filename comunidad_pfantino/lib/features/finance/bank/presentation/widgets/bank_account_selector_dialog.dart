@@ -104,7 +104,7 @@ class _BankAccountSelectorDialogState extends State<BankAccountSelectorDialog> {
             else
               DropdownButtonFormField<int>(
                 isExpanded: true,
-                value: _selectedBankAccountId,
+                initialValue: _selectedBankAccountId,
                 decoration: InputDecoration(
                   labelText: 'Destino (Cuenta o Caja)',
                   hintText: 'Seleccione una cuenta',
