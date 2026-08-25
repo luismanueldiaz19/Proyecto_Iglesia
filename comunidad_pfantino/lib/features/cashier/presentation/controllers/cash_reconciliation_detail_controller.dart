@@ -43,11 +43,15 @@ class CashReconciliationDetailController
     }
   }
 
-  Future<void> executeDeposit(int bankAccountId, double amount) async {
+  Future<void> executeDeposit(
+    int accountId,
+    int bankAccountId,
+    double amount,
+  ) async {
     try {
       await _ref
           .read(cashProvider.notifier)
-          .depositCash(_reconciliationId, bankAccountId, amount);
+          .depositCash(_reconciliationId, accountId, bankAccountId, amount);
 
       // Reload details to reflect the deposit
       await loadDetails();

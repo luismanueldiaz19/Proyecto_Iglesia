@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../../core/presentation/widgets/primary_button.dart';
 import '../../../../../core/theme/church_colors.dart';
 import '../../../../auth/providers/auth_provider.dart';
 import '../../../providers/cash_provider.dart';
@@ -127,33 +128,23 @@ class CashReconciliationDetailDialog extends ConsumerWidget {
             const Divider(height: 1),
             // Actions
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: state.maybeWhen(
                 data: (reconciliation) {
                   if (reconciliation == null) return const SizedBox.shrink();
 
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  return Wrap(
+                    alignment: WrapAlignment.end,
+                    spacing: 10,
+                    runSpacing: 10,
                     children: [
-                      if (!reconciliation.isDeposited &&
-                          reconciliation.totalGeneral > 0)
-                        ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.green,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 14,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                          ),
-                          icon: const Icon(Icons.account_balance, size: 20),
-                          label: const Text(
-                            'Registrar Depósito Bancario',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
+                      // Botón depósito bancario — visible mientras no se haya depositado
+                      if (!reconciliation.isDeposited)
+                        PrimaryButton(
+                          text: 'Deposito',
+                          icon: Icons.account_balance,
+                          color: const Color(0xFF2E7D32),
+                          width: null,
                           onPressed: () {
                             showDialog(
                               context: context,
@@ -166,31 +157,14 @@ class CashReconciliationDetailDialog extends ConsumerWidget {
                             );
                           },
                         ),
-                      if (isAdmin) ...[
-                        const SizedBox(width: 16),
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 24,
-                              vertical: 14,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            side: const BorderSide(color: ChurchColors.primary),
-                          ),
-                          icon: const Icon(
-                            Icons.add,
-                            size: 20,
-                            color: ChurchColors.primary,
-                          ),
-                          label: const Text(
-                            'Añadir Gasto',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: ChurchColors.primary,
-                            ),
-                          ),
+
+                      // Botón añadir gasto — solo para administradores
+                      if (isAdmin)
+                        PrimaryButton(
+                          text: 'Añadir Gasto',
+                          icon: Icons.add_circle_outline,
+                          isOutlined: true,
+                          width: null,
                           onPressed: () {
                             showDialog(
                               context: context,
@@ -200,25 +174,12 @@ class CashReconciliationDetailDialog extends ConsumerWidget {
                             );
                           },
                         ),
-                      ],
-                      const SizedBox(width: 16),
-                      ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ChurchColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        icon: const Icon(Icons.picture_as_pdf, size: 20),
-                        label: const Text(
-                          'Generar PDF',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
+
+                      // Botón generar PDF
+                      PrimaryButton(
+                        text: 'Generar PDF',
+                        icon: Icons.picture_as_pdf_outlined,
+                        width: null,
                         onPressed: () async {
                           try {
                             await controller.openPdf();

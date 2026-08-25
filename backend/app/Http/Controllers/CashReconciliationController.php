@@ -302,8 +302,9 @@ class CashReconciliationController extends Controller
     public function deposit(Request $request, $id, AccountingEngineService $accounting)
     {
         $request->validate([
-            'account_id' => 'required|exists:accounting_accounts,id',
-            'amount' => 'required|numeric|min:0.01',
+            'account_id'      => 'required|exists:accounting_accounts,id',
+            'bank_account_id' => 'required|exists:bank_accounts,id',
+            'amount'          => 'required|numeric|min:0.01',
         ]);
 
         return DB::transaction(function () use ($request, $id, $accounting) {
@@ -317,53 +318,87 @@ class CashReconciliationController extends Controller
                 return response()->json(['error' => 'Este cuadre ya fue depositado.'], 400);
             }
 
-            $amountToDeposit = $request->amount;
+            $amountToDeposit  = $request->amount;
             $cajaGeneralAccountId = 3; // Caja General
-            $bankAccountId = $request->account_id;
+            $bankAccountingId = $request->account_id;    // Cuenta contable del banco
+            $bankModuleId     = $request->bank_account_id; // Cuenta del módulo de bancos
             $sobranteAccountId = 21;
             $faltanteAccountId = 27;
 
-            // Diferencia entre lo que se debía depositar (Neto: físico - gastos) y lo que se depositó realmente
-            $expectedDeposit = $reconciliation->total_general - $reconciliation->total_expenses;
+            // Diferencia entre lo esperado (Neto: físico - gastos) y lo que se depositó
+            $expectedDeposit  = $reconciliation->total_general - $reconciliation->total_expenses;
             $depositDifference = $amountToDeposit - $expectedDeposit;
 
+            // ── 1. Asiento contable ──────────────────────────────────────────────────
             if ($amountToDeposit > 0) {
                 $lines = [
-                    ['account_id' => $bankAccountId, 'debit' => $amountToDeposit, 'credit' => 0],
-                    ['account_id' => $cajaGeneralAccountId, 'debit' => 0, 'credit' => $amountToDeposit],
+                    ['account_id' => $bankAccountingId,    'debit'  => $amountToDeposit, 'credit' => 0],
+                    ['account_id' => $cajaGeneralAccountId, 'debit' => 0, 'credit'  => $amountToDeposit],
                 ];
 
-                // Si hay diferencia en el depósito, la registramos.
                 if (abs($depositDifference) > 0) {
                     if ($depositDifference > 0) {
-                        // Se depositó MÁS de lo que había en la caja (Sobrante)
+                        // Se depositó MÁS de lo esperado → Sobrante
                         $lines[] = ['account_id' => $cajaGeneralAccountId, 'debit' => abs($depositDifference), 'credit' => 0];
-                        $lines[] = ['account_id' => $sobranteAccountId, 'debit' => 0, 'credit' => abs($depositDifference)];
+                        $lines[] = ['account_id' => $sobranteAccountId,    'debit' => 0, 'credit' => abs($depositDifference)];
                     } else {
-                        // Se depositó MENOS de lo que había en la caja (Faltante)
-                        $lines[] = ['account_id' => $faltanteAccountId, 'debit' => abs($depositDifference), 'credit' => 0];
+                        // Se depositó MENOS de lo esperado → Faltante
+                        $lines[] = ['account_id' => $faltanteAccountId,    'debit' => abs($depositDifference), 'credit' => 0];
                         $lines[] = ['account_id' => $cajaGeneralAccountId, 'debit' => 0, 'credit' => abs($depositDifference)];
                     }
                 }
 
                 try {
                     $accounting->recordManualEntry(
-                        description: "Depósito Bancario de Ingresos Cuadre #" . $reconciliation->id,
-                        lines: $lines,
-                        referenceId: $reconciliation->id,
+                        description:   'Depósito Bancario de Ingresos Cuadre #' . $reconciliation->id,
+                        lines:         $lines,
+                        referenceId:   $reconciliation->id,
                         referenceType: CashReconciliation::class
                     );
                 } catch (\Exception $e) {
-                    Log::error("Error contable en depósito de caja: " . $e->getMessage());
+                    Log::error('Error contable en depósito de caja: ' . $e->getMessage());
                 }
             }
 
+            // ── 2. Ingreso Provicional vinculado al cuadre ───────────────────────────
+            // Mismo flujo que el formulario manual de ingresos, pero con origen='cuadre'
+            // para identificar que este ingreso proviene de un depósito de cuadre.
+            $ingreso = \App\Models\IngresoProvicional::create([
+                'fecha_ingreso'          => $reconciliation->date,
+                'concepto'               => 'Depósito de Cuadre #' . $reconciliation->id,
+                'monto'                  => $amountToDeposit,
+                'usuario_registro'       => $request->user()->id,
+                'cash_reconciliation_id' => $reconciliation->id,
+                'origen'                 => 'cuadre',
+            ]);
+
+            // ── 3. Transacción bancaria (movimiento en el módulo de bancos) ──────────
+            // Igual que cuando se registra un ingreso manual: crea el depósito en tránsito
+            // y actualiza el saldo actual de la cuenta bancaria.
+            \App\Models\BankTransaction::create([
+                'bank_account_id' => $bankModuleId,
+                'date'            => $reconciliation->date,
+                'type'            => 'deposit',
+                'amount'          => $amountToDeposit,
+                'reference'       => 'CUADRE-' . $reconciliation->id,
+                'description'     => 'Depósito de Cuadre #' . $reconciliation->id,
+                'status'          => 'transit',
+            ]);
+
+            // ── 4. Actualizar saldo de la cuenta bancaria ────────────────────────────
+            $bankAccount = \App\Models\BankAccount::find($bankModuleId);
+            if ($bankAccount) {
+                $bankAccount->current_balance += $amountToDeposit;
+                $bankAccount->save();
+            }
+
+            // ── 5. Marcar el cuadre como depositado ──────────────────────────────────
             $reconciliation->update([
-                'is_deposited' => true,
-                'deposit_account_id' => $bankAccountId,
-                'deposit_amount' => $amountToDeposit,
+                'is_deposited'       => true,
+                'deposit_account_id' => $bankAccountingId,
+                'deposit_amount'     => $amountToDeposit,
                 'deposit_difference' => $depositDifference,
-                'deposit_date' => now(),
+                'deposit_date'       => now(),
             ]);
 
             return response()->json($reconciliation);

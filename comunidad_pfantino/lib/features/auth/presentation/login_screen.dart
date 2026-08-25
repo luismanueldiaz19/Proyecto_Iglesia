@@ -189,111 +189,112 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         ),
                         const SizedBox(height: 24),
 
-                        // // SWITCHER DE LLENADO RÁPIDO (SOLO PARA PRUEBAS) - COMENTADO A PETICIÓN
-                        // Container(
-                        //   padding: const EdgeInsets.all(4),
-                        //   decoration: BoxDecoration(
-                        //     color: ChurchColors.lightGrey.withValues(
-                        //       alpha: 0.3,
-                        //     ),
-                        //     borderRadius: BorderRadius.circular(12),
-                        //   ),
-                        //   child: Row(
-                        //     children: [
-                        //       Expanded(
-                        //         child: GestureDetector(
-                        //           onTap: () {
-                        //             setState(() {
-                        //               _selectedRole = 'admin';
-                        //               _usernameController.text = 'ludeveloper';
-                        //               _passwordController.text = '199512';
-                        //             });
-                        //           },
-                        //           child: Container(
-                        //             padding: const EdgeInsets.symmetric(
-                        //               vertical: 10,
-                        //             ),
-                        //             decoration: BoxDecoration(
-                        //               color: _selectedRole == 'admin'
-                        //                   ? ChurchColors.white
-                        //                   : Colors.transparent,
-                        //               borderRadius: BorderRadius.circular(8),
-                        //               boxShadow: _selectedRole == 'admin'
-                        //                   ? [
-                        //                       BoxShadow(
-                        //                         color: Colors.black.withValues(
-                        //                           alpha: 0.05,
-                        //                         ),
-                        //                         blurRadius: 4,
-                        //                         offset: const Offset(0, 2),
-                        //                       ),
-                        //                     ]
-                        //                   : null,
-                        //             ),
-                        //             alignment: Alignment.center,
-                        //             child: Text(
-                        //               'Administrador',
-                        //               style: TextStyle(
-                        //                 fontWeight: _selectedRole == 'admin'
-                        //                     ? FontWeight.bold
-                        //                     : FontWeight.normal,
-                        //                 color: _selectedRole == 'admin'
-                        //                     ? ChurchColors.primary
-                        //                     : ChurchColors.grey,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ),
-                        //       Expanded(
-                        //         child: GestureDetector(
-                        //           onTap: () {
-                        //             setState(() {
-                        //               _selectedRole = 'cajera1';
-                        //               _usernameController.text = 'cajera1';
-                        //               _passwordController.text = '123456';
-                        //             });
-                        //           },
-                        //           child: Container(
-                        //             padding: const EdgeInsets.symmetric(
-                        //               vertical: 10,
-                        //             ),
-                        //             decoration: BoxDecoration(
-                        //               color: _selectedRole == 'cajera1'
-                        //                   ? ChurchColors.white
-                        //                   : Colors.transparent,
-                        //               borderRadius: BorderRadius.circular(8),
-                        //               boxShadow: _selectedRole == 'cajera1'
-                        //                   ? [
-                        //                       BoxShadow(
-                        //                         color: Colors.black.withValues(
-                        //                           alpha: 0.05,
-                        //                         ),
-                        //                         blurRadius: 4,
-                        //                         offset: const Offset(0, 2),
-                        //                       ),
-                        //                     ]
-                        //                   : null,
-                        //             ),
-                        //             alignment: Alignment.center,
-                        //             child: Text(
-                        //               'Cajera',
-                        //               style: TextStyle(
-                        //                 fontWeight: _selectedRole == 'cajera1'
-                        //                     ? FontWeight.bold
-                        //                     : FontWeight.normal,
-                        //                 color: _selectedRole == 'cajera1'
-                        //                     ? ChurchColors.primary
-                        //                     : ChurchColors.grey,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // const SizedBox(height: 24),
+                        // SWITCHER DE LLENADO RÁPIDO (SOLO PARA PRUEBAS) - COMENTADO A PETICIÓN
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: ChurchColors.lightGrey.withValues(
+                              alpha: 0.3,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedRole = 'admin';
+                                      _usernameController.text = 'ludeveloper';
+                                      _passwordController.text = '199512';
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _selectedRole == 'admin'
+                                          ? ChurchColors.white
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: _selectedRole == 'admin'
+                                          ? [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(
+                                                  alpha: 0.05,
+                                                ),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Administrador',
+                                      style: TextStyle(
+                                        fontWeight: _selectedRole == 'admin'
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        color: _selectedRole == 'admin'
+                                            ? ChurchColors.primary
+                                            : ChurchColors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _selectedRole = 'cajera1';
+                                      _usernameController.text = 'cajera1';
+                                      _passwordController.text = '123456';
+                                    });
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _selectedRole == 'cajera1'
+                                          ? ChurchColors.white
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      boxShadow: _selectedRole == 'cajera1'
+                                          ? [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(
+                                                  alpha: 0.05,
+                                                ),
+                                                blurRadius: 4,
+                                                offset: const Offset(0, 2),
+                                              ),
+                                            ]
+                                          : null,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      'Cajera',
+                                      style: TextStyle(
+                                        fontWeight: _selectedRole == 'cajera1'
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        color: _selectedRole == 'cajera1'
+                                            ? ChurchColors.primary
+                                            : ChurchColors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
                         if (authState == AuthState.error)
                           Container(
                             padding: const EdgeInsets.all(12),

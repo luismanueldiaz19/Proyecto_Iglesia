@@ -4,24 +4,17 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/network/api_config.dart';
-
-class UpperCaseTextFormatter extends TextInputFormatter {
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    return TextEditingValue(
-      text: newValue.text.toUpperCase(),
-      selection: newValue.selection,
-    );
-  }
-}
+import 'nuevo_ingreso_dialog.dart';
 
 class NuevoGastoDialog extends StatefulWidget {
   final Function(Map<String, dynamic>) onSave;
 
   const NuevoGastoDialog({super.key, required this.onSave});
 
-  static void show(BuildContext context, {required Function(Map<String, dynamic>) onSave}) {
+  static void show(
+    BuildContext context, {
+    required Function(Map<String, dynamic>) onSave,
+  }) {
     showDialog(
       context: context,
       builder: (context) => NuevoGastoDialog(onSave: onSave),
@@ -110,7 +103,9 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
       widget.onSave({
         'fecha_gasto': _fechaController.text,
         'concepto': _conceptoController.text,
-        'num_check': _numCheckController.text.isNotEmpty ? _numCheckController.text : null,
+        'num_check': _numCheckController.text.isNotEmpty
+            ? _numCheckController.text
+            : null,
         'monto': double.parse(_montoController.text),
         'bank_account_id': _selectedBankAccountId,
       });
@@ -161,7 +156,10 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
                 decoration: InputDecoration(
                   labelText: 'Fecha',
                   hintText: 'Seleccionar fecha',
-                  prefixIcon: Icon(Icons.calendar_today, color: Colors.red.shade600),
+                  prefixIcon: Icon(
+                    Icons.calendar_today,
+                    color: Colors.red.shade600,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -171,7 +169,10 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.red.shade600, width: 2),
+                    borderSide: BorderSide(
+                      color: Colors.red.shade600,
+                      width: 2,
+                    ),
                   ),
                 ),
                 validator: (value) =>
@@ -186,7 +187,10 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
                 decoration: InputDecoration(
                   labelText: 'Concepto',
                   hintText: 'Descripción del gasto',
-                  prefixIcon: Icon(Icons.description, color: Colors.red.shade600),
+                  prefixIcon: Icon(
+                    Icons.description,
+                    color: Colors.red.shade600,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -196,7 +200,10 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.red.shade600, width: 2),
+                    borderSide: BorderSide(
+                      color: Colors.red.shade600,
+                      width: 2,
+                    ),
                   ),
                 ),
                 validator: (value) =>
@@ -221,7 +228,10 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.red.shade600, width: 2),
+                    borderSide: BorderSide(
+                      color: Colors.red.shade600,
+                      width: 2,
+                    ),
                   ),
                 ),
               ),
@@ -229,14 +239,19 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
               // Monto Field
               TextFormField(
                 controller: _montoController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                 ],
                 decoration: InputDecoration(
                   labelText: 'Monto',
                   hintText: '0.00',
-                  prefixIcon: Icon(Icons.attach_money, color: Colors.red.shade600),
+                  prefixIcon: Icon(
+                    Icons.attach_money,
+                    color: Colors.red.shade600,
+                  ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -246,7 +261,10 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.red.shade600, width: 2),
+                    borderSide: BorderSide(
+                      color: Colors.red.shade600,
+                      width: 2,
+                    ),
                   ),
                 ),
                 validator: (value) {
@@ -290,8 +308,10 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
                         ? account['bank']['name']
                         : 'Banco';
                     final accNum = account['account_number'] ?? '';
-                    final suffix = accNum.toString().isNotEmpty ? ' ($accNum)' : '';
-                    
+                    final suffix = accNum.toString().isNotEmpty
+                        ? ' ($accNum)'
+                        : '';
+
                     return DropdownMenuItem<int>(
                       value: account['id'],
                       child: Text(
@@ -316,11 +336,17 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 16,
+                      ),
                     ),
                     child: Text(
                       'Cancelar',
-                      style: TextStyle(color: Colors.grey.shade700, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: Colors.grey.shade700,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -329,7 +355,10 @@ class _NuevoGastoDialogState extends State<NuevoGastoDialog> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red.shade600,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 16,
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),

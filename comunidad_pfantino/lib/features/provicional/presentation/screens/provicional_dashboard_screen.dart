@@ -290,10 +290,11 @@ class _ProvicionalDashboardScreenState
                     children: [
                       Expanded(
                         child: TotalSummaryWidget(
-                          title: 'Total Ingresos',
+                          title: 'Ingresos Brutos',
                           totalAmount: _totalIngresos,
-                          icon: Icons.arrow_downward,
-                          accentColor: Colors.green.shade600,
+                          icon: Icons.trending_up_rounded,
+                          accentColor: const Color(0xFF2E7D32),
+                          subtitle: 'Monto Total + Gastos',
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -301,19 +302,21 @@ class _ProvicionalDashboardScreenState
                         child: TotalSummaryWidget(
                           title: 'Total Gastos',
                           totalAmount: _totalGastos,
-                          icon: Icons.arrow_upward,
-                          accentColor: Colors.red.shade600,
+                          icon: Icons.trending_down_rounded,
+                          accentColor: const Color(0xFFC62828),
+                          subtitle: 'Gastos registrados',
                         ),
                       ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: TotalSummaryWidget(
-                          title: 'Balance General',
+                          title: 'Monto Total (Neto)',
                           totalAmount: _balance,
-                          icon: Icons.account_balance,
+                          icon: Icons.account_balance_wallet_rounded,
                           accentColor: _balance >= 0
-                              ? Colors.blue.shade600
+                              ? const Color(0xFF1565C0)
                               : Colors.orange.shade700,
+                          subtitle: 'Dinero real depositado',
                         ),
                       ),
                     ],

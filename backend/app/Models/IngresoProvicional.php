@@ -10,11 +10,18 @@ class IngresoProvicional extends Model
         'fecha_ingreso',
         'concepto',
         'monto',
-        'usuario_registro'
+        'usuario_registro',
+        'cash_reconciliation_id',
+        'origen',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'usuario_registro');
+    }
+
+    public function cashReconciliation()
+    {
+        return $this->belongsTo(CashReconciliation::class, 'cash_reconciliation_id');
     }
 }

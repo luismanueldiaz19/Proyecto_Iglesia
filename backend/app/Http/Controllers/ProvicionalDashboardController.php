@@ -23,8 +23,9 @@ class ProvicionalDashboardController extends Controller
             $gastosQuery->whereBetween('fecha_gasto', [$startDate, $endDate]);
         }
 
-        $totalIngresos = (clone $ingresosQuery)->sum('monto');
+        $totalIngresosNetos = (clone $ingresosQuery)->sum('monto');
         $totalGastos = (clone $gastosQuery)->sum('monto');
+        $totalIngresosBrutos = $totalIngresosNetos + $totalGastos;
         
         $ingresosPorMes = (clone $ingresosQuery)
             ->selectRaw("TO_CHAR(fecha_ingreso, 'YYYY-MM') as mes, SUM(monto) as total")
@@ -43,22 +44,23 @@ class ProvicionalDashboardController extends Controller
 
         $graficaMensual = [];
         foreach ($mesesSet as $mes) {
-            $ingresoMes = isset($ingresosPorMes[$mes]) ? (float)$ingresosPorMes[$mes]->total : 0.0;
+            $ingresoNetoMes = isset($ingresosPorMes[$mes]) ? (float)$ingresosPorMes[$mes]->total : 0.0;
             $gastoMes = isset($gastosPorMes[$mes]) ? (float)$gastosPorMes[$mes]->total : 0.0;
+            $ingresoBrutoMes = $ingresoNetoMes + $gastoMes;
             
             $graficaMensual[] = [
                 'mes' => $mes,
-                'ingresos' => $ingresoMes,
+                'ingresos' => $ingresoBrutoMes,
                 'gastos' => $gastoMes,
-                'diferencia' => $ingresoMes - $gastoMes,
+                'diferencia' => $ingresoNetoMes,
             ];
         }
 
         return response()->json([
             'totales' => [
-                'ingresos' => $totalIngresos,
+                'ingresos' => $totalIngresosBrutos,
                 'gastos' => $totalGastos,
-                'balance' => $totalIngresos - $totalGastos,
+                'balance' => $totalIngresosNetos,
             ],
             'grafica_mensual' => $graficaMensual,
         ]);
@@ -80,8 +82,9 @@ class ProvicionalDashboardController extends Controller
             $gastosQuery->whereBetween('fecha_gasto', [$startDate, $endDate]);
         }
 
-        $totalIngresos = (clone $ingresosQuery)->sum('monto');
+        $totalIngresosNetos = (clone $ingresosQuery)->sum('monto');
         $totalGastos = (clone $gastosQuery)->sum('monto');
+        $totalIngresosBrutos = $totalIngresosNetos + $totalGastos;
         
         $ingresosPorMes = (clone $ingresosQuery)
             ->selectRaw("TO_CHAR(fecha_ingreso, 'YYYY-MM') as mes, SUM(monto) as total")
@@ -100,14 +103,15 @@ class ProvicionalDashboardController extends Controller
 
         $graficaMensual = [];
         foreach ($mesesSet as $mes) {
-            $ingresoMes = isset($ingresosPorMes[$mes]) ? (float)$ingresosPorMes[$mes]->total : 0.0;
+            $ingresoNetoMes = isset($ingresosPorMes[$mes]) ? (float)$ingresosPorMes[$mes]->total : 0.0;
             $gastoMes = isset($gastosPorMes[$mes]) ? (float)$gastosPorMes[$mes]->total : 0.0;
+            $ingresoBrutoMes = $ingresoNetoMes + $gastoMes;
             
             $graficaMensual[] = [
                 'mes' => $mes,
-                'ingresos' => $ingresoMes,
+                'ingresos' => $ingresoBrutoMes,
                 'gastos' => $gastoMes,
-                'diferencia' => $ingresoMes - $gastoMes,
+                'diferencia' => $ingresoNetoMes,
             ];
         }
 
@@ -115,9 +119,9 @@ class ProvicionalDashboardController extends Controller
             'fechaImpresion' => date('d/m/Y H:i:s'),
             'startDate' => $startDate,
             'endDate' => $endDate,
-            'totalIngresos' => $totalIngresos,
+            'totalIngresos' => $totalIngresosBrutos,
             'totalGastos' => $totalGastos,
-            'balance' => $totalIngresos - $totalGastos,
+            'balance' => $totalIngresosNetos,
             'datosPorMes' => $graficaMensual,
         ];
 

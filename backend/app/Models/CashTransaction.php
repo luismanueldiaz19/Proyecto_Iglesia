@@ -30,4 +30,13 @@ class CashTransaction extends Model
     {
         return $this->belongsTo(AccountingAccount::class, 'account_id');
     }
+
+    /**
+     * Gasto provisional que fue creado automáticamente desde este gasto de cuadre.
+     * Solo existe cuando la transacción es de tipo 'expense'.
+     */
+    public function gastoProvicional()
+    {
+        return $this->hasOne(GastoProvicional::class, 'cash_transaction_id');
+    }
 }

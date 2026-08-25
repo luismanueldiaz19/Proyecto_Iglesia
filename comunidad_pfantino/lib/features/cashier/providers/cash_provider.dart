@@ -268,6 +268,7 @@ class CashNotifier extends StateNotifier<CashState> {
 
   Future<void> depositCash(
     int reconciliationId,
+    int accountId,
     int bankAccountId,
     double amount,
   ) async {
@@ -279,6 +280,7 @@ class CashNotifier extends StateNotifier<CashState> {
       await _repository.depositReconciliation(
         token,
         reconciliationId,
+        accountId,
         bankAccountId,
         amount,
       );

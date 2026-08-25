@@ -296,56 +296,6 @@ class CashierDashboardScreen extends ConsumerWidget {
 
                           Row(
                             children: [
-                              // OutlinedButton.icon(
-                              //   icon: const Icon(Icons.add),
-                              //   label: const Text('Registrar Ingreso'),
-                              //   onPressed: () {
-                              //     showDialog(
-                              //       context: context,
-                              //       builder: (_) => _AddTransactionDialog(
-                              //         notifier: notifier,
-                              //         transactionType: 'income',
-                              //       ),
-                              //     );
-                              //   },
-                              // ),
-                              // const SizedBox(width: 8),
-                              OutlinedButton.icon(
-                                style: OutlinedButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 20,
-                                    vertical: 12,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  side: BorderSide(
-                                    color: Colors.red.withValues(alpha: 0.5),
-                                  ),
-                                ),
-                                icon: const Icon(
-                                  Icons.remove,
-                                  color: Colors.red,
-                                  size: 20,
-                                ),
-                                label: const Text(
-                                  'Registrar Gasto',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) => _AddTransactionDialog(
-                                      notifier: notifier,
-                                      transactionType: 'expense',
-                                    ),
-                                  );
-                                },
-                              ),
-                              const SizedBox(width: 16),
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: ChurchColors.primary,
@@ -469,151 +419,151 @@ class CashierDashboardScreen extends ConsumerWidget {
   }
 }
 
-class _AddTransactionDialog extends StatefulWidget {
-  final CashNotifier notifier;
-  final String transactionType; // 'income' or 'expense'
-  const _AddTransactionDialog({
-    required this.notifier,
-    required this.transactionType,
-  });
+// class _AddTransactionDialog extends StatefulWidget {
+//   final CashNotifier notifier;
+//   final String transactionType; // 'income' or 'expense'
+//   const _AddTransactionDialog({
+//     required this.notifier,
+//     required this.transactionType,
+//   });
 
-  @override
-  State<_AddTransactionDialog> createState() => _AddTransactionDialogState();
-}
+//   @override
+//   State<_AddTransactionDialog> createState() => _AddTransactionDialogState();
+// }
 
-class _AddTransactionDialogState extends State<_AddTransactionDialog> {
-  final _amountCtrl = TextEditingController();
-  final _descCtrl = TextEditingController();
-  final _rateCtrl = TextEditingController();
+// class _AddTransactionDialogState extends State<_AddTransactionDialog> {
+//   final _amountCtrl = TextEditingController();
+//   final _descCtrl = TextEditingController();
+//   final _rateCtrl = TextEditingController();
 
-  String _selectedCurrency = 'DOP';
+//   String _selectedCurrency = 'DOP';
 
-  @override
-  void initState() {
-    super.initState();
-    _rateCtrl.text = '1.0';
-  }
+//   @override
+//   void initState() {
+//     super.initState();
+//     _rateCtrl.text = '1.0';
+//   }
 
-  void _onCurrencyChanged(String? newValue) {
-    if (newValue == null) return;
-    setState(() {
-      _selectedCurrency = newValue;
-      if (newValue == 'USD') {
-        _rateCtrl.text = '58.0';
-      } else if (newValue == 'EUR') {
-        _rateCtrl.text = '65.0';
-      } else {
-        _rateCtrl.text = '1.0';
-      }
-    });
-  }
+//   void _onCurrencyChanged(String? newValue) {
+//     if (newValue == null) return;
+//     setState(() {
+//       _selectedCurrency = newValue;
+//       if (newValue == 'USD') {
+//         _rateCtrl.text = '58.0';
+//       } else if (newValue == 'EUR') {
+//         _rateCtrl.text = '65.0';
+//       } else {
+//         _rateCtrl.text = '1.0';
+//       }
+//     });
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    final isIncome = widget.transactionType == 'income';
+//   @override
+//   Widget build(BuildContext context) {
+//     final isIncome = widget.transactionType == 'income';
 
-    return AlertDialog(
-      title: Text(isIncome ? 'Registrar Ingreso' : 'Registrar Gasto'),
-      content: SizedBox(
-        width: 400,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            CustomDropdownField<String>(
-              value: _selectedCurrency,
-              labelText: 'Moneda',
-              items: const [
-                DropdownMenuItem(
-                  value: 'DOP',
-                  child: Text('Pesos Dominicanos (DOP)'),
-                ),
-                DropdownMenuItem(value: 'USD', child: Text('Dólares (USD)')),
-                DropdownMenuItem(value: 'EUR', child: Text('Euros (EUR)')),
-              ],
-              onChanged: _onCurrencyChanged,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: CustomTextField(
-                    controller: _amountCtrl,
-                    labelText: 'Monto Original',
-                    prefixText: _selectedCurrency == 'DOP'
-                        ? 'RD\$ '
-                        : (_selectedCurrency == 'USD' ? 'US\$ ' : '€ '),
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                  ),
-                ),
-                if (_selectedCurrency != 'DOP') ...[
-                  const SizedBox(width: 16),
-                  Expanded(
-                    flex: 1,
-                    child: CustomTextField(
-                      controller: _rateCtrl,
-                      labelText: 'Tasa',
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              controller: _descCtrl,
-              labelText: 'Descripción / Concepto',
-            ),
-          ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text(
-            'Cancelar',
-            style: TextStyle(color: ChurchColors.grey),
-          ),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: isIncome ? ChurchColors.primary : Colors.red,
-            foregroundColor: Colors.white,
-          ),
-          onPressed: () {
-            final rawAmount = double.tryParse(_amountCtrl.text) ?? 0.0;
-            final rate = double.tryParse(_rateCtrl.text) ?? 1.0;
+//     return AlertDialog(
+//       title: Text(isIncome ? 'Registrar Ingreso' : 'Registrar Gasto'),
+//       content: SizedBox(
+//         width: 400,
+//         child: Column(
+//           mainAxisSize: MainAxisSize.min,
+//           children: [
+//             CustomDropdownField<String>(
+//               value: _selectedCurrency,
+//               labelText: 'Moneda',
+//               items: const [
+//                 DropdownMenuItem(
+//                   value: 'DOP',
+//                   child: Text('Pesos Dominicanos (DOP)'),
+//                 ),
+//                 DropdownMenuItem(value: 'USD', child: Text('Dólares (USD)')),
+//                 DropdownMenuItem(value: 'EUR', child: Text('Euros (EUR)')),
+//               ],
+//               onChanged: _onCurrencyChanged,
+//             ),
+//             const SizedBox(height: 16),
+//             Row(
+//               children: [
+//                 Expanded(
+//                   flex: 2,
+//                   child: CustomTextField(
+//                     controller: _amountCtrl,
+//                     labelText: 'Monto Original',
+//                     prefixText: _selectedCurrency == 'DOP'
+//                         ? 'RD\$ '
+//                         : (_selectedCurrency == 'USD' ? 'US\$ ' : '€ '),
+//                     keyboardType: const TextInputType.numberWithOptions(
+//                       decimal: true,
+//                     ),
+//                   ),
+//                 ),
+//                 if (_selectedCurrency != 'DOP') ...[
+//                   const SizedBox(width: 16),
+//                   Expanded(
+//                     flex: 1,
+//                     child: CustomTextField(
+//                       controller: _rateCtrl,
+//                       labelText: 'Tasa',
+//                       keyboardType: const TextInputType.numberWithOptions(
+//                         decimal: true,
+//                       ),
+//                     ),
+//                   ),
+//                 ],
+//               ],
+//             ),
+//             const SizedBox(height: 16),
+//             CustomTextField(
+//               controller: _descCtrl,
+//               labelText: 'Descripción / Concepto',
+//             ),
+//           ],
+//         ),
+//       ),
+//       actions: [
+//         TextButton(
+//           onPressed: () => Navigator.pop(context),
+//           child: const Text(
+//             'Cancelar',
+//             style: TextStyle(color: ChurchColors.grey),
+//           ),
+//         ),
+//         ElevatedButton(
+//           style: ElevatedButton.styleFrom(
+//             backgroundColor: isIncome ? ChurchColors.primary : Colors.red,
+//             foregroundColor: Colors.white,
+//           ),
+//           onPressed: () {
+//             final rawAmount = double.tryParse(_amountCtrl.text) ?? 0.0;
+//             final rate = double.tryParse(_rateCtrl.text) ?? 1.0;
 
-            if (rawAmount > 0 && _descCtrl.text.isNotEmpty) {
-              double finalAmount = rawAmount;
-              String finalDesc = _descCtrl.text;
+//             if (rawAmount > 0 && _descCtrl.text.isNotEmpty) {
+//               double finalAmount = rawAmount;
+//               String finalDesc = _descCtrl.text;
 
-              if (_selectedCurrency != 'DOP') {
-                finalAmount = rawAmount * rate;
-                final symbol = _selectedCurrency == 'USD' ? 'US\$' : '€';
-                finalDesc =
-                    '[$symbol${rawAmount.toStringAsFixed(2)} @ $rate] $finalDesc';
-              }
+//               if (_selectedCurrency != 'DOP') {
+//                 finalAmount = rawAmount * rate;
+//                 final symbol = _selectedCurrency == 'USD' ? 'US\$' : '€';
+//                 finalDesc =
+//                     '[$symbol${rawAmount.toStringAsFixed(2)} @ $rate] $finalDesc';
+//               }
 
-              // ID 15 para Ingresos, ID 16 para Gastos (ejemplo genérico)
-              final accountId = isIncome ? 15 : 16;
+//               // ID 15 para Ingresos, ID 16 para Gastos (ejemplo genérico)
+//               final accountId = isIncome ? 15 : 16;
 
-              widget.notifier.addTransaction(
-                accountId,
-                finalAmount,
-                widget.transactionType,
-                finalDesc,
-              );
-              Navigator.pop(context);
-            }
-          },
-          child: const Text('Guardar'),
-        ),
-      ],
-    );
-  }
-}
+//               widget.notifier.addTransaction(
+//                 accountId,
+//                 finalAmount,
+//                 widget.transactionType,
+//                 finalDesc,
+//               );
+//               Navigator.pop(context);
+//             }
+//           },
+//           child: const Text('Guardar'),
+//         ),
+//       ],
+//     );
+//   }
+// }

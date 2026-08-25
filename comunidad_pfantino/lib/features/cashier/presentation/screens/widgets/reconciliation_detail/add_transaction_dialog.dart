@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../../core/presentation/widgets/custom_dropdown_field.dart';
 import '../../../../../../core/presentation/widgets/custom_text_field.dart';
 import '../../../../../../core/theme/church_colors.dart';
+import '../../../../../../core/utils/upper_case_text_formatter.dart';
 import '../../../../../accounting/providers/accounting_provider.dart';
 import '../../../../data/models/cash_transaction_model.dart';
 import '../../../../providers/cash_provider.dart';
@@ -173,6 +174,7 @@ class _AddTransactionDialogState extends ConsumerState<AddTransactionDialog> {
             CustomTextField(
               controller: _descCtrl,
               labelText: 'Descripción / Concepto',
+              inputFormatters: [UpperCaseTextFormatter()],
             ),
             const SizedBox(height: 24),
             Row(

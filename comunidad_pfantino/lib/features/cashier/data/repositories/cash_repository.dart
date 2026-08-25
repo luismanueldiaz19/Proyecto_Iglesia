@@ -187,6 +187,7 @@ class CashRepository {
     String token,
     int id,
     int accountId,
+    int bankAccountId,
     double amount,
   ) async {
     final response = await http.post(
@@ -196,7 +197,11 @@ class CashRepository {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      body: jsonEncode({'account_id': accountId, 'amount': amount}),
+      body: jsonEncode({
+        'account_id': accountId,
+        'bank_account_id': bankAccountId,
+        'amount': amount,
+      }),
     );
 
     if (response.statusCode != 200 && response.statusCode != 201) {
