@@ -102,10 +102,11 @@ class DashboardChartWidget extends StatelessWidget {
                     getTooltipColor: (_) => Colors.transparent,
                     tooltipPadding: EdgeInsets.zero,
                     tooltipMargin: 4,
+                    rotateAngle: -45,
                     getTooltipItem: (group, groupIndex, rod, rodIndex) {
                       final double originalValue = rod.toY * rod.toY;
                       if (originalValue == 0) return null; // No label for 0
-                      
+
                       return BarTooltipItem(
                         '\$${_formatYLabel(originalValue)}',
                         TextStyle(
@@ -128,17 +129,24 @@ class DashboardChartWidget extends StatelessWidget {
                         if (value < 0 || value >= chartData.length) {
                           return const SizedBox.shrink();
                         }
-                        
+
                         final dataItem = chartData[value.toInt()];
                         final mesStr = dataItem['mes'].toString();
-                        final dif = double.tryParse(dataItem['diferencia'].toString()) ?? 0;
-                        
+                        final double ingresosMes =
+                            double.tryParse(
+                              dataItem['diferencia'].toString(),
+                            ) ??
+                            0;
+                        final double gastosMes =
+                            double.tryParse(dataItem['gastos'].toString()) ?? 0;
+                        final dif = ingresosMes - gastosMes;
+
                         final parts = mesStr.split('-');
                         final mesNum = int.tryParse(parts.last) ?? 0;
                         final label = mesNum > 0 && mesNum <= 12
                             ? _months[mesNum]
                             : mesStr;
-                            
+
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Column(
@@ -152,11 +160,13 @@ class DashboardChartWidget extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(height: 2),
+                              const SizedBox(height: 8),
                               Text(
                                 '${dif >= 0 ? '+' : ''}\$${CurrencyFormatter.formatAmount(dif)}',
                                 style: TextStyle(
-                                  color: dif >= 0 ? Colors.blue.shade400 : Colors.redAccent.shade200,
+                                  color: dif >= 0
+                                      ? Colors.blue.shade400
+                                      : Colors.redAccent.shade200,
                                   fontSize: 9,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -165,21 +175,27 @@ class DashboardChartWidget extends StatelessWidget {
                           ),
                         );
                       },
-                      reservedSize: 42,
+                      reservedSize: 60,
                     ),
                   ),
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 50,
+                      reservedSize: 90,
                       getTitlesWidget: (value, meta) {
                         if (value == 0) return const SizedBox.shrink();
                         final double original = value * value;
-                        return Text(
-                          _formatYLabel(original),
-                          style: TextStyle(
-                            color: Colors.grey.shade500,
-                            fontSize: 11,
+                        return SideTitleWidget(
+                          // axisSide: meta.axisSide,
+                          meta: meta,
+                          space: 4,
+                          child: Text(
+                            _formatYLabel(original),
+                            style: TextStyle(
+                              color: Colors.grey.shade500,
+                              fontSize: 10,
+                            ),
+                            softWrap: false,
                           ),
                         );
                       },
@@ -210,7 +226,7 @@ class DashboardChartWidget extends StatelessWidget {
                   final index = entry.key;
                   final item = entry.value;
                   final double ingresos =
-                      double.tryParse(item['ingresos'].toString()) ?? 0;
+                      double.tryParse(item['diferencia'].toString()) ?? 0;
                   final double gastos =
                       double.tryParse(item['gastos'].toString()) ?? 0;
 
@@ -297,7 +313,8 @@ class DashboardChartWidget extends StatelessWidget {
     if (chartData.isEmpty) return 10;
     double max = 0;
     for (final item in chartData) {
-      final double ingresos = double.tryParse(item['ingresos'].toString()) ?? 0;
+      final double ingresos =
+          double.tryParse(item['diferencia'].toString()) ?? 0;
       final double gastos = double.tryParse(item['gastos'].toString()) ?? 0;
       if (ingresos > max) max = ingresos;
       if (gastos > max) max = gastos;
@@ -306,11 +323,6 @@ class DashboardChartWidget extends StatelessWidget {
   }
 
   String _formatYLabel(double value) {
-    if (value >= 1000000) {
-      return '${(value / 1000000).toStringAsFixed(1)}M';
-    } else if (value >= 1000) {
-      return '${(value / 1000).toStringAsFixed(1)}k';
-    }
-    return value.toInt().toString();
+    return CurrencyFormatter.formatAmount(value);
   }
 }

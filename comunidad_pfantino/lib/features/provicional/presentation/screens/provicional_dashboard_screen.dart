@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:file_picker/file_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/network/api_config.dart';
 import '../../../../core/presentation/widgets/page_header.dart';
 import '../widgets/ingresos_filter_widget.dart';
@@ -208,7 +209,7 @@ class _ProvicionalDashboardScreenState
       final token = prefs.getString('api_token');
 
       final uri = Uri.parse(
-        '${ApiConfig.baseUrl}/provicional-dashboard/pdf',
+        '${ApiConfig.baseUrl}/provicional-dashboard/pdf-url',
       ).replace(queryParameters: queryParams);
 
       final response = await http.get(
@@ -217,26 +218,14 @@ class _ProvicionalDashboardScreenState
       );
 
       if (response.statusCode == 200) {
-        String? outputFile = await FilePicker.platform.saveFile(
-          dialogTitle: 'Guardar reporte PDF',
-          fileName: 'dashboard_provisionales.pdf',
-          type: FileType.custom,
-          allowedExtensions: ['pdf'],
-          bytes: response.bodyBytes,
-        );
+        final data = json.decode(response.body);
+        final pdfUrl = data['url'];
+        final pdfUri = Uri.parse(pdfUrl);
 
-        if (outputFile != null && !kIsWeb) {
-          if (!outputFile.endsWith('.pdf')) {
-            outputFile += '.pdf';
-          }
-          final file = File(outputFile);
-          await file.writeAsBytes(response.bodyBytes);
-        }
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Reporte guardado exitosamente')),
-          );
+        if (await canLaunchUrl(pdfUri)) {
+          await launchUrl(pdfUri, mode: LaunchMode.externalApplication);
+        } else {
+          throw Exception('No se pudo abrir el enlace del reporte.');
         }
       } else {
         if (mounted) {
@@ -262,9 +251,12 @@ class _ProvicionalDashboardScreenState
       backgroundColor: Colors.grey.shade50,
       body: Column(
         children: [
-          const PageHeader(
-            title: 'Dashboard Provisionales',
-            subtitle: 'Comparativa de Ingresos vs Gastos Provisionales',
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: PageHeader(
+              title: 'Dashboard Provisionales',
+              subtitle: 'Comparativa de Ingresos vs Gastos Provisionales',
+            ),
           ),
           Expanded(
             child: Padding(
@@ -294,7 +286,7 @@ class _ProvicionalDashboardScreenState
                           totalAmount: _totalIngresos,
                           icon: Icons.trending_up_rounded,
                           accentColor: const Color(0xFF2E7D32),
-                          subtitle: 'Monto Total + Gastos',
+                          subtitle: 'Total de ingresos',
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -316,7 +308,7 @@ class _ProvicionalDashboardScreenState
                           accentColor: _balance >= 0
                               ? const Color(0xFF1565C0)
                               : Colors.orange.shade700,
-                          subtitle: 'Dinero real depositado',
+                          subtitle: 'Ingresos menos gastos',
                         ),
                       ),
                     ],

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/network/api_config.dart';
 import '../../../../core/theme/church_colors.dart';
 import '../../../../core/presentation/widgets/page_header.dart';
@@ -386,48 +387,32 @@ class _IngresoProvicionalScreenState extends State<IngresoProvicionalScreen> {
     }
   }
 
-  Future<void> _downloadFile(
-    String endpoint,
-    String defaultFileName,
-    String extension,
-  ) async {
+  Future<void> _downloadPdf() async {
     setState(() => _isUploading = true);
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('api_token');
 
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/$endpoint'),
+        Uri.parse('${ApiConfig.baseUrl}/provicional-reportes/pdf-url'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
       if (response.statusCode == 200) {
-        String? outputFile = await FilePicker.platform.saveFile(
-          dialogTitle: 'Guardar reporte',
-          fileName: defaultFileName,
-          type: FileType.custom,
-          allowedExtensions: [extension],
-          bytes: response.bodyBytes,
-        );
+        final data = json.decode(response.body);
+        final pdfUrl = data['url'];
+        final pdfUri = Uri.parse(pdfUrl);
 
-        if (outputFile != null && !kIsWeb) {
-          if (!outputFile.endsWith('.$extension')) {
-            outputFile += '.$extension';
-          }
-          final file = File(outputFile);
-          await file.writeAsBytes(response.bodyBytes);
-        }
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Reporte guardado exitosamente')),
-          );
+        if (await canLaunchUrl(pdfUri)) {
+          await launchUrl(pdfUri, mode: LaunchMode.externalApplication);
+        } else {
+          throw Exception('No se pudo abrir el enlace del reporte.');
         }
       } else {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Error al generar reporte: ${response.statusCode}'),
+              content: Text('Error al generar PDF: ${response.statusCode}'),
             ),
           );
         }
@@ -445,17 +430,48 @@ class _IngresoProvicionalScreenState extends State<IngresoProvicionalScreen> {
     }
   }
 
-  void _downloadPdf() => _downloadFile(
-    'provicional-reportes/pdf',
-    'reporte_provicional.pdf',
-    'pdf',
-  );
+  Future<void> _downloadExcel() async {
+    setState(() => _isUploading = true);
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('api_token');
 
-  void _downloadExcel() => _downloadFile(
-    'provicional-reportes/excel',
-    'reporte_provicional.xlsx',
-    'xlsx',
-  );
+      final response = await http.get(
+        Uri.parse('${ApiConfig.baseUrl}/provicional-reportes/excel-url'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        final excelUrl = data['url'];
+        final excelUri = Uri.parse(excelUrl);
+
+        if (await canLaunchUrl(excelUri)) {
+          await launchUrl(excelUri, mode: LaunchMode.externalApplication);
+        } else {
+          throw Exception('No se pudo abrir el enlace del reporte.');
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error al generar Excel: ${response.statusCode}'),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isUploading = false);
+      }
+    }
+  }
 
   Future<void> _downloadTemplate() async {
     const String csvData = "fecha_ingreso,concepto,monto\n";

@@ -18,7 +18,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  String _selectedRole = 'admin'; // Para el switcher de llenado rápido
+  // String _selectedRole = 'admin'; // Para el switcher de llenado rápido
 
   @override
   void dispose() {

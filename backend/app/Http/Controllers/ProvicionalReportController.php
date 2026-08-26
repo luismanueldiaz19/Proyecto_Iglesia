@@ -25,6 +25,15 @@ class ProvicionalReportController extends Controller
         ]);
     }
     
+    public function getPdfUrl(Request $request)
+    {
+        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'provicional-reportes.pdf',
+            now()->addMinutes(30)
+        );
+        return response()->json(['url' => $url]);
+    }
+
     /**
      * Download PDF
      */
@@ -36,9 +45,18 @@ class ProvicionalReportController extends Controller
         // Asumiendo que usas dompdf
         $pdf = Pdf::loadView('reports.provicional', compact('ingresos', 'gastos'));
         
-        return $pdf->download('reporte_provicional.pdf');
+        return $pdf->stream('reporte_provicional.pdf');
     }
     
+    public function getExcelUrl(Request $request)
+    {
+        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'provicional-reportes.excel',
+            now()->addMinutes(30)
+        );
+        return response()->json(['url' => $url]);
+    }
+
     /**
      * Download Excel
      */

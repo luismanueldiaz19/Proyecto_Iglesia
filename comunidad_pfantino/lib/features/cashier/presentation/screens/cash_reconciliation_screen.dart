@@ -12,7 +12,6 @@ import '../../../../core/utils/currency_formatter.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../providers/cash_provider.dart';
 import '../../data/models/denomination_model.dart';
-import 'widgets/cash_reconciliation_detail_dialog.dart';
 import 'widgets/reconciliation_detail/add_transaction_dialog.dart';
 
 class CashReconciliationScreen extends ConsumerStatefulWidget {
@@ -165,8 +164,13 @@ class _CashReconciliationScreenState
                           decoration: InputDecoration(
                             labelText: 'Tasa USD',
                             prefixText: 'RD\$ ',
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
@@ -185,8 +189,13 @@ class _CashReconciliationScreenState
                           decoration: InputDecoration(
                             labelText: 'Tasa EUR',
                             prefixText: 'RD\$ ',
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 12,
+                            ),
                           ),
                           keyboardType: const TextInputType.numberWithOptions(
                             decimal: true,
@@ -262,7 +271,10 @@ class _CashReconciliationScreenState
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(12),
                                       side: BorderSide(
-                                          color: Colors.grey.withValues(alpha: 0.2)),
+                                        color: Colors.grey.withValues(
+                                          alpha: 0.2,
+                                        ),
+                                      ),
                                     ),
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
@@ -276,7 +288,8 @@ class _CashReconciliationScreenState
                                             decoration: BoxDecoration(
                                               color: ChurchColors.primary
                                                   .withValues(alpha: 0.1),
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
                                             child: Icon(
                                               d.type == 'bill'
@@ -685,8 +698,9 @@ class _DenominationCounterState extends State<_DenominationCounter> {
               onTap: widget.initialValue > 0
                   ? () => widget.onChanged(widget.initialValue - 1)
                   : null,
-              borderRadius:
-                  const BorderRadius.horizontal(left: Radius.circular(8)),
+              borderRadius: const BorderRadius.horizontal(
+                left: Radius.circular(8),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Icon(
@@ -707,7 +721,9 @@ class _DenominationCounterState extends State<_DenominationCounter> {
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 textAlign: TextAlign.center,
                 style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.bold),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
                 decoration: const InputDecoration(
                   isDense: true,
                   contentPadding: EdgeInsets.zero,
@@ -721,15 +737,12 @@ class _DenominationCounterState extends State<_DenominationCounter> {
             ),
             InkWell(
               onTap: () => widget.onChanged(widget.initialValue + 1),
-              borderRadius:
-                  const BorderRadius.horizontal(right: Radius.circular(8)),
+              borderRadius: const BorderRadius.horizontal(
+                right: Radius.circular(8),
+              ),
               child: const Padding(
                 padding: EdgeInsets.all(10.0),
-                child: Icon(
-                  Icons.add,
-                  size: 20,
-                  color: ChurchColors.primary,
-                ),
+                child: Icon(Icons.add, size: 20, color: ChurchColors.primary),
               ),
             ),
           ],

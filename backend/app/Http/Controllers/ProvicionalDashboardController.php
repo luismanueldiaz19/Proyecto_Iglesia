@@ -23,9 +23,9 @@ class ProvicionalDashboardController extends Controller
             $gastosQuery->whereBetween('fecha_gasto', [$startDate, $endDate]);
         }
 
-        $totalIngresosNetos = (clone $ingresosQuery)->sum('monto');
+        $totalIngresos = (clone $ingresosQuery)->sum('monto');
         $totalGastos = (clone $gastosQuery)->sum('monto');
-        $totalIngresosBrutos = $totalIngresosNetos + $totalGastos;
+        $balance = $totalIngresos - $totalGastos;
         
         $ingresosPorMes = (clone $ingresosQuery)
             ->selectRaw("TO_CHAR(fecha_ingreso, 'YYYY-MM') as mes, SUM(monto) as total")
@@ -44,23 +44,23 @@ class ProvicionalDashboardController extends Controller
 
         $graficaMensual = [];
         foreach ($mesesSet as $mes) {
-            $ingresoNetoMes = isset($ingresosPorMes[$mes]) ? (float)$ingresosPorMes[$mes]->total : 0.0;
+            $ingresoMes = isset($ingresosPorMes[$mes]) ? (float)$ingresosPorMes[$mes]->total : 0.0;
             $gastoMes = isset($gastosPorMes[$mes]) ? (float)$gastosPorMes[$mes]->total : 0.0;
-            $ingresoBrutoMes = $ingresoNetoMes + $gastoMes;
+            $diferenciaMes = $ingresoMes - $gastoMes;
             
             $graficaMensual[] = [
                 'mes' => $mes,
-                'ingresos' => $ingresoBrutoMes,
+                'ingresos' => $ingresoMes,
                 'gastos' => $gastoMes,
-                'diferencia' => $ingresoNetoMes,
+                'diferencia' => $diferenciaMes,
             ];
         }
 
         return response()->json([
             'totales' => [
-                'ingresos' => $totalIngresosBrutos,
+                'ingresos' => $totalIngresos,
                 'gastos' => $totalGastos,
-                'balance' => $totalIngresosNetos,
+                'balance' => $balance,
             ],
             'grafica_mensual' => $graficaMensual,
         ]);
@@ -69,6 +69,20 @@ class ProvicionalDashboardController extends Controller
     /**
      * Exporta el dashboard consolidado a PDF
      */
+    public function getPdfUrl(Request $request)
+    {
+        $params = [];
+        if ($request->has('start_date')) $params['start_date'] = $request->start_date;
+        if ($request->has('end_date')) $params['end_date'] = $request->end_date;
+
+        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'provicional-dashboard.pdf',
+            now()->addMinutes(30),
+            $params
+        );
+        return response()->json(['url' => $url]);
+    }
+
     public function exportPdf(Request $request)
     {
         $startDate = $request->query('start_date');
@@ -82,9 +96,9 @@ class ProvicionalDashboardController extends Controller
             $gastosQuery->whereBetween('fecha_gasto', [$startDate, $endDate]);
         }
 
-        $totalIngresosNetos = (clone $ingresosQuery)->sum('monto');
+        $totalIngresos = (clone $ingresosQuery)->sum('monto');
         $totalGastos = (clone $gastosQuery)->sum('monto');
-        $totalIngresosBrutos = $totalIngresosNetos + $totalGastos;
+        $balance = $totalIngresos - $totalGastos;
         
         $ingresosPorMes = (clone $ingresosQuery)
             ->selectRaw("TO_CHAR(fecha_ingreso, 'YYYY-MM') as mes, SUM(monto) as total")
@@ -103,15 +117,15 @@ class ProvicionalDashboardController extends Controller
 
         $graficaMensual = [];
         foreach ($mesesSet as $mes) {
-            $ingresoNetoMes = isset($ingresosPorMes[$mes]) ? (float)$ingresosPorMes[$mes]->total : 0.0;
+            $ingresoMes = isset($ingresosPorMes[$mes]) ? (float)$ingresosPorMes[$mes]->total : 0.0;
             $gastoMes = isset($gastosPorMes[$mes]) ? (float)$gastosPorMes[$mes]->total : 0.0;
-            $ingresoBrutoMes = $ingresoNetoMes + $gastoMes;
+            $diferenciaMes = $ingresoMes - $gastoMes;
             
             $graficaMensual[] = [
                 'mes' => $mes,
-                'ingresos' => $ingresoBrutoMes,
+                'ingresos' => $ingresoMes,
                 'gastos' => $gastoMes,
-                'diferencia' => $ingresoNetoMes,
+                'diferencia' => $diferenciaMes,
             ];
         }
 
@@ -119,15 +133,15 @@ class ProvicionalDashboardController extends Controller
             'fechaImpresion' => date('d/m/Y H:i:s'),
             'startDate' => $startDate,
             'endDate' => $endDate,
-            'totalIngresos' => $totalIngresosBrutos,
+            'totalIngresos' => $totalIngresos,
             'totalGastos' => $totalGastos,
-            'balance' => $totalIngresosNetos,
+            'balance' => $balance,
             'datosPorMes' => $graficaMensual,
         ];
 
         $pdf = Pdf::loadView('pdf.dashboard_provicional', $data);
         $pdf->setPaper('a4', 'portrait');
 
-        return $pdf->download('dashboard_provisionales.pdf');
+        return $pdf->stream('dashboard_provisionales.pdf');
     }
 }

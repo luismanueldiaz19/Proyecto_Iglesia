@@ -47,7 +47,7 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Rol actual: ${user?.role ?? 'Desconocido'}',
+                      user?.role ?? 'Desconocido',
                       style: const TextStyle(
                         fontSize: 16,
                         color: ChurchColors.grey,

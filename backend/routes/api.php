@@ -46,6 +46,18 @@ Route::get('/donations/{id}/download-pdf', [DonationController::class, 'generate
     ->name('donation.pdf')
     ->middleware('signed');
 
+Route::get('/provicional-dashboard/download-pdf', [ProvicionalDashboardController::class, 'exportPdf'])
+    ->name('provicional-dashboard.pdf')
+    ->middleware('signed');
+
+Route::get('/provicional-reportes/download-pdf', [ProvicionalReportController::class, 'exportPdf'])
+    ->name('provicional-reportes.pdf')
+    ->middleware('signed');
+
+Route::get('/provicional-reportes/download-excel', [ProvicionalReportController::class, 'exportExcel'])
+    ->name('provicional-reportes.excel')
+    ->middleware('signed');
+
 
 
 // Rutas protegidas por Sanctum
@@ -115,10 +127,10 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Dashboard y Reportes
     Route::get('provicional-dashboard', [ProvicionalDashboardController::class, 'index']);
-    Route::get('provicional-dashboard/pdf', [ProvicionalDashboardController::class, 'exportPdf']);
+    Route::get('provicional-dashboard/pdf-url', [ProvicionalDashboardController::class, 'getPdfUrl']);
     Route::get('provicional-reportes', [ProvicionalReportController::class, 'index']);
-    Route::get('provicional-reportes/pdf', [ProvicionalReportController::class, 'exportPdf']);
-    Route::get('provicional-reportes/excel', [ProvicionalReportController::class, 'exportExcel']);
+    Route::get('provicional-reportes/pdf-url', [ProvicionalReportController::class, 'getPdfUrl']);
+    Route::get('provicional-reportes/excel-url', [ProvicionalReportController::class, 'getExcelUrl']);
 
     // Donaciones
     Route::get('donations', [DonationController::class, 'index']);
