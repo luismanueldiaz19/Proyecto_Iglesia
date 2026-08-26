@@ -48,7 +48,7 @@ if (Test-Path $publicIndexHtml) {
     Remove-Item -Path $publicIndexHtml -Force
 }
 
-Write-Host "¡Proceso terminado con exito! Listo para hacer git add, commit y push en produccion." -ForegroundColor Green
+Write-Host "Proceso terminado con exito! Listo para hacer git add, commit y push en produccion." -ForegroundColor Green
 
 
 # powershell -ExecutionPolicy Bypass -File .\compilar_web.ps1
