@@ -138,8 +138,11 @@ class DashboardChartWidget extends StatelessWidget {
                             ) ??
                             0;
                         final double gastosMes =
-                            double.tryParse(dataItem['gastos']?.toString() ?? '') ?? 0;
-                        final dif = ingresosMes - gastosMes;
+                            double.tryParse(
+                              dataItem['gastos']?.toString() ?? '',
+                            ) ??
+                            0;
+                        final total = ingresosMes + gastosMes;
 
                         final parts = mesStr.split('-');
                         final mesNum = int.tryParse(parts.last) ?? 0;
@@ -162,9 +165,9 @@ class DashboardChartWidget extends StatelessWidget {
                               ),
                               const SizedBox(height: 8),
                               Text(
-                                '${dif >= 0 ? '+' : ''}\$${CurrencyFormatter.formatAmount(dif)}',
+                                '${total >= 0 ? '+' : ''}\$${CurrencyFormatter.formatAmount(total)}',
                                 style: TextStyle(
-                                  color: dif >= 0
+                                  color: total >= 0
                                       ? Colors.blue.shade400
                                       : Colors.redAccent.shade200,
                                   fontSize: 9,
@@ -315,7 +318,8 @@ class DashboardChartWidget extends StatelessWidget {
     for (final item in chartData) {
       final double ingresos =
           double.tryParse(item['ingresos']?.toString() ?? '') ?? 0;
-      final double gastos = double.tryParse(item['gastos']?.toString() ?? '') ?? 0;
+      final double gastos =
+          double.tryParse(item['gastos']?.toString() ?? '') ?? 0;
       if (ingresos > max) max = ingresos;
       if (gastos > max) max = gastos;
     }

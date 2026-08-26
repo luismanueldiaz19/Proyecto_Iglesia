@@ -73,9 +73,7 @@ class _ProvicionalDashboardScreenState
           _totalGastos =
               double.tryParse(data['totales']['gastos']?.toString() ?? '0') ??
               0;
-          _balance =
-              double.tryParse(data['totales']['balance']?.toString() ?? '0') ??
-              0;
+          _balance = _totalIngresos + _totalGastos;
           _chartData = data['grafica_mensual'] ?? [];
         });
       }
@@ -308,7 +306,7 @@ class _ProvicionalDashboardScreenState
                           accentColor: _balance >= 0
                               ? const Color(0xFF1565C0)
                               : Colors.orange.shade700,
-                          subtitle: 'Ingresos menos gastos',
+                          subtitle: 'Ingresos más gastos',
                         ),
                       ),
                     ],
