@@ -528,7 +528,7 @@ class _CashReconciliationScreenState
                             title: 'Confirmar Cierre de Caja',
                             content: isPerfect
                                 ? 'El cuadre es perfecto. ¿Deseas cerrar la caja?'
-                                : 'Hay una diferencia de \$${difference.abs().toStringAsFixed(2)}. Esto generará un asiento contable automático. ¿Deseas continuar?',
+                                : 'Hay una diferencia en el cuadre. Esto generará un asiento contable automático. ¿Deseas continuar?',
                             cancelText: 'Revisar',
                             confirmText: 'Cerrar Definitivamente',
                           );

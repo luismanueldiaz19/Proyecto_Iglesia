@@ -136,6 +136,21 @@ class _DepositDialogState extends ConsumerState<DepositDialog> {
         )
         .toList();
 
+    bool showAccountingField = true;
+    if (_selectedBankAccountId != null) {
+      final selectedAccount = _bankAccounts.firstWhere(
+        (a) => a['id'] == _selectedBankAccountId,
+        orElse: () => null,
+      );
+      if (selectedAccount != null &&
+          selectedAccount['accounting_account_id'] != null) {
+        final accId = int.tryParse(selectedAccount['accounting_account_id'].toString());
+        if (accId != null && accountingBankAccounts.any((a) => a.id == accId)) {
+          showAccountingField = false;
+        }
+      }
+    }
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       backgroundColor: Colors.white,
@@ -221,36 +236,6 @@ class _DepositDialogState extends ConsumerState<DepositDialog> {
 
             const SizedBox(height: 20),
 
-            // ── Cuenta contable del banco (para asiento) ─────────────────
-            _FieldLabel(label: 'Cuenta contable de banco'),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<int>(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                labelText: 'Cuenta contable (1102-...)',
-                isDense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-              ),
-              value: _selectedAccountId,
-              items: accountingBankAccounts.map((a) {
-                return DropdownMenuItem(
-                  value: a.id,
-                  child: Text(
-                    '${a.code} - ${a.name}',
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                );
-              }).toList(),
-              onChanged: (val) => setState(() => _selectedAccountId = val),
-            ),
-
-            const SizedBox(height: 16),
-
             // ── Cuenta del módulo de bancos ──────────────────────────────
             _FieldLabel(label: 'Cuenta de banco (módulo de bancos)'),
             const SizedBox(height: 8),
@@ -294,9 +279,55 @@ class _DepositDialogState extends ConsumerState<DepositDialog> {
                         ),
                       );
                     }).toList(),
-                    onChanged: (val) =>
-                        setState(() => _selectedBankAccountId = val),
+                    onChanged: (val) {
+                      setState(() {
+                        _selectedBankAccountId = val;
+                        final selectedAccount = _bankAccounts.firstWhere(
+                          (a) => a['id'] == val,
+                          orElse: () => null,
+                        );
+                        if (selectedAccount != null &&
+                            selectedAccount['accounting_account_id'] != null) {
+                          final accId = int.tryParse(selectedAccount['accounting_account_id'].toString());
+                          if (accId != null && accountingBankAccounts.any((a) => a.id == accId)) {
+                            _selectedAccountId = accId;
+                          }
+                        }
+                      });
+                    },
                   ),
+
+            if (showAccountingField) ...[
+              const SizedBox(height: 16),
+
+              // ── Cuenta contable del banco (para asiento) ─────────────────
+              _FieldLabel(label: 'Cuenta contable de banco'),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<int>(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  labelText: 'Cuenta contable (1102-...)',
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                ),
+                value: _selectedAccountId,
+                items: accountingBankAccounts.map((a) {
+                  return DropdownMenuItem(
+                    value: a.id,
+                    child: Text(
+                      '${a.code} - ${a.name}',
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  );
+                }).toList(),
+                onChanged: (val) => setState(() => _selectedAccountId = val),
+              ),
+            ],
 
             const SizedBox(height: 28),
 

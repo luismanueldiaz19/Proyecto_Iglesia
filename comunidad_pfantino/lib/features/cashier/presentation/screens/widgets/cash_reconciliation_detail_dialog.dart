@@ -150,9 +150,7 @@ class CashReconciliationDetailDialog extends ConsumerWidget {
                               context: context,
                               builder: (_) => DepositDialog(
                                 reconciliationId: reconciliationId,
-                                initialAmount:
-                                    reconciliation.totalGeneral -
-                                    reconciliation.totalExpenses,
+                                initialAmount: reconciliation.totalGeneral,
                               ),
                             );
                           },
