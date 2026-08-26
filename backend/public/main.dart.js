@@ -58662,16 +58662,20 @@ l=k.ya()
 return A.ah(j,A.ao(A.b([q,B.a9,A.au(A.ER(A.u2(B.fr,j,h.a4R(i).geD().dM(0,new A.ahu(k),t.DK).ex(0),o,j,n,B.fV,j,new A.mI(!0,!0,m,new A.ahv(),A.me(),!1,j,A.RY(),A.me()),j,l,j,j,0,new A.mJ(!0,new A.hD(16,j,new A.hT(!0,new A.ahw(k),90,j,!0,!0),!0,B.cI),B.cK,B.cK,new A.hD(16,j,new A.hT(!0,new A.ahx(k),60,j,!0,!0),!0,B.cI)))),1)],p),B.z,B.i,B.j),B.k,j,j,new A.ax(B.h,j,j,s,r,j,B.v),j,j,j,j,B.ae,j,j,1/0)},
 XN(a,b){var s=null
 return A.an(A.b([A.ah(s,s,B.k,s,s,new A.ax(s,s,s,A.X(3),s,new A.dF(B.bp,B.cA,B.av,a,s,s),B.v),s,12,s,s,s,s,s,12),B.fa,A.x(b,s,s,s,s,A.aw(s,s,B.b7,s,s,s,s,s,s,s,s,12,s,s,B.aa,s,s,!0,s,s,s,s,s,s,s,s),s,s,s)],t.p),B.m,B.i,B.O,0,s,s)},
-ya(){var s,r,q,p,o=this.c,n=J.aD(o)
-if(n.ga5(o))return 10
-for(o=n.ga8(o),s=0;o.u();){r=o.gM()
-n=J.aD(r)
-q=A.ci(J.aC(n.i(r,"diferencia")))
-if(q==null)q=0
-p=A.ci(J.aC(n.i(r,"gastos")))
+ya(){var s,r,q,p,o,n=this.c,m=J.aD(n)
+if(m.ga5(n))return 10
+for(n=m.ga8(n),s=0;n.u();){r=n.gM()
+m=J.aD(r)
+q=m.i(r,"ingresos")
+q=q==null?null:J.aC(q)
+p=A.ci(q==null?"":q)
 if(p==null)p=0
-if(q>s)s=q
-if(p>s)s=p}return s===0?10:Math.sqrt(s)*1.25}}
+m=m.i(r,"gastos")
+m=m==null?null:J.aC(m)
+o=A.ci(m==null?"":m)
+if(o==null)o=0
+if(p>s)s=p
+if(o>s)s=o}return s<=0?10:Math.sqrt(s)*1.25}}
 A.ahs.prototype={
 $1(a){return B.w},
 $S:63}
@@ -58689,18 +58693,22 @@ if(a<0||a>=J.c5(this.a.c))return B.ai
 s=J.b_(this.a.c,B.d.cS(a))
 r=J.aD(s)
 q=J.aC(r.i(s,"mes"))
-p=A.ci(J.aC(r.i(s,"diferencia")))
-if(p==null)p=0
-o=A.ci(J.aC(r.i(s,"gastos")))
-n=p-(o==null?0:o)
-m=A.hP(B.b.gak(q.split("-")),h)
-if(m==null)m=0
-l=m>0&&m<=12?B.uW[m]:q
-r=A.x(l,h,h,h,h,A.aw(h,h,B.as,h,h,h,h,h,h,h,h,12,h,h,B.u,h,h,!0,h,h,h,h,h,h,h,h),h,h,h)
-k=n>=0
-j=k?"+":""
-i=A.dD(n)
-return new A.ar(B.eM,A.ao(A.b([r,B.ay,A.x(j+"$"+i,h,h,h,h,A.aw(h,h,k?B.fB:B.LY,h,h,h,h,h,h,h,h,9,h,h,B.u,h,h,!0,h,h,h,h,h,h,h,h),h,h,h)],t.p),B.m,B.i,B.O),h)},
+p=r.i(s,"ingresos")
+p=p==null?h:J.aC(p)
+o=A.ci(p==null?"":p)
+if(o==null)o=0
+r=r.i(s,"gastos")
+r=r==null?h:J.aC(r)
+n=A.ci(r==null?"":r)
+m=o-(n==null?0:n)
+l=A.hP(B.b.gak(q.split("-")),h)
+if(l==null)l=0
+k=l>0&&l<=12?B.uW[l]:q
+r=A.x(k,h,h,h,h,A.aw(h,h,B.as,h,h,h,h,h,h,h,h,12,h,h,B.u,h,h,!0,h,h,h,h,h,h,h,h),h,h,h)
+p=m>=0
+j=p?"+":""
+i=A.dD(m)
+return new A.ar(B.eM,A.ao(A.b([r,B.ay,A.x(j+"$"+i,h,h,h,h,A.aw(h,h,p?B.fB:B.LY,h,h,h,h,h,h,h,h,9,h,h,B.u,h,h,!0,h,h,h,h,h,h,h,h),h,h,h)],t.p),B.m,B.i,B.O),h)},
 $S:142}
 A.ahw.prototype={
 $2(a,b){var s=null
@@ -58711,19 +58719,23 @@ A.ahv.prototype={
 $1(a){return A.GG(B.c5,A.b([5,5],t.t),null,1)},
 $S:53}
 A.ahu.prototype={
-$1(a){var s,r,q,p,o,n=null,m=a.b,l=J.aD(m),k=A.ci(J.aC(l.i(m,"diferencia")))
-if(k==null)k=0
-s=A.ci(J.aC(l.i(m,"gastos")))
+$1(a){var s,r,q,p,o,n=null,m=a.b,l=J.aD(m),k=l.i(m,"ingresos")
+k=k==null?n:J.aC(k)
+s=A.ci(k==null?"":k)
 if(s==null)s=0
+l=l.i(m,"gastos")
+l=l==null?n:J.aC(l)
+r=A.ci(l==null?"":l)
+if(r==null)r=0
 l=A.b([0,1],t.t)
-r=Math.sqrt(k)
+k=s>0?Math.sqrt(s):0
 q=t.e
 p=A.b([B.rl,B.ds],q)
 o=this.a
-r=A.nP(A.nO(B.c6,n,n,!0,o.ya()),n,B.dL,n,n,n,new A.dF(B.ch,B.ci,B.av,p,n,n),B.dK,n,r,n,16)
-p=Math.sqrt(s)
+k=A.nP(A.nO(B.c6,n,n,!0,o.ya()),n,B.dL,n,n,n,new A.dF(B.ch,B.ci,B.av,p,n,n),B.dK,n,k,n,16)
+p=r>0?Math.sqrt(r):0
 q=A.b([B.hU,B.bw],q)
-return A.u4(A.b([r,A.nP(A.nO(B.c6,n,n,!0,o.ya()),n,B.dL,n,n,n,new A.dF(B.ch,B.ci,B.av,q,n,n),B.dK,n,p,n,16)],t.UA),6,n,l,a.a)},
+return A.u4(A.b([k,A.nP(A.nO(B.c6,n,n,!0,o.ya()),n,B.dL,n,n,n,new A.dF(B.ch,B.ci,B.av,q,n,n),B.dK,n,p,n,16)],t.UA),6,n,l,a.a)},
 $S:465}
 A.zx.prototype={
 D(a){var s=this,r=null,q=A.b7m(2,"$"),p=A.X(16),o=s.c,n=J.aD(o),m=A.x("Se han detectado "+n.gF(o)+" registros v\xe1lidos. Por favor verifica que los montos sean correctos antes de importar.",r,r,r,r,B.a6W,r,r,r),l=A.dU(B.bj,1),k=A.X(8),j=t.p

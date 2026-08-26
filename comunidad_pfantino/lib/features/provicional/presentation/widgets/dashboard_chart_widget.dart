@@ -134,11 +134,11 @@ class DashboardChartWidget extends StatelessWidget {
                         final mesStr = dataItem['mes'].toString();
                         final double ingresosMes =
                             double.tryParse(
-                              dataItem['diferencia'].toString(),
+                              dataItem['ingresos']?.toString() ?? '',
                             ) ??
                             0;
                         final double gastosMes =
-                            double.tryParse(dataItem['gastos'].toString()) ?? 0;
+                            double.tryParse(dataItem['gastos']?.toString() ?? '') ?? 0;
                         final dif = ingresosMes - gastosMes;
 
                         final parts = mesStr.split('-');
@@ -226,16 +226,16 @@ class DashboardChartWidget extends StatelessWidget {
                   final index = entry.key;
                   final item = entry.value;
                   final double ingresos =
-                      double.tryParse(item['diferencia'].toString()) ?? 0;
+                      double.tryParse(item['ingresos']?.toString() ?? '') ?? 0;
                   final double gastos =
-                      double.tryParse(item['gastos'].toString()) ?? 0;
+                      double.tryParse(item['gastos']?.toString() ?? '') ?? 0;
 
                   return BarChartGroupData(
                     x: index,
                     showingTooltipIndicators: [0, 1],
                     barRods: [
                       BarChartRodData(
-                        toY: math.sqrt(ingresos),
+                        toY: ingresos > 0 ? math.sqrt(ingresos) : 0,
                         gradient: LinearGradient(
                           colors: [Colors.teal.shade400, Colors.green.shade600],
                           begin: Alignment.bottomCenter,
@@ -252,7 +252,7 @@ class DashboardChartWidget extends StatelessWidget {
                         ),
                       ),
                       BarChartRodData(
-                        toY: math.sqrt(gastos),
+                        toY: gastos > 0 ? math.sqrt(gastos) : 0,
                         gradient: LinearGradient(
                           colors: [Colors.orange.shade400, Colors.red.shade600],
                           begin: Alignment.bottomCenter,
@@ -314,12 +314,12 @@ class DashboardChartWidget extends StatelessWidget {
     double max = 0;
     for (final item in chartData) {
       final double ingresos =
-          double.tryParse(item['diferencia'].toString()) ?? 0;
-      final double gastos = double.tryParse(item['gastos'].toString()) ?? 0;
+          double.tryParse(item['ingresos']?.toString() ?? '') ?? 0;
+      final double gastos = double.tryParse(item['gastos']?.toString() ?? '') ?? 0;
       if (ingresos > max) max = ingresos;
       if (gastos > max) max = gastos;
     }
-    return max == 0 ? 10 : math.sqrt(max) * 1.25;
+    return max <= 0 ? 10.0 : math.sqrt(max) * 1.25;
   }
 
   String _formatYLabel(double value) {
