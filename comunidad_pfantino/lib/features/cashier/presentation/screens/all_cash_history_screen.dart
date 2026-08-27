@@ -279,8 +279,10 @@ class AllCashHistoryScreen extends ConsumerWidget {
                                     context: context,
                                     builder: (_) =>
                                         CashReconciliationDetailDialog(
-                                          reconciliationId: history.id,
-                                        ),
+                                      reconciliationId: history.id,
+                                      fallbackTotalGeneral: history.totalGeneral,
+                                      fallbackTotalExpenses: history.totalExpenses,
+                                    ),
                                   );
                                 },
                                 child: IntrinsicHeight(

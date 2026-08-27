@@ -68,6 +68,10 @@ class CashNotifier extends StateNotifier<CashState> {
     return _ref.read(authProvider.notifier).getToken();
   }
 
+  Future<void> loadModules() async {
+    await _init();
+  }
+
   Future<void> _init() async {
     state = state.copyWith(isLoading: true);
     try {
@@ -130,7 +134,8 @@ class CashNotifier extends StateNotifier<CashState> {
       final token = await _getToken();
       String? formattedDate;
       if (date != null) {
-        formattedDate = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+        formattedDate =
+            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
       }
 
       final reconciliation = await _repository.openCashReconciliation(
@@ -169,6 +174,26 @@ class CashNotifier extends StateNotifier<CashState> {
       state = state.copyWith(isLoading: false, clearActiveReconciliation: true);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
+    }
+  }
+
+  Future<void> deleteActiveReconciliation() async {
+    final active = state.activeReconciliation;
+    if (active == null) return;
+
+    state = state.copyWith(isLoading: true);
+    try {
+      final token = await _getToken();
+      await _repository.deleteReconciliation(token!, active.id);
+      
+      // Update state
+      state = state.copyWith(
+        clearActiveReconciliation: true,
+        isLoading: false,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString());
+      rethrow;
     }
   }
 

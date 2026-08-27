@@ -17,6 +17,7 @@ use App\Http\Controllers\IngresoProvicionalController;
 use App\Http\Controllers\GastoProvicionalController;
 use App\Http\Controllers\ProvicionalDashboardController;
 use App\Http\Controllers\ProvicionalReportController;
+use App\Http\Controllers\PendingTaskController;
 use App\Http\Controllers\Api\BankController;
 use App\Http\Controllers\Api\BankAccountController;
 use App\Http\Controllers\Api\BankTransactionController;
@@ -56,6 +57,10 @@ Route::get('/provicional-reportes/download-pdf', [ProvicionalReportController::c
 
 Route::get('/provicional-reportes/download-excel', [ProvicionalReportController::class, 'exportExcel'])
     ->name('provicional-reportes.excel')
+    ->middleware('signed');
+
+Route::get('/pending-tasks/download-pdf', [App\Http\Controllers\PendingTaskController::class, 'downloadPdf'])
+    ->name('pending-tasks.pdf')
     ->middleware('signed');
 
 
@@ -110,6 +115,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/cash-reconciliations', [CashReconciliationController::class, 'store']);
     Route::post('/cash-reconciliations/{id}/close', [CashReconciliationController::class, 'close']);
     Route::post('/cash-reconciliations/{id}/deposit', [CashReconciliationController::class, 'deposit']);
+    Route::delete('/cash-reconciliations/{id}', [CashReconciliationController::class, 'destroy']);
     
     Route::post('/cash-transactions', [CashTransactionController::class, 'store']);
     Route::put('/cash-transactions/{id}', [CashTransactionController::class, 'update']);
@@ -151,4 +157,10 @@ Route::middleware('auth:sanctum')->group(function () {
     // Intenciones
     Route::get('intentions', [IntentionController::class, 'index']);
     Route::put('intentions/{id}/approve', [IntentionController::class, 'approve']);
+
+    // Tareas Pendientes PDF
+    Route::get('pending-tasks/pdf-url', [App\Http\Controllers\PendingTaskController::class, 'getPdfUrl']);
+
+    // Tareas Pendientes
+    Route::apiResource('pending-tasks', PendingTaskController::class);
 });

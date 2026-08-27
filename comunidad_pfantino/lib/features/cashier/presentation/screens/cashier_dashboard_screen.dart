@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../../../../core/theme/church_colors.dart';
-import '../../../../core/presentation/widgets/custom_text_field.dart';
-import '../../../../core/presentation/widgets/custom_dropdown_field.dart';
 import '../../../../core/utils/currency_formatter.dart';
 import '../../../auth/providers/auth_provider.dart';
 import '../../providers/cash_provider.dart';
@@ -56,13 +53,25 @@ class CashierDashboardScreen extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Cajero (Cuadre)',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: ChurchColors.black,
-                  ),
+                Row(
+                  children: [
+                    const Text(
+                      'Cajero (Cuadre)',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: ChurchColors.black,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.refresh),
+                      tooltip: 'Recargar módulos',
+                      onPressed: () {
+                        notifier.loadModules();
+                      },
+                    ),
+                  ],
                 ),
                 if (state.modules.isNotEmpty)
                   Row(
@@ -294,7 +303,8 @@ class CashierDashboardScreen extends ConsumerWidget {
                             ],
                           ),
 
-                          Row(
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
@@ -319,6 +329,77 @@ class CashierDashboardScreen extends ConsumerWidget {
                                 ),
                                 onPressed: () {
                                   context.push('/cashier/reconciliation');
+                                },
+                              ),
+                              const SizedBox(height: 8),
+                              TextButton.icon(
+                                icon: const Icon(
+                                  Icons.delete_outline,
+                                  size: 18,
+                                ),
+                                label: const Text('Eliminar Apertura'),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                ),
+                                onPressed: () async {
+                                  final confirm = await showDialog<bool>(
+                                    context: context,
+                                    builder: (ctx) => AlertDialog(
+                                      title: const Text('Eliminar Apertura'),
+                                      content: const Text(
+                                        '¿Estás seguro de que deseas eliminar esta apertura de caja? '
+                                        'Esta acción borrará el turno abierto y no se puede deshacer.',
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(ctx, false),
+                                          child: const Text('Cancelar'),
+                                        ),
+                                        ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                            foregroundColor: Colors.white,
+                                          ),
+                                          onPressed: () =>
+                                              Navigator.pop(ctx, true),
+                                          child: const Text('Eliminar'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+
+                                  if (confirm == true) {
+                                    try {
+                                      await notifier
+                                          .deleteActiveReconciliation();
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Apertura de caja eliminada correctamente.',
+                                            ),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                      }
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Error al eliminar: $e',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    }
+                                  }
                                 },
                               ),
                             ],

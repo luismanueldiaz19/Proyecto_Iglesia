@@ -234,6 +234,18 @@ class CashRepository {
     }
   }
 
+  Future<void> deleteReconciliation(String token, int id) async {
+    final response = await http.delete(
+      Uri.parse('$_baseUrl/cash-reconciliations/$id'),
+      headers: await _getHeaders(token),
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      final errorMsg = jsonDecode(response.body)['error'] ?? 'Error desconocido';
+      throw Exception('Error al eliminar la caja: $errorMsg');
+    }
+  }
+
   Future<CashReconciliationModel> closeCashReconciliation(
     String token,
     int reconciliationId,

@@ -81,6 +81,12 @@ class Sidebar extends ConsumerWidget {
                     isSelected: currentPath == '/all-cash-history',
                     onTap: () => context.go('/all-cash-history'),
                   ),
+                  SidebarItem(
+                    icon: Icons.pending_actions_rounded,
+                    title: 'Pendientes',
+                    isSelected: currentPath == '/pending-tasks',
+                    onTap: () => context.go('/pending-tasks'),
+                  ),
                   const SizedBox(height: 16),
                   _buildSectionHeader('Operaciones'),
                   SidebarItem(

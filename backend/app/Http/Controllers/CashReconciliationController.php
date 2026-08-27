@@ -404,4 +404,19 @@ class CashReconciliationController extends Controller
             return response()->json($reconciliation);
         });
     }
+    public function destroy($id)
+    {
+        $reconciliation = CashReconciliation::findOrFail($id);
+
+        if ($reconciliation->status !== 'draft') {
+            return response()->json(['error' => 'Solo se pueden eliminar cajas abiertas (estado borrador).'], 400);
+        }
+
+        // Las transacciones en cascada deberían eliminarse si está configurado en BD,
+        // pero por seguridad las eliminamos manualmente
+        $reconciliation->transactions()->delete();
+        $reconciliation->delete();
+
+        return response()->json(['message' => 'Apertura de caja eliminada correctamente.']);
+    }
 }

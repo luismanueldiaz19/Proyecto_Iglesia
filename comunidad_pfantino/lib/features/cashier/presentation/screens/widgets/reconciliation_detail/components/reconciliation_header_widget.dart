@@ -4,8 +4,15 @@ import '../../../../../data/models/cash_reconciliation_model.dart';
 
 class ReconciliationHeaderWidget extends StatelessWidget {
   final CashReconciliationModel reconciliation;
+  final double? fallbackTotalGeneral;
+  final double? fallbackTotalExpenses;
 
-  const ReconciliationHeaderWidget({super.key, required this.reconciliation});
+  const ReconciliationHeaderWidget({
+    super.key,
+    required this.reconciliation,
+    this.fallbackTotalGeneral,
+    this.fallbackTotalExpenses,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -55,6 +62,40 @@ class ReconciliationHeaderWidget extends StatelessWidget {
                   fontSize: 18,
                   color: ChurchColors.black,
                 ),
+              ),
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Text(
+                'A Depositar',
+                style: TextStyle(
+                  color: ChurchColors.grey,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Builder(
+                builder: (context) {
+                  final effGral = reconciliation.totalGeneral > 0 
+                      ? reconciliation.totalGeneral 
+                      : (fallbackTotalGeneral ?? 0.0);
+                  final effExp = reconciliation.totalExpenses > 0 
+                      ? reconciliation.totalExpenses 
+                      : (fallbackTotalExpenses ?? 0.0);
+                  
+                  return Text(
+                    '\$${(effGral - effExp).toStringAsFixed(2)}',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w900,
+                      fontSize: 18,
+                      color: Colors.blue,
+                    ),
+                  );
+                }
               ),
             ],
           ),

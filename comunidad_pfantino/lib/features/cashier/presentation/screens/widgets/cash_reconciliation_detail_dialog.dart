@@ -15,10 +15,14 @@ import 'reconciliation_detail/components/general_summary_widget.dart';
 
 class CashReconciliationDetailDialog extends ConsumerWidget {
   final int reconciliationId;
+  final double? fallbackTotalGeneral;
+  final double? fallbackTotalExpenses;
 
   const CashReconciliationDetailDialog({
     super.key,
     required this.reconciliationId,
+    this.fallbackTotalGeneral,
+    this.fallbackTotalExpenses,
   });
 
   @override
@@ -91,6 +95,8 @@ class CashReconciliationDetailDialog extends ConsumerWidget {
                       children: [
                         ReconciliationHeaderWidget(
                           reconciliation: reconciliation,
+                          fallbackTotalGeneral: fallbackTotalGeneral,
+                          fallbackTotalExpenses: fallbackTotalExpenses,
                         ),
                         const SizedBox(height: 32),
                         const _SectionTitle(title: 'Transacciones'),
@@ -148,10 +154,18 @@ class CashReconciliationDetailDialog extends ConsumerWidget {
                           onPressed: () {
                             showDialog(
                               context: context,
-                              builder: (_) => DepositDialog(
-                                reconciliationId: reconciliationId,
-                                initialAmount: reconciliation.totalGeneral,
-                              ),
+                              builder: (_) {
+                                final effGral = reconciliation.totalGeneral > 0 
+                                    ? reconciliation.totalGeneral 
+                                    : (fallbackTotalGeneral ?? 0.0);
+                                final effExp = reconciliation.totalExpenses > 0 
+                                    ? reconciliation.totalExpenses 
+                                    : (fallbackTotalExpenses ?? 0.0);
+                                return DepositDialog(
+                                  reconciliationId: reconciliationId,
+                                  initialAmount: effGral - effExp,
+                                );
+                              },
                             );
                           },
                         ),
