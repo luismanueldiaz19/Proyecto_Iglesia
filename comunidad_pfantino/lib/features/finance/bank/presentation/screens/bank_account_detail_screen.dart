@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../auth/providers/auth_provider.dart';
 import '../../../../../core/presentation/widgets/page_header.dart';
 import '../../../../../core/presentation/widgets/primary_button.dart';
 import '../../../../../core/theme/church_colors.dart';
@@ -9,17 +11,18 @@ import '../../data/models/bank_transaction_model.dart';
 import '../../data/repositories/bank_repository.dart';
 import '../widgets/bank_transaction_form_dialog.dart';
 
-class BankAccountDetailScreen extends StatefulWidget {
+class BankAccountDetailScreen extends ConsumerStatefulWidget {
   final int accountId;
 
   const BankAccountDetailScreen({super.key, required this.accountId});
 
   @override
-  State<BankAccountDetailScreen> createState() =>
+  ConsumerState<BankAccountDetailScreen> createState() =>
       _BankAccountDetailScreenState();
 }
 
-class _BankAccountDetailScreenState extends State<BankAccountDetailScreen> {
+class _BankAccountDetailScreenState
+    extends ConsumerState<BankAccountDetailScreen> {
   final BankRepository _repository = BankRepository();
   bool _isLoading = true;
   BankAccount? _account;
@@ -56,6 +59,12 @@ class _BankAccountDetailScreenState extends State<BankAccountDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userRole = ref.watch(authProvider.notifier).currentUser?.role;
+    final isAllowed =
+        userRole == 'Operativo' ||
+        userRole == 'Administrador' ||
+        userRole == 'admin' ||
+        userRole == 'Supervisor';
     if (_isLoading) {
       return const Scaffold(
         backgroundColor: Colors.transparent,
@@ -101,7 +110,7 @@ class _BankAccountDetailScreenState extends State<BankAccountDetailScreen> {
             ),
 
             const SizedBox(height: 24),
-            _buildBalanceCard(),
+            _buildBalanceCard(isAllowed),
             const SizedBox(height: 24),
             const Text(
               'Transacciones Recientes',
@@ -219,7 +228,7 @@ class _BankAccountDetailScreenState extends State<BankAccountDetailScreen> {
     );
   }
 
-  Widget _buildBalanceCard() {
+  Widget _buildBalanceCard(bool isAllowed) {
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -321,35 +330,37 @@ class _BankAccountDetailScreenState extends State<BankAccountDetailScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      PrimaryButton(
-                        text: 'Nueva Transacción',
-                        icon: Icons.add,
-                        isOutlined: true,
-                        width: double.infinity,
-                        onPressed: () async {
-                          final result = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => BankTransactionFormDialog(
-                              bankAccountId: widget.accountId,
-                            ),
-                          );
-                          if (result == true) {
-                            _loadData();
-                          }
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      PrimaryButton(
-                        text: 'Conciliar Cuenta',
-                        icon: Icons.fact_check,
-                        isOutlined: false,
-                        width: double.infinity,
-                        onPressed: () {
-                          context.go(
-                            '/bank/accounts/${_account!.id}/reconcile',
-                          );
-                        },
-                      ),
+                      if (isAllowed) ...[
+                        PrimaryButton(
+                          text: 'Nueva Transacción',
+                          icon: Icons.add,
+                          isOutlined: true,
+                          width: double.infinity,
+                          onPressed: () async {
+                            final result = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => BankTransactionFormDialog(
+                                bankAccountId: widget.accountId,
+                              ),
+                            );
+                            if (result == true) {
+                              _loadData();
+                            }
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        PrimaryButton(
+                          text: 'Conciliar Cuenta',
+                          icon: Icons.fact_check,
+                          isOutlined: false,
+                          width: double.infinity,
+                          onPressed: () {
+                            context.go(
+                              '/bank/accounts/${_account!.id}/reconcile',
+                            );
+                          },
+                        ),
+                      ],
                     ],
                   ),
                 ),

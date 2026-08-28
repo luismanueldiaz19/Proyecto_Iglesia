@@ -84,6 +84,10 @@ class BankTransactionController extends Controller
 
     public function destroy(string $id)
     {
+        if (!auth()->user()->hasRole('Administrador')) {
+            return response()->json(['message' => 'Acceso denegado. Solo el administrador puede eliminar registros.'], 403);
+        }
+
         $transaction = BankTransaction::findOrFail($id);
         
         $account = BankAccount::find($transaction->bank_account_id);

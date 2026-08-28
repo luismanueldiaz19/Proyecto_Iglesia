@@ -124,6 +124,8 @@ class UsersCrudScreen extends ConsumerWidget {
       return const Center(child: Text('No hay usuarios registrados.'));
     }
 
+    final currentUserRole = ref.watch(authProvider.notifier).currentUser?.role;
+
     return SingleChildScrollView(
       child: DataTable(
         headingRowColor: WidgetStateProperty.all(ChurchColors.background),
@@ -222,7 +224,7 @@ class UsersCrudScreen extends ConsumerWidget {
                       onPressed: () => _showUserDialog(context, ref, user),
                       tooltip: 'Editar',
                     ),
-                    if (user.role != 'Administrador')
+                    if (currentUserRole == 'Administrador' && user.role != 'Administrador')
                       IconButton(
                         icon: const Icon(
                           Icons.delete_rounded,
@@ -312,7 +314,7 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
   late TextEditingController _nameController;
   late TextEditingController _usernameController;
   late TextEditingController _passwordController;
-  String _selectedRole = 'Cajera';
+  String _selectedRole = 'Operativo';
   bool _isLoading = false;
 
   @override
@@ -439,7 +441,15 @@ class _UserFormDialogState extends ConsumerState<_UserFormDialog> {
                     value: 'Administrador',
                     child: Text('Administrador'),
                   ),
-                  DropdownMenuItem(value: 'Cajera', child: Text('Cajera')),
+                  DropdownMenuItem(value: 'Gerente', child: Text('Gerente')),
+                  DropdownMenuItem(
+                    value: 'Supervisor',
+                    child: Text('Supervisor'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Operativo',
+                    child: Text('Operativo'),
+                  ),
                 ],
                 onChanged: (v) {
                   if (v != null) {

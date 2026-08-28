@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../auth/providers/auth_provider.dart';
 import '../../../../../core/utils/app_formatters.dart';
 import '../../../../../core/presentation/widgets/page_header.dart';
 import '../../../../../core/theme/church_colors.dart';
@@ -7,14 +9,14 @@ import '../../data/models/bank_account_model.dart';
 import '../../data/repositories/bank_repository.dart';
 import '../widgets/bank_account_form_dialog.dart';
 
-class BankAccountsScreen extends StatefulWidget {
+class BankAccountsScreen extends ConsumerStatefulWidget {
   const BankAccountsScreen({super.key});
 
   @override
-  State<BankAccountsScreen> createState() => _BankAccountsScreenState();
+  ConsumerState<BankAccountsScreen> createState() => _BankAccountsScreenState();
 }
 
-class _BankAccountsScreenState extends State<BankAccountsScreen> {
+class _BankAccountsScreenState extends ConsumerState<BankAccountsScreen> {
   final BankRepository _repository = BankRepository();
   bool _isLoading = true;
   List<BankAccount> _accounts = [];
@@ -45,6 +47,8 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userRole = ref.watch(authProvider.notifier).currentUser?.role;
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Padding(
@@ -55,30 +59,32 @@ class _BankAccountsScreenState extends State<BankAccountsScreen> {
             PageHeader(
               title: 'Cuentas Bancarias',
               subtitle: 'Gestiona los saldos y conciliaciones de tus cuentas',
-              actionButton: ElevatedButton.icon(
-                onPressed: () async {
-                  final result = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => const BankAccountFormDialog(),
-                  );
-                  if (result == true) {
-                    _loadAccounts();
-                  }
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Nueva Cuenta'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ChurchColors.primary,
-                  foregroundColor: ChurchColors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+              actionButton: userRole == 'Administrador'
+                  ? ElevatedButton.icon(
+                      onPressed: () async {
+                        final result = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => const BankAccountFormDialog(),
+                        );
+                        if (result == true) {
+                          _loadAccounts();
+                        }
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Nueva Cuenta'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ChurchColors.primary,
+                        foregroundColor: ChurchColors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(height: 24),
             Expanded(

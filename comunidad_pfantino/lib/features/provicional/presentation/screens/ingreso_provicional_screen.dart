@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../auth/providers/auth_provider.dart';
 import '../../../../core/network/api_config.dart';
 import '../../../../core/theme/church_colors.dart';
 import '../../../../core/presentation/widgets/page_header.dart';
@@ -18,15 +20,16 @@ import '../widgets/total_summary_widget.dart';
 import '../widgets/nuevo_ingreso_dialog.dart';
 import '../widgets/excel_preview_dialog.dart';
 
-class IngresoProvicionalScreen extends StatefulWidget {
+class IngresoProvicionalScreen extends ConsumerStatefulWidget {
   const IngresoProvicionalScreen({super.key});
 
   @override
-  State<IngresoProvicionalScreen> createState() =>
+  ConsumerState<IngresoProvicionalScreen> createState() =>
       _IngresoProvicionalScreenState();
 }
 
-class _IngresoProvicionalScreenState extends State<IngresoProvicionalScreen> {
+class _IngresoProvicionalScreenState
+    extends ConsumerState<IngresoProvicionalScreen> {
   bool _isUploading = false;
   List<dynamic> _ingresos = [];
   bool _isLoading = false;
@@ -561,6 +564,14 @@ class _IngresoProvicionalScreenState extends State<IngresoProvicionalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userRole = ref.watch(authProvider.notifier).currentUser?.role;
+
+    final isAllowed =
+        userRole == 'Operativo' ||
+        userRole == 'Administrador' ||
+        userRole == 'admin' ||
+        userRole == 'Supervisor';
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Padding(
@@ -572,24 +583,26 @@ class _IngresoProvicionalScreenState extends State<IngresoProvicionalScreen> {
               title: 'Ingresos',
               subtitle:
                   'Gestión, registro y reportes de ingresos de la iglesia',
-              actionButton: ElevatedButton.icon(
-                onPressed: () {
-                  _showCreateDialog(context);
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Nuevo Ingreso'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ChurchColors.primary,
-                  foregroundColor: ChurchColors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+              actionButton: isAllowed
+                  ? ElevatedButton.icon(
+                      onPressed: () {
+                        _showCreateDialog(context);
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Nuevo Ingreso'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ChurchColors.primary,
+                        foregroundColor: ChurchColors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(height: 24),
             IngresosFilterWidget(

@@ -13,6 +13,7 @@ class Sidebar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentPath = GoRouterState.of(context).uri.toString();
+    final userRole = ref.watch(authProvider.notifier).currentUser?.role;
 
     return Container(
       width: 280,
@@ -69,12 +70,13 @@ class Sidebar extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildSectionHeader('Principal'),
-                  SidebarItem(
-                    icon: Icons.dashboard_rounded,
-                    title: 'Dashboard',
-                    isSelected: currentPath == '/dashboard',
-                    onTap: () => context.go('/dashboard'),
-                  ),
+                  if (userRole != 'Operativo')
+                    SidebarItem(
+                      icon: Icons.dashboard_rounded,
+                      title: 'Dashboard',
+                      isSelected: currentPath == '/dashboard',
+                      onTap: () => context.go('/dashboard'),
+                    ),
                   SidebarItem(
                     icon: Icons.history_edu_rounded,
                     title: 'Todos Cuadre',
@@ -89,12 +91,13 @@ class Sidebar extends ConsumerWidget {
                   ),
                   const SizedBox(height: 16),
                   _buildSectionHeader('Operaciones'),
-                  SidebarItem(
-                    icon: Icons.point_of_sale_rounded,
-                    title: 'Cajero (Cuadre)',
-                    isSelected: currentPath.startsWith('/cashier'),
-                    onTap: () => context.go('/cashier'),
-                  ),
+                  if (userRole != 'Gerente')
+                    SidebarItem(
+                      icon: Icons.point_of_sale_rounded,
+                      title: 'Cajero (Cuadre)',
+                      isSelected: currentPath.startsWith('/cashier'),
+                      onTap: () => context.go('/cashier'),
+                    ),
                   SidebarItem(
                     icon: Icons.arrow_circle_down_rounded,
                     title: 'Ingresos',
@@ -122,18 +125,20 @@ class Sidebar extends ConsumerWidget {
                   // ),
                   const SizedBox(height: 16),
                   _buildSectionHeader('Ingresos'),
-                  SidebarItem(
-                    icon: Icons.favorite_rounded,
-                    title: 'Ofrendas y Diezmos',
-                    isSelected: currentPath.startsWith('/offerings'),
-                    onTap: () {},
-                  ),
-                  SidebarItem(
-                    icon: Icons.volunteer_activism_rounded,
-                    title: 'Recibir Donación',
-                    isSelected: currentPath == '/donations/create',
-                    onTap: () => context.go('/donations/create'),
-                  ),
+                  if (userRole != 'Operativo')
+                    SidebarItem(
+                      icon: Icons.favorite_rounded,
+                      title: 'Ofrendas y Diezmos',
+                      isSelected: currentPath.startsWith('/offerings'),
+                      onTap: () {},
+                    ),
+                  if (userRole != 'Gerente')
+                    SidebarItem(
+                      icon: Icons.volunteer_activism_rounded,
+                      title: 'Recibir Donación',
+                      isSelected: currentPath == '/donations/create',
+                      onTap: () => context.go('/donations/create'),
+                    ),
                   SidebarItem(
                     icon: Icons.history_rounded,
                     title: 'Historial Donaciones',
@@ -163,14 +168,15 @@ class Sidebar extends ConsumerWidget {
                   // ),
                   const SizedBox(height: 16),
                   _buildSectionHeader('Finanzas'),
-                  SidebarItem(
-                    icon: Icons.account_balance_rounded,
-                    title: 'Libros Contables',
-                    isSelected:
-                        currentPath == '/finance' ||
-                        currentPath.startsWith('/finance/'),
-                    onTap: () => context.go('/finance'),
-                  ),
+                  if (userRole != 'Gerente')
+                    SidebarItem(
+                      icon: Icons.account_balance_rounded,
+                      title: 'Libros Contables',
+                      isSelected:
+                          currentPath == '/finance' ||
+                          currentPath.startsWith('/finance/'),
+                      onTap: () => context.go('/finance'),
+                    ),
                   SidebarItem(
                     icon: Icons.list_alt_rounded,
                     title: 'Catálogo de Cuentas',
@@ -185,23 +191,29 @@ class Sidebar extends ConsumerWidget {
                   ),
 
                   const SizedBox(height: 16),
-                  _buildSectionHeader('Administración'),
-                  if (ref.watch(authProvider.notifier).currentUser?.role ==
-                      'Administrador')
+                  if (userRole == 'Administrador') ...[
+                    _buildSectionHeader('Administración'),
                     SidebarItem(
                       icon: Icons.settings_rounded,
                       title: 'Gestión de Usuarios',
                       isSelected: currentPath == '/settings/users',
                       onTap: () => context.go('/settings/users'),
                     ),
-                  SidebarItem(
-                    icon: Icons.settings_applications_rounded,
-                    title: 'Config. Contable',
-                    isSelected: currentPath.startsWith(
-                      '/accounting/operations',
+                    SidebarItem(
+                      icon: Icons.admin_panel_settings_rounded,
+                      title: 'Roles y Permisos',
+                      isSelected: currentPath == '/settings/roles',
+                      onTap: () => context.go('/settings/roles'),
                     ),
-                    onTap: () => context.go('/accounting/operations'),
-                  ),
+                    SidebarItem(
+                      icon: Icons.settings_applications_rounded,
+                      title: 'Config. Contable',
+                      isSelected: currentPath.startsWith(
+                        '/accounting/operations',
+                      ),
+                      onTap: () => context.go('/accounting/operations'),
+                    ),
+                  ],
 
                   const SizedBox(height: 32),
                 ],

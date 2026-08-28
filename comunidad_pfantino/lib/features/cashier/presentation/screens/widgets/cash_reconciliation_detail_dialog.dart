@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/presentation/widgets/primary_button.dart';
 import '../../../../../core/theme/church_colors.dart';
 import '../../../../auth/providers/auth_provider.dart';
-import '../../../providers/cash_provider.dart';
+
 import '../../controllers/cash_reconciliation_detail_controller.dart';
 import 'reconciliation_detail/deposit_dialog.dart';
 import 'reconciliation_detail/add_transaction_dialog.dart';
@@ -34,7 +34,7 @@ class CashReconciliationDetailDialog extends ConsumerWidget {
 
     final isAdmin =
         ref.watch(authProvider.notifier).currentUser?.role == 'Administrador';
-    final cashNotifier = ref.read(cashProvider.notifier);
+    // final cashNotifier = ref.read(cashProvider.notifier);
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -155,11 +155,11 @@ class CashReconciliationDetailDialog extends ConsumerWidget {
                             showDialog(
                               context: context,
                               builder: (_) {
-                                final effGral = reconciliation.totalGeneral > 0 
-                                    ? reconciliation.totalGeneral 
+                                final effGral = reconciliation.totalGeneral > 0
+                                    ? reconciliation.totalGeneral
                                     : (fallbackTotalGeneral ?? 0.0);
-                                final effExp = reconciliation.totalExpenses > 0 
-                                    ? reconciliation.totalExpenses 
+                                final effExp = reconciliation.totalExpenses > 0
+                                    ? reconciliation.totalExpenses
                                     : (fallbackTotalExpenses ?? 0.0);
                                 return DepositDialog(
                                   reconciliationId: reconciliationId,

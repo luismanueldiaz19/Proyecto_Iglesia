@@ -8,6 +8,7 @@ import '../../../../core/presentation/widgets/custom_text_field.dart';
 import '../../../../core/presentation/widgets/custom_dropdown_field.dart';
 import '../../../../core/presentation/widgets/primary_button.dart';
 import '../../providers/donation_provider.dart';
+import '../../../auth/providers/auth_provider.dart';
 
 class DonationScreen extends ConsumerStatefulWidget {
   const DonationScreen({super.key});
@@ -121,7 +122,12 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
   @override
   Widget build(BuildContext context) {
     final isLoading = ref.watch(donationProvider).isLoading;
-
+    final userRole = ref.watch(authProvider.notifier).currentUser?.role;
+    final isAllowed =
+        userRole == 'Operativo' ||
+        userRole == 'Administrador' ||
+        userRole == 'admin' ||
+        userRole == 'Supervisor';
     return Scaffold(
       appBar: AppBar(
         title: const Text('Recibir Donación'),
@@ -300,12 +306,13 @@ class _DonationScreenState extends ConsumerState<DonationScreen> {
                       ],
                     ),
                     const SizedBox(height: 32),
-                    PrimaryButton(
-                      onPressed: isLoading ? null : _submit,
-                      text: 'Registrar e Imprimir Recibo',
-                      isLoading: isLoading,
-                      icon: Icons.print,
-                    ),
+                    if (isAllowed)
+                      PrimaryButton(
+                        onPressed: isLoading ? null : _submit,
+                        text: 'Registrar e Imprimir Recibo',
+                        isLoading: isLoading,
+                        icon: Icons.print,
+                      ),
                   ],
                 ),
               ),

@@ -33,12 +33,23 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
   List<dynamic> _chartData = [];
   bool _isLoadingChart = false;
   String _selectedPaymentMethod = 'Todos';
+  String? _userRole;
 
   @override
   void initState() {
     super.initState();
+    _loadUserRole();
     _applyQuickFilter('Este año');
     _loadChartData();
+  }
+
+  Future<void> _loadUserRole() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _userRole = prefs.getString('role');
+      });
+    }
   }
 
   double get _totalAmount {
@@ -357,24 +368,26 @@ class _DonationHistoryScreenState extends State<DonationHistoryScreen> {
             PageHeader(
               title: 'Historial de Donaciones',
               subtitle: 'Consulta, filtra y exporta el historial de donaciones',
-              actionButton: ElevatedButton.icon(
-                onPressed: () {
-                  context.go('/donations/create');
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Nueva Donación'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ChurchColors.primary,
-                  foregroundColor: ChurchColors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+              actionButton: ['Administrador', 'Supervisor', 'Operativo', 'admin'].contains(_userRole)
+                  ? ElevatedButton.icon(
+                      onPressed: () {
+                        context.go('/donations/create');
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Nueva Donación'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ChurchColors.primary,
+                        foregroundColor: ChurchColors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(height: 24),
             DonationsFilterWidget(

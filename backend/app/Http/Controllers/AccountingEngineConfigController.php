@@ -39,6 +39,10 @@ class AccountingEngineConfigController extends Controller
 
     public function destroy(Request $request, $id)
     {
+        if (!auth()->user()->hasRole('Administrador')) {
+            return response()->json(['message' => 'Acceso denegado. Solo el administrador puede eliminar registros.'], 403);
+        }
+
         if (!$request->user()->hasRole('Administrador') && !$request->user()->hasRole('admin')) {
             return response()->json(['message' => 'Solo los administradores pueden eliminar configuraciones.'], 403);
         }

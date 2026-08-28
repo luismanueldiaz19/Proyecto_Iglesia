@@ -72,6 +72,10 @@ class PendingTaskController extends Controller
 
     public function destroy($id)
     {
+        if (!auth()->user()->hasRole('Administrador')) {
+            return response()->json(['message' => 'Acceso denegado. Solo el administrador puede eliminar registros.'], 403);
+        }
+
         $task = PendingTask::findOrFail($id);
         $task->delete();
         return response()->json(['message' => 'Task deleted successfully']);

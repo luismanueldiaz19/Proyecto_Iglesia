@@ -3,10 +3,12 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../auth/providers/auth_provider.dart';
 import '../../../../core/network/api_config.dart';
 import '../../../../core/theme/church_colors.dart';
 import '../../../../core/presentation/widgets/page_header.dart';
@@ -20,14 +22,16 @@ import '../widgets/check_count_summary_widget.dart';
 import '../widgets/nuevo_gasto_dialog.dart';
 import '../widgets/excel_preview_dialog.dart';
 
-class GastoProvicionalScreen extends StatefulWidget {
+class GastoProvicionalScreen extends ConsumerStatefulWidget {
   const GastoProvicionalScreen({super.key});
 
   @override
-  State<GastoProvicionalScreen> createState() => _GastoProvicionalScreenState();
+  ConsumerState<GastoProvicionalScreen> createState() =>
+      _GastoProvicionalScreenState();
 }
 
-class _GastoProvicionalScreenState extends State<GastoProvicionalScreen> {
+class _GastoProvicionalScreenState
+    extends ConsumerState<GastoProvicionalScreen> {
   bool _isUploading = false;
   List<dynamic> _gastos = [];
   bool _isLoading = false;
@@ -569,6 +573,14 @@ class _GastoProvicionalScreenState extends State<GastoProvicionalScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userRole = ref.watch(authProvider.notifier).currentUser?.role;
+
+    final isAllowed =
+        userRole == 'Operativo' ||
+        userRole == 'Administrador' ||
+        userRole == 'admin' ||
+        userRole == 'Supervisor';
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Padding(
@@ -579,24 +591,26 @@ class _GastoProvicionalScreenState extends State<GastoProvicionalScreen> {
             PageHeader(
               title: 'Gastos',
               subtitle: 'Gestión, registro y reportes de gastos de la iglesia',
-              actionButton: ElevatedButton.icon(
-                onPressed: () {
-                  _showCreateDialog(context);
-                },
-                icon: const Icon(Icons.add),
-                label: const Text('Nuevo Gasto'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ChurchColors.primary,
-                  foregroundColor: ChurchColors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
+              actionButton: isAllowed
+                  ? ElevatedButton.icon(
+                      onPressed: () {
+                        _showCreateDialog(context);
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('Nuevo Gasto'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: ChurchColors.primary,
+                        foregroundColor: ChurchColors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 16,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                    )
+                  : null,
             ),
             const SizedBox(height: 24),
             GastosFilterWidget(

@@ -124,6 +124,10 @@ class GastoProvicionalController extends Controller
      */
     public function destroy(string $id)
     {
+        if (!auth()->user()->hasRole('Administrador')) {
+            return response()->json(['message' => 'Acceso denegado. Solo el administrador puede eliminar registros.'], 403);
+        }
+
         $gasto = \App\Models\GastoProvicional::findOrFail($id);
         $gasto->delete();
 

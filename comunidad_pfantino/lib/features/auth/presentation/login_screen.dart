@@ -249,8 +249,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                 child: GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      _selectedRole = 'cajera1';
-                                      _usernameController.text = 'cajera1';
+                                      _selectedRole = 'operativo';
+                                      _usernameController.text = 'supervisor1';
                                       _passwordController.text = '123456';
                                     });
                                   },
@@ -259,11 +259,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                       vertical: 10,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: _selectedRole == 'cajera1'
+                                      color: _selectedRole == 'operativo'
                                           ? ChurchColors.white
                                           : Colors.transparent,
                                       borderRadius: BorderRadius.circular(8),
-                                      boxShadow: _selectedRole == 'cajera1'
+                                      boxShadow: _selectedRole == 'operativo'
                                           ? [
                                               BoxShadow(
                                                 color: Colors.black.withValues(
@@ -277,12 +277,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     ),
                                     alignment: Alignment.center,
                                     child: Text(
-                                      'Cajera',
+                                      'Operativo 1',
                                       style: TextStyle(
-                                        fontWeight: _selectedRole == 'cajera1'
+                                        fontWeight: _selectedRole == 'operativo'
                                             ? FontWeight.bold
                                             : FontWeight.normal,
-                                        color: _selectedRole == 'cajera1'
+                                        color: _selectedRole == 'operativo'
                                             ? ChurchColors.primary
                                             : ChurchColors.grey,
                                       ),

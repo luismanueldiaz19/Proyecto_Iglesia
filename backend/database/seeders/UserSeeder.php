@@ -22,13 +22,40 @@ class UserSeeder extends Seeder
         );
         $admin->assignRole('Administrador');
 
-        $cajera = User::firstOrCreate(
-            ['username' => 'cajera1'],
+        $operativo = User::firstOrCreate(
+            ['username' => 'operativo1'],
             [
-                'name' => 'Cajera',
+                'name' => 'Operativo 1',
                 'password' => bcrypt('123456'),
             ]
         );
-        $cajera->assignRole('Cajera');
+        $operativo->assignRole('Operativo');
+
+        $gerente = User::firstOrCreate(
+            ['username' => 'gerente1'],
+            [
+                'name' => 'Gerente',
+                'password' => bcrypt('123456'),
+            ]
+        );
+        $gerente->assignRole('Gerente');
+
+        $supervisor = User::firstOrCreate(
+            ['username' => 'supervisor1'],
+            [
+                'name' => 'Supervisor',
+                'password' => bcrypt('123456'),
+            ]
+        );
+        $supervisor->assignRole('Supervisor');
+
+        $operativo2 = User::firstOrCreate(
+            ['username' => 'operativo2'],
+            [
+                'name' => 'Operativo 2',
+                'password' => bcrypt('123456'),
+            ]
+        );
+        $operativo2->assignRole('Operativo');
     }
 }

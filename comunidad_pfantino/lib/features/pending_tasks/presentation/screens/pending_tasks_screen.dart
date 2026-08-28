@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../auth/providers/auth_provider.dart';
 import '../../../../core/theme/church_colors.dart';
 import '../../providers/pending_task_provider.dart';
 import '../widgets/task_detail_panel.dart';
@@ -66,7 +67,10 @@ class _PendingTasksScreenState extends ConsumerState<PendingTasksScreen> {
       ),
       floatingActionButton: LayoutBuilder(
         builder: (context, constraints) {
-          if (constraints.maxWidth < 900) {
+          final userRole = ref.watch(authProvider.notifier).currentUser?.role;
+          final canCreate = ['Administrador', 'Supervisor', 'Operativo', 'admin'].contains(userRole);
+
+          if (constraints.maxWidth < 900 && canCreate) {
             return FloatingActionButton(
               backgroundColor: ChurchColors.primary,
               child: const Icon(Icons.add, color: Colors.white),

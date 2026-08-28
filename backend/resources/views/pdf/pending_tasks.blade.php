@@ -11,21 +11,66 @@
             margin: 0;
             padding: 0;
         }
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #002B5B;
-            padding-bottom: 10px;
+        .report-card {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            width: 100%;
+            margin: 0 auto;
         }
-        .header h1 {
-            color: #002B5B;
+        .header-table {
+            width: 100%;
+            background-color: #0B2E6B;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            border-collapse: collapse;
+            margin-top: 0;
+        }
+        .header-table td {
+            padding: 28px 32px;
+            vertical-align: middle;
+            border: none;
+        }
+        .header-title-large {
+            margin: 2px 0 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+        .header-receipt-text {
             margin: 0;
-            font-size: 24px;
+            font-size: 11px;
+            color: #B7CFC3;
+            text-align: right;
         }
-        .header p {
-            margin: 5px 0 0 0;
-            color: #666;
+        .header-receipt-number {
+            margin: 2px 0 0;
             font-size: 14px;
+            font-weight: normal;
+            color: #D4A017;
+            text-align: right;
+        }
+        .body-section {
+            padding: 24px 32px 32px 32px;
+        }
+        .title-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 20px;
+            margin-top: 0;
+        }
+        .title-table td {
+            padding-bottom: 16px;
+            vertical-align: bottom;
+            border: none;
+        }
+        .title-text {
+            margin: 0;
+            font-size: 20px;
+            font-weight: bold;
+            color: #111827;
+            text-transform: uppercase;
         }
         table {
             width: 100%;
@@ -66,10 +111,44 @@
 </head>
 <body>
 
-    <div class="header">
-        <h1>Historial de Registros de Auditoría</h1>
-        <p>Reporte generado el: {{ \Carbon\Carbon::now()->format('d/m/Y H:i A') }}</p>
-    </div>
+<div class="report-card">
+    <!-- Header -->
+    <table class="header-table">
+        <tr>
+            <td style="width: 70px;">
+                @php
+                    $logoPath = public_path('logo_app.jpeg');
+                    $logoData = '';
+                    if(file_exists($logoPath)) {
+                        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
+                        $data = file_get_contents($logoPath);
+                        $logoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
+                    }
+                @endphp
+                @if($logoData)
+                    <img src="{{ $logoData }}" style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #D4A017; object-fit: cover; background-color: white; vertical-align: middle; display: inline-block;" alt="Logo">
+                @else
+                    <div style="width: 52px; height: 52px; background-color: #D4A017; border-radius: 50%; text-align: center; line-height: 52px; color: #0B2E6B; font-size: 26px; font-weight: bold; display: inline-block;">+</div>
+                @endif
+            </td>
+            <td>
+                <p class="header-title-large" style="margin: 0; font-size: 16px; text-transform: uppercase; line-height: 1.3;">Fundación Centro de<br>Evangelización Padre Fantino</p>
+            </td>
+            <td>
+                <p class="header-receipt-text">Reporte de Tareas</p>
+                <p class="header-receipt-number">Generado el <b>{{ \Carbon\Carbon::now()->format('Y-m-d') }}</b></p>
+            </td>
+        </tr>
+    </table>
+
+    <div class="body-section">
+        <table class="title-table">
+            <tr>
+                <td>
+                    <h1 class="title-text">Historial de Registros de Auditoría</h1>
+                </td>
+            </tr>
+        </table>
 
     <table>
         <thead>
@@ -113,6 +192,9 @@
     <div class="footer">
         Este documento es un reporte generado por el sistema automatizado de la Iglesia.
     </div>
+
+    </div> <!-- end body section -->
+</div> <!-- end report card -->
 
 </body>
 </html>

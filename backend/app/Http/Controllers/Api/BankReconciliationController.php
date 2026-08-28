@@ -76,6 +76,10 @@ class BankReconciliationController extends Controller
 
     public function destroy(string $id)
     {
+        if (!auth()->user()->hasRole('Administrador')) {
+            return response()->json(['message' => 'Acceso denegado. Solo el administrador puede eliminar registros.'], 403);
+        }
+
         $reconciliation = BankReconciliation::findOrFail($id);
         $reconciliation->delete();
         return response()->json(null, 204);

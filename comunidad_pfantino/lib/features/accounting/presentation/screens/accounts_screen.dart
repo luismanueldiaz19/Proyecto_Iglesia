@@ -27,7 +27,7 @@ class AccountsScreen extends ConsumerWidget {
             PageHeader(
               title: 'Catálogo de Cuentas',
               subtitle: 'Administra las cuentas contables y bancos de la iglesia',
-              actionButton: ElevatedButton.icon(
+              actionButton: isAdmin ? ElevatedButton.icon(
                 onPressed: () {
                   showDialog(
                     context: context,
@@ -47,7 +47,7 @@ class AccountsScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-              ),
+              ) : null,
             ),
             const SizedBox(height: 32),
 

@@ -42,6 +42,13 @@ class CashierDashboardScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(cashProvider);
     final notifier = ref.read(cashProvider.notifier);
+    final currentUserRole = ref.watch(authProvider.notifier).currentUser?.role;
+    final canCreate = [
+      'Administrador',
+      'Supervisor',
+      'Operativo',
+      'admin',
+    ].contains(currentUserRole);
 
     return Scaffold(
       backgroundColor: ChurchColors.background,
@@ -210,46 +217,47 @@ class CashierDashboardScreen extends ConsumerWidget {
                         style: TextStyle(color: ChurchColors.grey),
                       ),
                       const SizedBox(height: 24),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.lock_open_rounded),
-                        label: const Text('Abrir Turno de Caja'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: ChurchColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 32,
-                            vertical: 16,
+                      if (canCreate)
+                        ElevatedButton.icon(
+                          icon: const Icon(Icons.lock_open_rounded),
+                          label: const Text('Abrir Turno de Caja'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ChurchColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 32,
+                              vertical: 16,
+                            ),
                           ),
-                        ),
-                        onPressed: () async {
-                          final now = DateTime.now();
-                          final selectedDate = await showDatePicker(
-                            context: context,
-                            initialDate: now,
-                            firstDate: DateTime(2020),
-                            lastDate: now,
-                            helpText: 'SELECCIONA LA FECHA DE APERTURA',
-                            cancelText: 'CANCELAR',
-                            confirmText: 'ABRIR CAJA',
-                            builder: (context, child) {
-                              return Theme(
-                                data: Theme.of(context).copyWith(
-                                  colorScheme: ColorScheme.light(
-                                    primary: ChurchColors.primary,
-                                    onPrimary: Colors.white,
-                                    onSurface: Colors.black,
+                          onPressed: () async {
+                            final now = DateTime.now();
+                            final selectedDate = await showDatePicker(
+                              context: context,
+                              initialDate: now,
+                              firstDate: DateTime(2020),
+                              lastDate: now,
+                              helpText: 'SELECCIONA LA FECHA DE APERTURA',
+                              cancelText: 'CANCELAR',
+                              confirmText: 'ABRIR CAJA',
+                              builder: (context, child) {
+                                return Theme(
+                                  data: Theme.of(context).copyWith(
+                                    colorScheme: ColorScheme.light(
+                                      primary: ChurchColors.primary,
+                                      onPrimary: Colors.white,
+                                      onSurface: ChurchColors.black,
+                                    ),
                                   ),
-                                ),
-                                child: child!,
-                              );
-                            },
-                          );
+                                  child: child!,
+                                );
+                              },
+                            );
 
-                          if (selectedDate != null) {
-                            notifier.openReconciliation(date: selectedDate);
-                          }
-                        },
-                      ),
+                            if (selectedDate != null) {
+                              notifier.openReconciliation(date: selectedDate);
+                            }
+                          },
+                        ),
                     ],
                   ),
                 ),
@@ -331,77 +339,79 @@ class CashierDashboardScreen extends ConsumerWidget {
                                   context.push('/cashier/reconciliation');
                                 },
                               ),
-                              const SizedBox(height: 8),
-                              TextButton.icon(
-                                icon: const Icon(
-                                  Icons.delete_outline,
-                                  size: 18,
-                                ),
-                                label: const Text('Eliminar Apertura'),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: Colors.red,
-                                ),
-                                onPressed: () async {
-                                  final confirm = await showDialog<bool>(
-                                    context: context,
-                                    builder: (ctx) => AlertDialog(
-                                      title: const Text('Eliminar Apertura'),
-                                      content: const Text(
-                                        '¿Estás seguro de que deseas eliminar esta apertura de caja? '
-                                        'Esta acción borrará el turno abierto y no se puede deshacer.',
+                              if (currentUserRole == 'Administrador') ...[
+                                const SizedBox(height: 8),
+                                TextButton.icon(
+                                  icon: const Icon(
+                                    Icons.delete_outline,
+                                    size: 18,
+                                  ),
+                                  label: const Text('Eliminar Apertura'),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: Colors.red,
+                                  ),
+                                  onPressed: () async {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text('Eliminar Apertura'),
+                                        content: const Text(
+                                          '¿Estás seguro de que deseas eliminar esta apertura de caja? '
+                                          'Esta acción borrará el turno abierto y no se puede deshacer.',
+                                        ),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () =>
+                                                Navigator.pop(ctx, false),
+                                            child: const Text('Cancelar'),
+                                          ),
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              foregroundColor: Colors.white,
+                                            ),
+                                            onPressed: () =>
+                                                Navigator.pop(ctx, true),
+                                            child: const Text('Eliminar'),
+                                          ),
+                                        ],
                                       ),
-                                      actions: [
-                                        TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(ctx, false),
-                                          child: const Text('Cancelar'),
-                                        ),
-                                        ElevatedButton(
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.red,
-                                            foregroundColor: Colors.white,
-                                          ),
-                                          onPressed: () =>
-                                              Navigator.pop(ctx, true),
-                                          child: const Text('Eliminar'),
-                                        ),
-                                      ],
-                                    ),
-                                  );
+                                    );
 
-                                  if (confirm == true) {
-                                    try {
-                                      await notifier
-                                          .deleteActiveReconciliation();
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          const SnackBar(
-                                            content: Text(
-                                              'Apertura de caja eliminada correctamente.',
+                                    if (confirm == true) {
+                                      try {
+                                        await notifier
+                                            .deleteActiveReconciliation();
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Apertura de caja eliminada correctamente.',
+                                              ),
+                                              backgroundColor: Colors.green,
                                             ),
-                                            backgroundColor: Colors.green,
-                                          ),
-                                        );
-                                      }
-                                    } catch (e) {
-                                      if (context.mounted) {
-                                        ScaffoldMessenger.of(
-                                          context,
-                                        ).showSnackBar(
-                                          SnackBar(
-                                            content: Text(
-                                              'Error al eliminar: $e',
+                                          );
+                                        }
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(
+                                            context,
+                                          ).showSnackBar(
+                                            SnackBar(
+                                              content: Text(
+                                                'Error al eliminar: $e',
+                                              ),
+                                              backgroundColor: Colors.red,
                                             ),
-                                            backgroundColor: Colors.red,
-                                          ),
-                                        );
+                                          );
+                                        }
                                       }
                                     }
-                                  }
-                                },
-                              ),
+                                  },
+                                ),
+                              ],
                             ],
                           ),
                         ],

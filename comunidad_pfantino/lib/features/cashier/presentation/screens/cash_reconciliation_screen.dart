@@ -103,6 +103,13 @@ class _CashReconciliationScreenState
   Widget build(BuildContext context) {
     final state = ref.watch(cashProvider);
     final active = state.activeReconciliation;
+    final currentUserRole = ref.watch(authProvider.notifier).currentUser?.role;
+
+    final isAllowed =
+        currentUserRole == 'Operativo' ||
+        currentUserRole == 'Administrador' ||
+        currentUserRole == 'admin' ||
+        currentUserRole == 'Supervisor';
 
     if (active == null) {
       return const Scaffold(
@@ -524,7 +531,7 @@ class _CashReconciliationScreenState
 
                   if (state.isLoading)
                     const Center(child: CircularProgressIndicator())
-                  else
+                  else if (isAllowed)
                     SizedBox(
                       width: double.infinity,
                       height: 56,

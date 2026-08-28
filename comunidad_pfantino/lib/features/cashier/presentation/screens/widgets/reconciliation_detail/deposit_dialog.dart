@@ -102,7 +102,11 @@ class _DepositDialogState extends ConsumerState<DepositDialog> {
           .read(
             cashReconciliationDetailProvider(widget.reconciliationId).notifier,
           )
-          .executeDeposit(_selectedAccountId!, _selectedBankAccountId!, depositAmount);
+          .executeDeposit(
+            _selectedAccountId!,
+            _selectedBankAccountId!,
+            depositAmount,
+          );
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -144,7 +148,9 @@ class _DepositDialogState extends ConsumerState<DepositDialog> {
       );
       if (selectedAccount != null &&
           selectedAccount['accounting_account_id'] != null) {
-        final accId = int.tryParse(selectedAccount['accounting_account_id'].toString());
+        final accId = int.tryParse(
+          selectedAccount['accounting_account_id'].toString(),
+        );
         if (accId != null && accountingBankAccounts.any((a) => a.id == accId)) {
           showAccountingField = false;
         }
@@ -215,7 +221,9 @@ class _DepositDialogState extends ConsumerState<DepositDialog> {
             const SizedBox(height: 8),
             TextField(
               controller: _amountCtrl,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               decoration: InputDecoration(
                 border: OutlineInputBorder(
@@ -262,7 +270,7 @@ class _DepositDialogState extends ConsumerState<DepositDialog> {
                         vertical: 14,
                       ),
                     ),
-                    value: _selectedBankAccountId,
+                    initialValue: _selectedBankAccountId,
                     items: _bankAccounts.map((account) {
                       final bankName = account['bank'] != null
                           ? account['bank']['name']
@@ -288,8 +296,13 @@ class _DepositDialogState extends ConsumerState<DepositDialog> {
                         );
                         if (selectedAccount != null &&
                             selectedAccount['accounting_account_id'] != null) {
-                          final accId = int.tryParse(selectedAccount['accounting_account_id'].toString());
-                          if (accId != null && accountingBankAccounts.any((a) => a.id == accId)) {
+                          final accId = int.tryParse(
+                            selectedAccount['accounting_account_id'].toString(),
+                          );
+                          if (accId != null &&
+                              accountingBankAccounts.any(
+                                (a) => a.id == accId,
+                              )) {
                             _selectedAccountId = accId;
                           }
                         }
@@ -315,7 +328,7 @@ class _DepositDialogState extends ConsumerState<DepositDialog> {
                     vertical: 14,
                   ),
                 ),
-                value: _selectedAccountId,
+                initialValue: _selectedAccountId,
                 items: accountingBankAccounts.map((a) {
                   return DropdownMenuItem(
                     value: a.id,
@@ -336,7 +349,9 @@ class _DepositDialogState extends ConsumerState<DepositDialog> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: _isSubmitting ? null : () => Navigator.pop(context),
+                  onPressed: _isSubmitting
+                      ? null
+                      : () => Navigator.pop(context),
                   child: Text(
                     'Cancelar',
                     style: TextStyle(

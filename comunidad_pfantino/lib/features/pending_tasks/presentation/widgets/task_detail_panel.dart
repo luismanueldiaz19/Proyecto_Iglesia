@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../auth/providers/auth_provider.dart';
 import '../../../../core/theme/church_colors.dart';
 import '../../data/models/pending_task_model.dart';
 
-class TaskDetailPanel extends StatefulWidget {
+class TaskDetailPanel extends ConsumerStatefulWidget {
   final PendingTaskModel? task;
   final Function(PendingTaskModel) onSave;
   final Function(int) onDelete;
@@ -20,10 +22,10 @@ class TaskDetailPanel extends StatefulWidget {
   });
 
   @override
-  State<TaskDetailPanel> createState() => _TaskDetailPanelState();
+  ConsumerState<TaskDetailPanel> createState() => _TaskDetailPanelState();
 }
 
-class _TaskDetailPanelState extends State<TaskDetailPanel> {
+class _TaskDetailPanelState extends ConsumerState<TaskDetailPanel> {
   final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _detailsController = TextEditingController();
@@ -116,7 +118,9 @@ class _TaskDetailPanelState extends State<TaskDetailPanel> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
             decoration: BoxDecoration(
-              color: isReadOnly ? ChurchColors.lightGrey.withValues(alpha: 0.1) : null,
+              color: isReadOnly
+                  ? ChurchColors.lightGrey.withValues(alpha: 0.1)
+                  : null,
               border: Border.all(color: ChurchColors.lightGrey),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -142,6 +146,14 @@ class _TaskDetailPanelState extends State<TaskDetailPanel> {
 
   @override
   Widget build(BuildContext context) {
+    final currentUserRole = ref.watch(authProvider.notifier).currentUser?.role;
+    
+    final canCreate = ['Administrador', 'Supervisor', 'Operativo', 'admin'].contains(currentUserRole);
+    final canUpdate = ['Administrador', 'Supervisor', 'admin'].contains(currentUserRole);
+    final canDelete = ['Administrador', 'admin'].contains(currentUserRole);
+
+    final isAllowedToSave = widget.task == null ? canCreate : canUpdate;
+
     return Padding(
       padding: EdgeInsets.all(widget.isMobile ? 16.0 : 24.0),
       child: Form(
@@ -177,40 +189,45 @@ class _TaskDetailPanelState extends State<TaskDetailPanel> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline, color: Colors.red),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () async {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: const Text('Eliminar'),
-                              content: const Text(
-                                '¿Estás seguro de eliminar este registro?',
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx, false),
-                                  child: const Text('Cancelar'),
+                      if (canDelete) ...[
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete_outline,
+                            color: Colors.red,
+                          ),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () async {
+                            final confirm = await showDialog<bool>(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Eliminar'),
+                                content: const Text(
+                                  '¿Estás seguro de eliminar este registro?',
                                 ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    foregroundColor: Colors.white,
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx, false),
+                                    child: const Text('Cancelar'),
                                   ),
-                                  onPressed: () => Navigator.pop(ctx, true),
-                                  child: const Text('Eliminar'),
-                                ),
-                              ],
-                            ),
-                          );
-                          if (confirm == true) {
-                            widget.onDelete(widget.task!.id);
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 8),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    onPressed: () => Navigator.pop(ctx, true),
+                                    child: const Text('Eliminar'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            if (confirm == true) {
+                              widget.onDelete(widget.task!.id);
+                            }
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                      ],
                       IconButton(
                         icon: const Icon(Icons.close),
                         padding: EdgeInsets.zero,
@@ -294,7 +311,9 @@ class _TaskDetailPanelState extends State<TaskDetailPanel> {
                           child: _buildDateBox(
                             title: 'Fecha Realizada',
                             value: _completedDate != null
-                                ? DateFormat('yyyy-MM-dd HH:mm').format(_completedDate!)
+                                ? DateFormat(
+                                    'yyyy-MM-dd HH:mm',
+                                  ).format(_completedDate!)
                                 : '-',
                             isReadOnly: false,
                             onTap: () async {
@@ -304,12 +323,17 @@ class _TaskDetailPanelState extends State<TaskDetailPanel> {
                                 firstDate: DateTime(2000),
                                 lastDate: DateTime(2100),
                               );
+
                               if (date != null) {
+                                if (!context.mounted) return;
                                 final time = await showTimePicker(
                                   context: context,
-                                  initialTime: TimeOfDay.fromDateTime(_completedDate ?? DateTime.now()),
+                                  initialTime: TimeOfDay.fromDateTime(
+                                    _completedDate ?? DateTime.now(),
+                                  ),
                                 );
                                 if (time != null) {
+                                  if (!mounted) return;
                                   setState(() {
                                     _completedDate = DateTime(
                                       date.year,
@@ -431,24 +455,25 @@ class _TaskDetailPanelState extends State<TaskDetailPanel> {
               ),
             ),
             const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ChurchColors.white,
-                  foregroundColor: ChurchColors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  side: const BorderSide(color: ChurchColors.lightGrey),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            if (isAllowedToSave)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ChurchColors.white,
+                    foregroundColor: ChurchColors.black,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    side: const BorderSide(color: ChurchColors.lightGrey),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: _submit,
+                  child: Text(
+                    widget.task == null ? 'Registrar Tarea' : 'Guardar Cambios',
                   ),
                 ),
-                onPressed: _submit,
-                child: Text(
-                  widget.task == null ? 'Registrar Tarea' : 'Guardar Cambios',
-                ),
               ),
-            ),
           ],
         ),
       ),

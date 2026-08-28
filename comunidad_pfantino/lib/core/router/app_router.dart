@@ -25,6 +25,7 @@ import '../../features/finance/bank/presentation/screens/bank_accounts_screen.da
 import '../../features/finance/bank/presentation/screens/bank_account_detail_screen.dart';
 import '../../features/finance/bank/presentation/screens/bank_reconciliation_screen.dart';
 import '../../features/users/presentation/screens/profile_screen.dart';
+import '../../features/users/presentation/screens/roles_screen.dart';
 import '../../features/pending_tasks/presentation/screens/pending_tasks_screen.dart';
 import '../presentation/layout/main_layout.dart';
 
@@ -184,6 +185,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/settings/users',
             builder: (context, state) => const UsersCrudScreen(),
+          ),
+          GoRoute(
+            path: '/settings/roles',
+            builder: (context, state) => const RolesScreen(),
           ),
           GoRoute(
             path: '/profile',

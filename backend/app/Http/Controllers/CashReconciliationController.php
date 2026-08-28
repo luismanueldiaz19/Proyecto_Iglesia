@@ -406,6 +406,10 @@ class CashReconciliationController extends Controller
     }
     public function destroy($id)
     {
+        if (!auth()->user()->hasRole('Administrador')) {
+            return response()->json(['message' => 'Acceso denegado. Solo el administrador puede eliminar registros.'], 403);
+        }
+
         $reconciliation = CashReconciliation::findOrFail($id);
 
         if ($reconciliation->status !== 'draft') {
