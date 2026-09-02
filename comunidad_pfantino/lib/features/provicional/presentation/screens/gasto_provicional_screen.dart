@@ -404,8 +404,24 @@ class _GastoProvicionalScreenState
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('api_token');
 
+      String url = '${ApiConfig.baseUrl}/provicional-reportes/pdf-url';
+      List<String> queryParams = [];
+      if (_startDate != null) {
+        queryParams.add('start_date=${_formatDateForApi(_startDate!)}');
+      }
+      if (_endDate != null) {
+        queryParams.add('end_date=${_formatDateForApi(_endDate!)}');
+      }
+      if (_searchQuery.isNotEmpty) {
+        queryParams.add('search=$_searchQuery');
+      }
+
+      if (queryParams.isNotEmpty) {
+        url += '?${queryParams.join('&')}';
+      }
+
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/provicional-reportes/pdf-url'),
+        Uri.parse(url),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -447,8 +463,24 @@ class _GastoProvicionalScreenState
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('api_token');
 
+      String url = '${ApiConfig.baseUrl}/provicional-reportes/excel-url';
+      List<String> queryParams = [];
+      if (_startDate != null) {
+        queryParams.add('start_date=${_formatDateForApi(_startDate!)}');
+      }
+      if (_endDate != null) {
+        queryParams.add('end_date=${_formatDateForApi(_endDate!)}');
+      }
+      if (_searchQuery.isNotEmpty) {
+        queryParams.add('search=$_searchQuery');
+      }
+
+      if (queryParams.isNotEmpty) {
+        url += '?${queryParams.join('&')}';
+      }
+
       final response = await http.get(
-        Uri.parse('${ApiConfig.baseUrl}/provicional-reportes/excel-url'),
+        Uri.parse(url),
         headers: {'Authorization': 'Bearer $token'},
       );
 
