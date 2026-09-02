@@ -190,111 +190,110 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         const SizedBox(height: 24),
 
                         // SWITCHER DE LLENADO RÁPIDO (SOLO PARA PRUEBAS) - COMENTADO A PETICIÓN
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: ChurchColors.lightGrey.withValues(
-                              alpha: 0.3,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedRole = 'admin';
-                                      _usernameController.text = 'ludeveloper';
-                                      _passwordController.text = '199512';
-                                    });
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 10,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _selectedRole == 'admin'
-                                          ? ChurchColors.white
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: _selectedRole == 'admin'
-                                          ? [
-                                              BoxShadow(
-                                                color: Colors.black.withValues(
-                                                  alpha: 0.05,
-                                                ),
-                                                blurRadius: 4,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ]
-                                          : null,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Administrador',
-                                      style: TextStyle(
-                                        fontWeight: _selectedRole == 'admin'
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        color: _selectedRole == 'admin'
-                                            ? ChurchColors.primary
-                                            : ChurchColors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Expanded(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedRole = 'operativo';
-                                      _usernameController.text = 'supervisor1';
-                                      _passwordController.text = '123456';
-                                    });
-                                  },
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 10,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _selectedRole == 'operativo'
-                                          ? ChurchColors.white
-                                          : Colors.transparent,
-                                      borderRadius: BorderRadius.circular(8),
-                                      boxShadow: _selectedRole == 'operativo'
-                                          ? [
-                                              BoxShadow(
-                                                color: Colors.black.withValues(
-                                                  alpha: 0.05,
-                                                ),
-                                                blurRadius: 4,
-                                                offset: const Offset(0, 2),
-                                              ),
-                                            ]
-                                          : null,
-                                    ),
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'Operativo 1',
-                                      style: TextStyle(
-                                        fontWeight: _selectedRole == 'operativo'
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        color: _selectedRole == 'operativo'
-                                            ? ChurchColors.primary
-                                            : ChurchColors.grey,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
+                        // Container(
+                        //   padding: const EdgeInsets.all(4),
+                        //   decoration: BoxDecoration(
+                        //     color: ChurchColors.lightGrey.withValues(
+                        //       alpha: 0.3,
+                        //     ),
+                        //     borderRadius: BorderRadius.circular(12),
+                        //   ),
+                        //   child: Row(
+                        //     children: [
+                        //       Expanded(
+                        //         child: GestureDetector(
+                        //           onTap: () {
+                        //             setState(() {
+                        //               _selectedRole = 'admin';
+                        //               _usernameController.text = 'ludeveloper';
+                        //               _passwordController.text = '199512';
+                        //             });
+                        //           },
+                        //           child: Container(
+                        //             padding: const EdgeInsets.symmetric(
+                        //               vertical: 10,
+                        //             ),
+                        //             decoration: BoxDecoration(
+                        //               color: _selectedRole == 'admin'
+                        //                   ? ChurchColors.white
+                        //                   : Colors.transparent,
+                        //               borderRadius: BorderRadius.circular(8),
+                        //               boxShadow: _selectedRole == 'admin'
+                        //                   ? [
+                        //                       BoxShadow(
+                        //                         color: Colors.black.withValues(
+                        //                           alpha: 0.05,
+                        //                         ),
+                        //                         blurRadius: 4,
+                        //                         offset: const Offset(0, 2),
+                        //                       ),
+                        //                     ]
+                        //                   : null,
+                        //             ),
+                        //             alignment: Alignment.center,
+                        //             child: Text(
+                        //               'Administrador',
+                        //               style: TextStyle(
+                        //                 fontWeight: _selectedRole == 'admin'
+                        //                     ? FontWeight.bold
+                        //                     : FontWeight.normal,
+                        //                 color: _selectedRole == 'admin'
+                        //                     ? ChurchColors.primary
+                        //                     : ChurchColors.grey,
+                        //               ),
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //       Expanded(
+                        //         child: GestureDetector(
+                        //           onTap: () {
+                        //             setState(() {
+                        //               _selectedRole = 'operativo';
+                        //               _usernameController.text = 'supervisor1';
+                        //               _passwordController.text = '123456';
+                        //             });
+                        //           },
+                        //           child: Container(
+                        //             padding: const EdgeInsets.symmetric(
+                        //               vertical: 10,
+                        //             ),
+                        //             decoration: BoxDecoration(
+                        //               color: _selectedRole == 'operativo'
+                        //                   ? ChurchColors.white
+                        //                   : Colors.transparent,
+                        //               borderRadius: BorderRadius.circular(8),
+                        //               boxShadow: _selectedRole == 'operativo'
+                        //                   ? [
+                        //                       BoxShadow(
+                        //                         color: Colors.black.withValues(
+                        //                           alpha: 0.05,
+                        //                         ),
+                        //                         blurRadius: 4,
+                        //                         offset: const Offset(0, 2),
+                        //                       ),
+                        //                     ]
+                        //                   : null,
+                        //             ),
+                        //             alignment: Alignment.center,
+                        //             child: Text(
+                        //               'Operativo 1',
+                        //               style: TextStyle(
+                        //                 fontWeight: _selectedRole == 'operativo'
+                        //                     ? FontWeight.bold
+                        //                     : FontWeight.normal,
+                        //                 color: _selectedRole == 'operativo'
+                        //                     ? ChurchColors.primary
+                        //                     : ChurchColors.grey,
+                        //               ),
+                        //             ),
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 24),
                         if (authState == AuthState.error)
                           Container(
                             padding: const EdgeInsets.all(12),
