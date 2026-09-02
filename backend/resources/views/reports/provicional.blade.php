@@ -188,6 +188,7 @@
             </tr>
         </table>
     
+        @if($type === 'ingresos' || $type === 'all' || empty($type))
         <h2>Ingresos</h2>
         <table class="data-table">
             <thead>
@@ -213,7 +214,9 @@
                 @endforelse
             </tbody>
         </table>
+        @endif
 
+        @if($type === 'gastos' || $type === 'all' || empty($type))
         <h2>Gastos</h2>
         <table class="data-table">
             <thead>
@@ -241,6 +244,7 @@
                 @endforelse
             </tbody>
         </table>
+        @endif
 
         <table class="footer-table">
             <tr>

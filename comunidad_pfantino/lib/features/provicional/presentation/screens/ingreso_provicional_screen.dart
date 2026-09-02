@@ -407,6 +407,7 @@ class _IngresoProvicionalScreenState
       if (_searchQuery.isNotEmpty) {
         queryParams.add('search=$_searchQuery');
       }
+      queryParams.add('type=ingresos');
 
       if (queryParams.isNotEmpty) {
         url += '?${queryParams.join('&')}';
@@ -466,6 +467,7 @@ class _IngresoProvicionalScreenState
       if (_searchQuery.isNotEmpty) {
         queryParams.add('search=$_searchQuery');
       }
+      queryParams.add('type=ingresos');
 
       if (queryParams.isNotEmpty) {
         url += '?${queryParams.join('&')}';

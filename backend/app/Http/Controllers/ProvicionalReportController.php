@@ -30,7 +30,7 @@ class ProvicionalReportController extends Controller
         $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
             'provicional-reportes.pdf',
             now()->addMinutes(30),
-            $request->only(['start_date', 'end_date', 'search'])
+            $request->only(['start_date', 'end_date', 'search', 'type'])
         );
         return response()->json(['url' => $url]);
     }
@@ -40,6 +40,7 @@ class ProvicionalReportController extends Controller
      */
     public function exportPdf(Request $request)
     {
+        $type = $request->input('type');
         $queryIngresos = IngresoProvicional::with('user')->orderBy('fecha_ingreso', 'desc');
         $queryGastos = GastoProvicional::with('user')->orderBy('fecha_gasto', 'desc');
 
@@ -59,11 +60,19 @@ class ProvicionalReportController extends Controller
             $queryGastos->where('concepto', 'ilike', $searchTerm);
         }
 
-        $ingresos = $queryIngresos->get();
-        $gastos = $queryGastos->get();
+        $ingresos = collect();
+        $gastos = collect();
+
+        if ($type === 'ingresos' || $type === 'all' || empty($type)) {
+            $ingresos = $queryIngresos->get();
+        }
+
+        if ($type === 'gastos' || $type === 'all' || empty($type)) {
+            $gastos = $queryGastos->get();
+        }
         
         // Asumiendo que usas dompdf
-        $pdf = Pdf::loadView('reports.provicional', compact('ingresos', 'gastos'));
+        $pdf = Pdf::loadView('reports.provicional', compact('ingresos', 'gastos', 'type'));
         
         return $pdf->stream('reporte_provicional.pdf');
     }
@@ -73,7 +82,7 @@ class ProvicionalReportController extends Controller
         $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
             'provicional-reportes.excel',
             now()->addMinutes(30),
-            $request->only(['start_date', 'end_date', 'search'])
+            $request->only(['start_date', 'end_date', 'search', 'type'])
         );
         return response()->json(['url' => $url]);
     }
@@ -86,7 +95,8 @@ class ProvicionalReportController extends Controller
         return Excel::download(new ProvicionalExport(
             $request->input('start_date'),
             $request->input('end_date'),
-            $request->input('search')
+            $request->input('search'),
+            $request->input('type')
         ), 'reporte_provicional.xlsx');
     }
 }

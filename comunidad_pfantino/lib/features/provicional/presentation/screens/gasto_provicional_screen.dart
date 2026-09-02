@@ -415,6 +415,7 @@ class _GastoProvicionalScreenState
       if (_searchQuery.isNotEmpty) {
         queryParams.add('search=$_searchQuery');
       }
+      queryParams.add('type=gastos');
 
       if (queryParams.isNotEmpty) {
         url += '?${queryParams.join('&')}';
@@ -474,6 +475,7 @@ class _GastoProvicionalScreenState
       if (_searchQuery.isNotEmpty) {
         queryParams.add('search=$_searchQuery');
       }
+      queryParams.add('type=gastos');
 
       if (queryParams.isNotEmpty) {
         url += '?${queryParams.join('&')}';
