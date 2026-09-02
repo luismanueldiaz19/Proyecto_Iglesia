@@ -248,10 +248,140 @@ class _ProvicionalDashboardScreenState
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.only(left: 24.0, right: 24.0, top: 24.0),
             child: PageHeader(
               title: 'Dashboard Provisionales',
               subtitle: 'Comparativa de Ingresos vs Gastos Provisionales',
+              actionButton: Wrap(
+                spacing: 12,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  Container(
+                    height: 40,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: Border.all(color: Colors.grey.shade300),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _selectedQuickFilter,
+                        icon: Icon(
+                          Icons.keyboard_arrow_down,
+                          color: Colors.grey.shade600,
+                        ),
+                        style: TextStyle(
+                          color: Colors.grey.shade800,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        items:
+                            [
+                              'Hoy',
+                              'Ayer',
+                              'Esta semana',
+                              'Este mes',
+                              'Mes pasado',
+                              'Este año',
+                              'Personalizado',
+                            ].map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                        onChanged: (String? newValue) {
+                          if (newValue != null) _applyQuickFilter(newValue);
+                        },
+                      ),
+                    ),
+                  ),
+                  Tooltip(
+                    message: 'Rango de fechas',
+                    child: IconButton(
+                      onPressed: _selectDateRange,
+                      icon: const Icon(Icons.date_range, size: 22),
+                      color: Colors.grey.shade700,
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: Colors.grey.shade300),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Theme(
+                    data: Theme.of(context).copyWith(
+                      splashColor: Colors.transparent,
+                      highlightColor: Colors.transparent,
+                    ),
+                    child: PopupMenuButton<int>(
+                      tooltip: 'Buscar por mes (Este año)',
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      position: PopupMenuPosition.under,
+                      onSelected: _selectMonth,
+                      itemBuilder: (BuildContext context) =>
+                          [
+                            'Enero',
+                            'Febrero',
+                            'Marzo',
+                            'Abril',
+                            'Mayo',
+                            'Junio',
+                            'Julio',
+                            'Agosto',
+                            'Septiembre',
+                            'Octubre',
+                            'Noviembre',
+                            'Diciembre',
+                          ].asMap().entries.map((entry) {
+                            return PopupMenuItem<int>(
+                              value: entry.key + 1,
+                              child: Text(
+                                entry.value,
+                                style: TextStyle(color: Colors.grey.shade800),
+                              ),
+                            );
+                          }).toList(),
+                      child: Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          Icons.calendar_month,
+                          color: Colors.grey.shade700,
+                          size: 22,
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  Tooltip(
+                    message: 'Imprimir PDF',
+                    child: IconButton(
+                      onPressed: _downloadPdf,
+                      icon: const Icon(Icons.print, size: 22),
+                      color: Colors.grey.shade700,
+                      style: IconButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: Colors.grey.shade300),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           Expanded(
@@ -260,19 +390,6 @@ class _ProvicionalDashboardScreenState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Filter widget without search and excel imports
-                  IngresosFilterWidget(
-                    selectedQuickFilter: _selectedQuickFilter,
-                    onQuickFilterChanged: _applyQuickFilter,
-                    onDateRangeSelected: _selectDateRange,
-                    onMonthSelected: _selectMonth,
-                    onDownloadPdf: _downloadPdf,
-                    onShowInfo: () {},
-                    isUploading: false,
-                    showSearchAndExport: false,
-                  ),
-                  const SizedBox(height: 24),
-
                   // Summary cards
                   Row(
                     children: [
@@ -293,18 +410,6 @@ class _ProvicionalDashboardScreenState
                           icon: Icons.trending_down_rounded,
                           accentColor: const Color(0xFFC62828),
                           subtitle: 'Gastos registrados',
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TotalSummaryWidget(
-                          title: 'Monto Total (Neto)',
-                          totalAmount: _balance,
-                          icon: Icons.account_balance_wallet_rounded,
-                          accentColor: _balance >= 0
-                              ? const Color(0xFF1565C0)
-                              : Colors.orange.shade700,
-                          subtitle: 'Ingresos más gastos',
                         ),
                       ),
                     ],

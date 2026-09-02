@@ -42,156 +42,341 @@ class AllCashHistoryScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(24.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             PageHeader(
               title: 'Todos los Cuadres',
               subtitle: 'Historial completo de cuadres de caja',
-              actionButton: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    icon: const Icon(
-                      Icons.refresh,
-                      color: ChurchColors.primary,
-                    ),
-                    tooltip: 'Refrescar',
-                    onPressed: () {
-                      ref
-                          .read(allCashHistoryProvider.notifier)
-                          .fetchReconciliations();
-                    },
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.picture_as_pdf, color: Colors.red),
-                    tooltip: 'Generar PDF',
-                    onPressed: () async {
-                      try {
-                        await ref
-                            .read(allCashHistoryProvider.notifier)
-                            .downloadPdf();
-                      } catch (e) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error al generar PDF: $e'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                        }
-                      }
-                    },
+            ),
+            const SizedBox(height: 24),
+            // Filtros y Acciones
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20.0,
+                vertical: 16.0,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.grey.shade200),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 24),
-            // Filtros
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: ChurchColors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: ChurchColors.lightGrey),
-              ),
-              child: Row(
+              child: Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                alignment: WrapAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: DropdownButtonFormField<int?>(
-                      initialValue: state.selectedModuleId,
-                      decoration: const InputDecoration(
-                        labelText: 'Módulo',
-                        border: OutlineInputBorder(),
-                        contentPadding: EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 8,
+                  // Lado izquierdo: Filtros
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      // Módulo
+                      Container(
+                        height: 40,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          border: Border.all(color: Colors.grey.shade300),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<int?>(
+                            value: state.selectedModuleId,
+                            icon: Icon(
+                              Icons.keyboard_arrow_down,
+                              color: Colors.grey.shade600,
+                            ),
+                            style: TextStyle(
+                              color: Colors.grey.shade800,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            items: [
+                              const DropdownMenuItem<int?>(
+                                value: null,
+                                child: Text('Todos los Módulos'),
+                              ),
+                              ...cashState.modules.map((m) {
+                                return DropdownMenuItem<int?>(
+                                  value: m.id,
+                                  child: Text(m.name),
+                                );
+                              }),
+                            ],
+                            onChanged: (val) {
+                              ref
+                                  .read(allCashHistoryProvider.notifier)
+                                  .setFilter(
+                                    moduleId: val,
+                                    clearModuleId: val == null,
+                                  );
+                            },
+                          ),
                         ),
                       ),
-                      items: [
-                        const DropdownMenuItem<int?>(
-                          value: null,
-                          child: Text('Todos los Módulos'),
-                        ),
-                        ...cashState.modules.map((m) {
-                          return DropdownMenuItem<int?>(
-                            value: m.id,
-                            child: Text(m.name),
+
+                      // Rango de fechas
+                      InkWell(
+                        onTap: () async {
+                          final picked = await showDateRangePicker(
+                            context: context,
+                            initialDateRange: DateTimeRange(
+                              start: state.startDate,
+                              end: state.endDate,
+                            ),
+                            firstDate: DateTime(2000),
+                            lastDate: DateTime(2100),
+                            builder: (context, child) {
+                              return Theme(
+                                data: Theme.of(context).copyWith(
+                                  colorScheme: ColorScheme.light(
+                                    primary: ChurchColors.primary,
+                                    onPrimary: Colors.white,
+                                    surface: Colors.white,
+                                    onSurface: Colors.black,
+                                  ),
+                                ),
+                                child: child!,
+                              );
+                            },
                           );
-                        }),
-                      ],
-                      onChanged: (val) {
-                        ref
-                            .read(allCashHistoryProvider.notifier)
-                            .setFilter(
-                              moduleId: val,
-                              clearModuleId: val == null,
+                          if (picked != null) {
+                            ref
+                                .read(allCashHistoryProvider.notifier)
+                                .setFilter(
+                                  startDate: picked.start,
+                                  endDate: DateTime(
+                                    picked.end.year,
+                                    picked.end.month,
+                                    picked.end.day,
+                                    23,
+                                    59,
+                                    59,
+                                  ),
+                                );
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          height: 40,
+                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.date_range,
+                                size: 18,
+                                color: Colors.grey.shade600,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "${state.startDate.day.toString().padLeft(2, '0')}/${state.startDate.month.toString().padLeft(2, '0')}/${state.startDate.year} - ${state.endDate.day.toString().padLeft(2, '0')}/${state.endDate.month.toString().padLeft(2, '0')}/${state.endDate.year}",
+                                style: TextStyle(
+                                  color: Colors.grey.shade800,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      // Selector de mes
+                      Theme(
+                        data: Theme.of(context).copyWith(
+                          splashColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                        ),
+                        child: PopupMenuButton<int>(
+                          tooltip: 'Buscar por mes (Este año)',
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          position: PopupMenuPosition.under,
+                          onSelected: (month) {
+                            final now = DateTime.now();
+                            if (month == 0) {
+                              final startDate = DateTime(now.year, 1, 1);
+                              final endDate = DateTime(
+                                now.year,
+                                12,
+                                31,
+                                23,
+                                59,
+                                59,
+                              );
+                              ref
+                                  .read(allCashHistoryProvider.notifier)
+                                  .setFilter(
+                                    startDate: startDate,
+                                    endDate: endDate,
+                                  );
+                              return;
+                            }
+                            final startDate = DateTime(now.year, month, 1);
+                            final endDate = DateTime(
+                              now.year,
+                              month + 1,
+                              0,
+                              23,
+                              59,
+                              59,
                             );
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: state.startDate,
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (picked != null) {
-                          ref
-                              .read(allCashHistoryProvider.notifier)
-                              .setFilter(startDate: picked);
-                        }
-                      },
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Desde',
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                            ref
+                                .read(allCashHistoryProvider.notifier)
+                                .setFilter(
+                                  startDate: startDate,
+                                  endDate: endDate,
+                                );
+                          },
+                          itemBuilder: (BuildContext context) => [
+                            const PopupMenuItem<int>(
+                              value: 0,
+                              child: Text(
+                                'Todo el Año',
+                                style: TextStyle(
+                                  color: ChurchColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            ...[
+                              'Enero',
+                              'Febrero',
+                              'Marzo',
+                              'Abril',
+                              'Mayo',
+                              'Junio',
+                              'Julio',
+                              'Agosto',
+                              'Septiembre',
+                              'Octubre',
+                              'Noviembre',
+                              'Diciembre',
+                            ].asMap().entries.map((entry) {
+                              return PopupMenuItem<int>(
+                                value: entry.key + 1,
+                                child: Text(
+                                  entry.value,
+                                  style: TextStyle(color: Colors.grey.shade800),
+                                ),
+                              );
+                            }),
+                          ],
+                          child: Container(
+                            height: 40,
+                            width: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.calendar_month,
+                              color: Colors.grey.shade700,
+                              size: 22,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          "${state.startDate.day.toString().padLeft(2, '0')}/${state.startDate.month.toString().padLeft(2, '0')}/${state.startDate.year}",
-                        ),
                       ),
-                    ),
+                    ],
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: InkWell(
-                      onTap: () async {
-                        final picked = await showDatePicker(
-                          context: context,
-                          initialDate: state.endDate,
-                          firstDate: DateTime(2000),
-                          lastDate: DateTime(2100),
-                        );
-                        if (picked != null) {
+
+                  // Lado derecho: Acciones
+                  Wrap(
+                    spacing: 8,
+                    children: [
+                      // Refrescar
+                      TextButton.icon(
+                        onPressed: () {
                           ref
                               .read(allCashHistoryProvider.notifier)
-                              .setFilter(endDate: picked);
-                        }
-                      },
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Hasta',
-                          border: OutlineInputBorder(),
-                          contentPadding: EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 8,
+                              .fetchReconciliations();
+                        },
+                        icon: Icon(
+                          Icons.refresh,
+                          color: ChurchColors.primary,
+                          size: 18,
+                        ),
+                        label: Text(
+                          'Refrescar',
+                          style: TextStyle(
+                            color: Colors.grey.shade800,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
-                        child: Text(
-                          "${state.endDate.day.toString().padLeft(2, '0')}/${state.endDate.month.toString().padLeft(2, '0')}/${state.endDate.year}",
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(color: Colors.grey.shade200),
+                          ),
                         ),
                       ),
-                    ),
+
+                      // PDF
+                      TextButton.icon(
+                        onPressed: () async {
+                          try {
+                            await ref
+                                .read(allCashHistoryProvider.notifier)
+                                .downloadPdf();
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error al generar PDF: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        icon: Icon(
+                          Icons.picture_as_pdf,
+                          color: Colors.red.shade600,
+                          size: 18,
+                        ),
+                        label: Text(
+                          'PDF',
+                          style: TextStyle(
+                            color: Colors.grey.shade800,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        style: TextButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(color: Colors.grey.shade200),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -210,322 +395,310 @@ class AllCashHistoryScreen extends ConsumerWidget {
                     )
                   : state.reconciliations.isEmpty
                   ? const Center(child: Text('No hay cuadres en este rango.'))
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: state.reconciliations.length,
-                      itemBuilder: (context, index) {
-                        final history = state.reconciliations[index];
-
-                        final finalDifference = history.isDeposited
-                            ? (history.depositDifference ?? history.difference)
-                            : history.difference;
-                        final isFaltante = finalDifference < 0;
-                        final isPerfect = finalDifference == 0;
-
-                        final moduleName = cashState.modules
-                            .firstWhere(
-                              (m) => m.id == history.moduleId,
-                              orElse: () => ModuleModel(
-                                id: 0,
-                                name: 'Desconocido',
-                                isActive: false,
+                  : Card(
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        side: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      color: Colors.white,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(16),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: SingleChildScrollView(
+                            child: DataTable(
+                              headingRowColor: WidgetStateProperty.resolveWith(
+                                (states) => Colors.grey.shade50,
                               ),
-                            )
-                            .name;
-
-                        Color statusColor;
-                        if (isPerfect) {
-                          statusColor = Colors.green;
-                        } else if (isFaltante) {
-                          statusColor = Colors.red;
-                        } else {
-                          statusColor = Colors.orange;
-                        }
-
-                        String statusText;
-                        if (isPerfect) {
-                          statusText = 'CUADRE PERFECTO';
-                        } else if (isFaltante) {
-                          statusText = 'FALTANTE';
-                        } else {
-                          statusText = 'SOBRANTE';
-                        }
-
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.04),
-                                offset: const Offset(0, 4),
-                                blurRadius: 8,
-                              ),
-                              BoxShadow(
-                                color: statusColor.withValues(alpha: 0.15),
-                                offset: const Offset(4, 6),
-                                blurRadius: 12,
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(12),
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (_) =>
-                                        CashReconciliationDetailDialog(
-                                      reconciliationId: history.id,
-                                      fallbackTotalGeneral: history.totalGeneral,
-                                      fallbackTotalExpenses: history.totalExpenses,
+                              dataRowMaxHeight: 48,
+                              dataRowMinHeight: 48,
+                              horizontalMargin: 24,
+                              columnSpacing: 24,
+                              columns: const [
+                                DataColumn(
+                                  label: Text(
+                                    'Cierre #',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
                                     ),
-                                  );
-                                },
-                                child: IntrinsicHeight(
-                                  child: Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.stretch,
-                                    children: [
-                                      // Franja lateral 3D
-                                      Container(width: 6, color: statusColor),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16),
-                                          child: Row(
-                                            children: [
-                                              Expanded(
-                                                flex: 2,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      '$moduleName (Cierre #${history.id}) - ${history.date}',
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: ChurchColors
-                                                            .primary,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(height: 8),
-                                                    Row(
-                                                      children: [
-                                                        Icon(
-                                                          history.isDeposited
-                                                              ? Icons
-                                                                    .account_balance
-                                                              : Icons
-                                                                    .access_time_filled,
-                                                          size: 16,
-                                                          color:
-                                                              history
-                                                                  .isDeposited
-                                                              ? Colors.green
-                                                              : Colors.orange,
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 4,
-                                                        ),
-                                                        Text(
-                                                          history.isDeposited
-                                                              ? 'Depositado: \$${history.depositAmount != null ? CurrencyFormatter.formatAmount(history.depositAmount!) : "0.00"}'
-                                                              : 'Pendiente de Depósito',
-                                                          style: TextStyle(
-                                                            color:
-                                                                history
-                                                                    .isDeposited
-                                                                ? Colors.green
-                                                                : Colors.orange,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 12,
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    const SizedBox(height: 12),
-                                                    Row(
-                                                      children: [
-                                                        _buildSummaryChip(
-                                                          'Cuadre',
-                                                          history.totalGeneral,
-                                                          Colors.green,
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 8,
-                                                        ),
-                                                        _buildSummaryChip(
-                                                          'Gastos',
-                                                          history.totalExpenses,
-                                                          Colors.red,
-                                                        ),
-                                                        const SizedBox(
-                                                          width: 8,
-                                                        ),
-                                                        _buildSummaryChip(
-                                                          'A Depositar',
-                                                          history.totalGeneral -
-                                                              history
-                                                                  .totalExpenses,
-                                                          Colors.blue,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Fecha',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Módulo',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Efectivo',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Gastos',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'A Depositar',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Depósito',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Diferencia',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                                DataColumn(
+                                  label: Text(
+                                    'Acciones',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                              rows: state.reconciliations.map((history) {
+                                final finalDifference = history.isDeposited
+                                    ? (history.depositDifference ??
+                                          history.difference)
+                                    : history.difference;
+                                final isFaltante = finalDifference < 0;
+                                final isPerfect = finalDifference == 0;
+
+                                final moduleName = cashState.modules
+                                    .firstWhere(
+                                      (m) => m.id == history.moduleId,
+                                      orElse: () => ModuleModel(
+                                        id: 0,
+                                        name: 'Desconocido',
+                                        isActive: false,
+                                      ),
+                                    )
+                                    .name;
+
+                                Color statusColor = isPerfect
+                                    ? Colors.green
+                                    : (isFaltante ? Colors.red : Colors.orange);
+                                String statusText = isPerfect
+                                    ? 'PERFECTO'
+                                    : (isFaltante ? 'FALTANTE' : 'SOBRANTE');
+
+                                final aDepositar =
+                                    history.totalGeneral -
+                                    history.totalExpenses;
+
+                                return DataRow(
+                                  cells: [
+                                    DataCell(
+                                      Text(
+                                        '#${history.id}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: ChurchColors.primary,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        history.date,
+                                        style: TextStyle(
+                                          color: Colors.grey.shade800,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        moduleName,
+                                        style: TextStyle(
+                                          color: Colors.grey.shade800,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        '\$${CurrencyFormatter.formatAmount(history.totalGeneral)}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.green,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        '\$${CurrencyFormatter.formatAmount(history.totalExpenses)}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.red,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      Text(
+                                        '\$${CurrencyFormatter.formatAmount(aDepositar)}',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                    ),
+                                    DataCell(
+                                      history.isDeposited
+                                          ? Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(
+                                                  Icons.check_circle,
+                                                  color: Colors.green,
+                                                  size: 16,
                                                 ),
-                                              ),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
-                                                  children: [
-                                                    const Text(
-                                                      'Efectivo Físico',
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        color:
-                                                            ChurchColors.grey,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      '\$${CurrencyFormatter.formatAmount(history.totalGeneral)}',
-                                                      style: const TextStyle(
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.w900,
-                                                      ),
-                                                    ),
-                                                  ],
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  '\$${history.depositAmount != null ? CurrencyFormatter.formatAmount(history.depositAmount!) : "0.00"}',
+                                                  style: const TextStyle(
+                                                    color: Colors.green,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                                 ),
-                                              ),
-                                              const SizedBox(width: 16),
-                                              !history.isDeposited
-                                                  ? Container(
-                                                      width: 120,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: const Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Icon(
-                                                            Icons
-                                                                .warning_amber_rounded,
-                                                            color:
-                                                                Colors.orange,
-                                                            size: 28,
-                                                          ),
-                                                          SizedBox(height: 4),
-                                                          Text(
-                                                            'SIN DEPOSITAR',
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.orange,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 10,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    )
-                                                  : Container(
-                                                      width: 120,
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            vertical: 8,
-                                                            horizontal: 8,
-                                                          ),
-                                                      decoration: BoxDecoration(
-                                                        color: statusColor
-                                                            .withValues(
-                                                              alpha: 0.1,
-                                                            ),
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              8,
-                                                            ),
-                                                        border: Border.all(
-                                                          color: statusColor,
-                                                          width: 1,
-                                                        ),
-                                                      ),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Text(
-                                                            statusText,
-                                                            textAlign: TextAlign
-                                                                .center,
-                                                            style: TextStyle(
-                                                              color:
-                                                                  statusColor,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 10,
-                                                            ),
-                                                          ),
-                                                          const SizedBox(
-                                                            height: 4,
-                                                          ),
-                                                          Text(
-                                                            '\$${CurrencyFormatter.formatAmount(finalDifference.abs())}',
-                                                            style: TextStyle(
-                                                              color:
-                                                                  statusColor,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w900,
-                                                              fontSize: 14,
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                            ],
+                                              ],
+                                            )
+                                          : Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(
+                                                  Icons.access_time_filled,
+                                                  color: Colors.orange,
+                                                  size: 16,
+                                                ),
+                                                const SizedBox(width: 4),
+                                                const Text(
+                                                  'Pendiente',
+                                                  style: TextStyle(
+                                                    color: Colors.orange,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                    ),
+                                    DataCell(
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: statusColor.withValues(
+                                            alpha: 0.1,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
+                                          border: Border.all(
+                                            color: statusColor.withValues(
+                                              alpha: 0.3,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          isPerfect
+                                              ? statusText
+                                              : '$statusText (\$${CurrencyFormatter.formatAmount(finalDifference.abs())})',
+                                          style: TextStyle(
+                                            color: statusColor,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 12,
                                           ),
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                                    ),
+                                    DataCell(
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.visibility,
+                                          color: ChurchColors.primary,
+                                          size: 20,
+                                        ),
+                                        tooltip: 'Ver Detalle',
+                                        onPressed: () {
+                                          showDialog(
+                                            context: context,
+                                            builder: (_) =>
+                                                CashReconciliationDetailDialog(
+                                                  reconciliationId: history.id,
+                                                  fallbackTotalGeneral:
+                                                      history.totalGeneral,
+                                                  fallbackTotalExpenses:
+                                                      history.totalExpenses,
+                                                ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
                             ),
                           ),
-                        );
-                      },
+                        ),
+                      ),
                     ),
             ),
 
             // Resumen Final
             if (!state.isLoading && state.reconciliations.isNotEmpty)
               Container(
-                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(top: 16),
+                padding: const EdgeInsets.symmetric(vertical: 16),
                 decoration: BoxDecoration(
-                  color: ChurchColors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: ChurchColors.lightGrey),
-                  boxShadow: const [
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey.shade200),
+                  boxShadow: [
                     BoxShadow(
-                      color: Colors.black12,
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 10,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -597,41 +770,6 @@ class AllCashHistoryScreen extends ConsumerWidget {
                   ),
                 ),
               ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSummaryChip(String label, double amount, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                color: color,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            Text(
-              '\$${CurrencyFormatter.formatAmount(amount)}',
-              style: TextStyle(
-                fontSize: 12,
-                color: color,
-                fontWeight: FontWeight.w900,
-              ),
-              overflow: TextOverflow.ellipsis,
-            ),
           ],
         ),
       ),

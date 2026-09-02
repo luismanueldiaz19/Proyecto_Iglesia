@@ -56,7 +56,7 @@
             text-align: right;
         }
         .body-section {
-            padding: 24px 24px 24px 24px;
+            padding: 12px 24px 20px 24px;
         }
         .title-table {
             width: 100%;
@@ -84,13 +84,15 @@
         table.data-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
-            font-size: 12px;
+            margin-bottom: 12px;
+            font-size: 9px; /* Tamaño equilibrado */
+            line-height: 1.3;
         }
         table.data-table th, table.data-table td {
             border: 1px solid #E5E7EB;
-            padding: 8px 12px;
+            padding: 2px 4px; /* Un poco más de aire para que respire */
             text-align: left;
+            vertical-align: middle;
         }
         table.data-table th {
             background-color: #F9FAFB;
@@ -115,11 +117,11 @@
 
         h2 {
             color: #111827;
-            font-size: 16px;
-            margin-top: 30px;
-            margin-bottom: 10px;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 5px;
+            font-size: 13px;
+            margin-top: 8px;
+            margin-bottom: 6px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 2px;
         }
 
     </style>
@@ -127,82 +129,17 @@
 <body>
 
 <div class="report-card">
-    <!-- Header -->
-    <table class="header-table">
-        <tr>
-            <td style="width: 70px;">
-                @php
-                    $logoPath = public_path('logo_app.jpeg');
-                    $logoData = '';
-                    if(file_exists($logoPath)) {
-                        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-                        $data = file_get_contents($logoPath);
-                        $logoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    }
-                @endphp
-                @if($logoData)
-                    <img src="{{ $logoData }}" style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #D4A017; object-fit: cover; background-color: white; vertical-align: middle; display: inline-block;" alt="Logo">
-                @else
-                    <div style="width: 52px; height: 52px; background-color: #D4A017; border-radius: 50%; text-align: center; line-height: 52px; color: #0B2E6B; font-size: 26px; font-weight: bold; display: inline-block;">+</div>
-                @endif
-            </td>
-            <td>
-                <p class="header-title-small">Centro de evangelización</p>
-                <p class="header-title-large">Padre Fantino</p>
-            </td>
-            <td>
-                <p class="header-receipt-text">Reporte</p>
-                <p class="header-receipt-number">Provisional</p>
-            </td>
-        </tr>
-    </table>
+    @include('pdf.components.header', [
+        'title' => 'Reporte de Gastos Provisionales',
+        'period' => (isset($startDate) && isset($endDate)) ? "$startDate al $endDate" : 'Histórico Completo'
+    ])
 
     <div class="body-section">
-        <table class="title-table">
-            <tr>
-                <td>
-                    <h1 class="title-text">Reporte Provisional</h1>
-                </td>
-                <td class="date-text">
-                    Generado: {{ now()->format('d M Y, h:i a') }}
-                </td>
-            </tr>
-        </table>
-    
-        @if($type === 'ingresos' || $type === 'all')
-        <h2>Ingresos</h2>
-        <table class="data-table">
-            <thead>
-                <tr>
-                    <th>Fecha</th>
-                    <th>Concepto</th>
-                    <th>Usuario Registro</th>
-                    <th class="amount">Monto</th>
-                </tr>
-            </thead>
-            <tbody>
-                @forelse($ingresos as $ingreso)
-                <tr>
-                    <td>{{ $ingreso->fecha_ingreso }}</td>
-                    <td>{{ $ingreso->concepto }}</td>
-                    <td>{{ $ingreso->user->name ?? 'N/A' }}</td>
-                    <td class="amount">${{ number_format($ingreso->monto, 2) }}</td>
-                </tr>
-                @empty
-                <tr>
-                    <td colspan="4" style="text-align: center; color: #6b7280;">No hay ingresos registrados</td>
-                </tr>
-                @endforelse
-            </tbody>
-        </table>
-        @endif
-
-        @if($type === 'gastos' || $type === 'all')
         <h2>Gastos</h2>
         <table class="data-table">
             <thead>
                 <tr>
-                    <th>Fecha</th>
+                     <th>Fecha</th>
                     <th>Descripción</th>
                     <th>Cheque</th>
                     <th>Registrado por</th>
@@ -240,7 +177,6 @@
                 </tr>
             </tfoot>
         </table>
-        @endif
 
         @include('pdf.components.footer')
     </div> <!-- end body section -->

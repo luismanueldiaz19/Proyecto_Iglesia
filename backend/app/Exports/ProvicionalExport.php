@@ -22,12 +22,17 @@ class ProvicionalExport implements WithMultipleSheets
     public function sheets(): array
     {
         $sheets = [];
+        
+        $type = $this->type;
+        if (!in_array($type, ['ingresos', 'gastos'])) {
+            $type = 'all';
+        }
 
-        if ($this->type === 'ingresos' || $this->type === 'all' || empty($this->type)) {
+        if ($type === 'ingresos' || $type === 'all') {
             $sheets[] = new IngresosSheet($this->startDate, $this->endDate, $this->search);
         }
 
-        if ($this->type === 'gastos' || $this->type === 'all' || empty($this->type)) {
+        if ($type === 'gastos' || $type === 'all') {
             $sheets[] = new GastosSheet($this->startDate, $this->endDate, $this->search);
         }
 

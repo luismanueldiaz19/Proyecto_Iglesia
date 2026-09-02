@@ -142,7 +142,7 @@ class DashboardChartWidget extends StatelessWidget {
                               dataItem['gastos']?.toString() ?? '',
                             ) ??
                             0;
-                        final total = ingresosMes + gastosMes;
+                        final total = ingresosMes - gastosMes;
 
                         final parts = mesStr.split('-');
                         final mesNum = int.tryParse(parts.last) ?? 0;

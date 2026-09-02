@@ -129,6 +129,9 @@ class ProvicionalDashboardController extends Controller
             ];
         }
 
+        $detallesIngresos = (clone $ingresosQuery)->orderBy('fecha_ingreso', 'asc')->get();
+        $detallesGastos = (clone $gastosQuery)->orderBy('fecha_gasto', 'asc')->get();
+
         $data = [
             'fechaImpresion' => date('d/m/Y H:i:s'),
             'startDate' => $startDate,
@@ -137,6 +140,8 @@ class ProvicionalDashboardController extends Controller
             'totalGastos' => $totalGastos,
             'balance' => $balance,
             'datosPorMes' => $graficaMensual,
+            'detallesIngresos' => $detallesIngresos,
+            'detallesGastos' => $detallesGastos,
         ];
 
         $pdf = Pdf::loadView('pdf.dashboard_provicional', $data);

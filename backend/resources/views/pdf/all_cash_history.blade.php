@@ -85,11 +85,11 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            font-size: 12px;
+            font-size: 10px;
         }
         table.data-table th, table.data-table td {
             border: 1px solid #E5E7EB;
-            padding: 6px;
+            padding: 4px 6px;
             text-align: left;
         }
         table.data-table th {
@@ -108,35 +108,7 @@
         .status-faltante { color: #EF4444; font-weight: bold; }
         .status-sobrante { color: #F59E0B; font-weight: bold; }
         
-        .summary-box {
-            background-color: #F9FAFB;
-            border: 1px solid #E5E7EB;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 20px;
-            width: 50%;
-            float: right;
-        }
-        .summary-row {
-            display: table;
-            width: 100%;
-            margin-bottom: 5px;
-        }
-        .summary-row .label {
-            display: table-cell;
-            text-align: left;
-            font-weight: bold;
-            color: #374151;
-        }
-        .summary-row .val {
-            display: table-cell;
-            text-align: right;
-            font-weight: bold;
-        }
-        .val.total {
-            font-size: 16px;
-            color: #0B2E6B;
-        }
+
         .clearfix::after {
             content: "";
             clear: both;
@@ -177,52 +149,20 @@
 <body>
 
 <div class="report-card">
-    <!-- Header -->
-    <table class="header-table">
-        <tr>
-            <td style="width: 70px;">
-                @php
-                    $logoPath = public_path('logo_app.jpeg');
-                    $logoData = '';
-                    if(file_exists($logoPath)) {
-                        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-                        $data = file_get_contents($logoPath);
-                        $logoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    }
-                @endphp
-                @if($logoData)
-                    <img src="{{ $logoData }}" style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #D4A017; object-fit: cover; background-color: white; vertical-align: middle; display: inline-block;" alt="Logo">
-                @else
-                    <div style="width: 52px; height: 52px; background-color: #D4A017; border-radius: 50%; text-align: center; line-height: 52px; color: #0B2E6B; font-size: 26px; font-weight: bold; display: inline-block;">+</div>
-                @endif
-            </td>
-            <td>
-                <p class="header-title-large" style="margin: 0; font-size: 16px; text-transform: uppercase; line-height: 1.3;">Fundación Centro de Evangelización<br>Padre Fantino</p>
-            </td>
-            <td>
-                <p class="header-receipt-text">Historial de Cuadres</p>
-                <p class="header-receipt-number">Desde <b>{{ $request->start_date ?? 'Inicio' }}</b> <br> Hasta <b>{{ $request->end_date ?? 'Hoy' }}</b></p>
-            </td>
-        </tr>
-    </table>
+    @php
+        $periodoFiltro = 'Desde <b>' . ($request->start_date ?? 'Inicio') . '</b> <br> Hasta <b>' . ($request->end_date ?? 'Hoy') . '</b>';
+        if ($request->module_id && $request->module_id !== 'null') {
+            $periodoFiltro .= '<br>Módulo ID: ' . $request->module_id;
+        }
+    @endphp
+    @include('pdf.components.header', ['title' => 'Historial de Cuadres', 'period' => $periodoFiltro])
 
     <div class="body-section">
-        <table class="title-table">
-            <tr>
-                <td>
-                    <h1 class="title-text">Reporte Historial de Cuadres</h1>
-                </td>
-                <td class="date-text">
-                    Generado: {{ now()->format('d M Y, h:i a') }}
-                    @if($request->module_id && $request->module_id !== 'null')
-                        <br>Filtro Módulo ID: {{ $request->module_id }}
-                    @endif
-                </td>
-            </tr>
-        </table>
 
     @php
         $totalFisico = 0;
+        $totalGastos = 0;
+        $totalADepositar = 0;
         $totalDepositado = 0;
         $totalDiferencia = 0;
     @endphp
@@ -231,102 +171,82 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Módulo</th>
                 <th>Fecha</th>
-                <th>Estado</th>
-                <th class="right">Físico</th>
-                <th class="right">Depositado</th>
+                <th>Módulo</th>
+                <th class="right">Efectivo</th>
+                <th class="right">Gastos</th>
+                <th class="right">A Depositar</th>
+                <th class="right">Depósito</th>
                 <th class="right">Diferencia</th>
             </tr>
         </thead>
         <tbody>
             @forelse($reconciliations as $rec)
                 @php
+                    $aDepositar = $rec->total_general - $rec->total_expenses;
                     $finalDiff = $rec->is_deposited 
                         ? ($rec->deposit_difference ?? $rec->difference) 
                         : $rec->difference;
                         
                     $totalFisico += $rec->total_general;
+                    $totalGastos += $rec->total_expenses;
+                    $totalADepositar += $aDepositar;
                     $totalDepositado += ($rec->deposit_amount ?? 0);
                     $totalDiferencia += $finalDiff;
                 @endphp
                 <tr>
                     <td>{{ $rec->id }}</td>
+                    <td>{{ \Carbon\Carbon::parse($rec->date)->format('d/m/Y') }}</td>
                     <td>{{ $rec->module ? $rec->module->name : 'N/A' }}</td>
-                    <td>{{ $rec->date }}</td>
-                    <td>
+                    <td class="right" style="color: #10B981;">${{ number_format($rec->total_general, 2) }}</td>
+                    <td class="right" style="color: #EF4444;">${{ number_format($rec->total_expenses, 2) }}</td>
+                    <td class="right" style="color: #3B82F6;">${{ number_format($aDepositar, 2) }}</td>
+                    <td class="right">
                         @if($rec->is_deposited)
-                            <span style="color: #10B981;">Depositado</span>
+                            <span style="color: #10B981;">${{ number_format($rec->deposit_amount ?? 0, 2) }}</span>
                         @else
-                            <span style="color: #F59E0B;">Pendiente</span>
+                            <span style="color: #9CA3AF;">-</span>
                         @endif
                     </td>
-                    <td class="right">${{ number_format($rec->total_general, 2) }}</td>
-                    <td class="right">${{ number_format($rec->deposit_amount ?? 0, 2) }}</td>
                     <td class="right">
                         @if($finalDiff == 0)
-                            <span class="status-perfect">$0.00</span>
+                            <span class="status-perfect">PERFECTO</span>
                         @elseif($finalDiff < 0)
-                            <span class="status-faltante">-${{ number_format(abs($finalDiff), 2) }}</span>
+                            <span class="status-faltante">FALTANTE (${{ number_format(abs($finalDiff), 2) }})</span>
                         @else
-                            <span class="status-sobrante">+${{ number_format($finalDiff, 2) }}</span>
+                            <span class="status-sobrante">SOBRANTE (${{ number_format($finalDiff, 2) }})</span>
                         @endif
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="center" style="color:#9ca3af;">No hay cuadres en este rango</td>
+                    <td colspan="8" class="center" style="color:#9ca3af;">No hay cuadres en este rango</td>
                 </tr>
             @endforelse
         </tbody>
-    </table>
-
-    @if($reconciliations->count() > 0)
-    <div class="clearfix">
-        <div class="summary-box">
-            <div class="summary-row">
-                <span class="label">Total Físico (Acumulado):</span>
-                <span class="val total">${{ number_format($totalFisico, 2) }}</span>
-            </div>
-            <div class="summary-row" style="margin-top: 5px;">
-                <span class="label">Total Depositado (Acumulado):</span>
-                <span class="val total" style="color: #10B981;">${{ number_format($totalDepositado, 2) }}</span>
-            </div>
-            <hr style="border: 0; border-top: 1px solid #E5E7EB; margin: 10px 0;">
-            <div class="summary-row" style="margin-top: 10px;">
-                <span class="label">Diferencia Total:</span>
-                <span class="val 
-                    @if($totalDiferencia == 0) status-perfect 
-                    @elseif($totalDiferencia < 0) status-faltante 
-                    @else status-sobrante 
-                    @endif
-                ">
-                    @if($totalDiferencia < 0)
-                        -${{ number_format(abs($totalDiferencia), 2) }}
+        @if($reconciliations->count() > 0)
+        <tfoot>
+            <tr style="background-color: #f8fafc; border-top: 2px solid #94a3b8; font-weight: bold;">
+                <td colspan="3" style="text-align: right; text-transform: uppercase; color: #475569;">Totales Acumulados:</td>
+                <td class="right" style="color: #10B981;">${{ number_format($totalFisico, 2) }}</td>
+                <td class="right" style="color: #EF4444;">${{ number_format($totalGastos, 2) }}</td>
+                <td class="right" style="color: #3B82F6;">${{ number_format($totalADepositar, 2) }}</td>
+                <td class="right" style="color: #10B981;">${{ number_format($totalDepositado, 2) }}</td>
+                <td class="right">
+                    @if($totalDiferencia == 0)
+                        <span style="color: #10B981;">$0.00</span>
+                    @elseif($totalDiferencia < 0)
+                        <span style="color: #EF4444;">-${{ number_format(abs($totalDiferencia), 2) }}</span>
                     @else
-                        ${{ number_format($totalDiferencia, 2) }}
+                        <span style="color: #F59E0B;">+${{ number_format($totalDiferencia, 2) }}</span>
                     @endif
-                </span>
-            </div>
-        </div>
-    </div>
-    @endif
-
-        <table class="footer-table">
-            <tr>
-                <td style="width: 40%;">
-                    <div class="signature-line"></div>
-                    <p class="signature-text">Administración</p>
-                </td>
-                <td style="width: 60%;">
-                    <p class="address-text">
-                        Av. Presidente Antonio Guzmán Fernández<br/>
-                        Jamo Las Vegas, tramo Controba - San Francisco de Macorís<br/>
-                        Tel (809) 697-8028 · RNC 3-30-37238-2
-                    </p>
                 </td>
             </tr>
-        </table>
+        </tfoot>
+        @endif
+    </table>
+
+        @include('pdf.components.footer')
     </div> <!-- end body section -->
 </div> <!-- end report card -->
 

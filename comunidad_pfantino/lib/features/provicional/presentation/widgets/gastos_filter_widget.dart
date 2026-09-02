@@ -31,304 +31,174 @@ class GastosFilterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
+            color: Colors.black.withValues(alpha: 0.02),
             blurRadius: 10,
-            spreadRadius: 2,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Wrap(
+        spacing: 16,
+        runSpacing: 16,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        alignment: WrapAlignment.spaceBetween,
         children: [
-          // Barra de búsqueda superior
-          // Barra de búsqueda superior
-          Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: 'Buscar concepto o número de cheque...',
-                    prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.grey.shade50,
-                    contentPadding: const EdgeInsets.symmetric(
-                      vertical: 16.0,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(
-                        color: Colors.teal.shade300,
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                  onChanged: onSearchQueryChanged,
-                  onSubmitted: (_) => onSearchSubmitted(),
+          // 1. Barra de Búsqueda (Toma el espacio disponible pero maximo 350px)
+          ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Buscar concepto o cheque...',
+                hintStyle: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                prefixIcon: const Icon(Icons.search, color: Colors.grey, size: 20),
+                filled: true,
+                fillColor: Colors.grey.shade50,
+                isDense: true,
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.grey.shade200),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 1.5),
                 ),
               ),
-              const SizedBox(width: 12),
-              ElevatedButton(
-                onPressed: onSearchSubmitted,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal.shade600,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 24,
-                    vertical: 16,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Buscar',
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
+              onChanged: onSearchQueryChanged,
+              onSubmitted: (_) => onSearchSubmitted(),
+            ),
           ),
-          const SizedBox(height: 16),
 
-          // Import/Export / PDF
+          // 2. Controles de Filtros y Acciones
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            alignment: WrapAlignment.end,
+            spacing: 12,
+            runSpacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              OutlinedButton.icon(
+              // Filtro rápido (Dropdown limpio)
+              Container(
+                height: 40,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey.shade300),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton<String>(
+                    value: selectedQuickFilter,
+                    icon: Icon(Icons.keyboard_arrow_down, color: Colors.grey.shade600),
+                    style: TextStyle(color: Colors.grey.shade800, fontSize: 14, fontWeight: FontWeight.w500),
+                    items: [
+                      'Hoy', 'Ayer', 'Esta semana', 'Este mes', 'Mes pasado', 'Este año', 'Personalizado'
+                    ].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      if (newValue != null) onQuickFilterChanged(newValue);
+                    },
+                  ),
+                ),
+              ),
+
+              // Rango de fechas
+              Tooltip(
+                message: 'Rango de fechas',
+                child: IconButton(
+                  onPressed: onDateRangeSelected,
+                  icon: const Icon(Icons.date_range, size: 22),
+                  color: Colors.grey.shade700,
+                  style: IconButton.styleFrom(
+                    backgroundColor: Colors.grey.shade100,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
+              ),
+
+              // Selector de mes
+              Theme(
+                data: Theme.of(context).copyWith(
+                  splashColor: Colors.transparent,
+                  highlightColor: Colors.transparent,
+                ),
+                child: PopupMenuButton<int>(
+                  tooltip: 'Buscar por mes (Este año)',
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  position: PopupMenuPosition.under,
+                  onSelected: onMonthSelected,
+                  itemBuilder: (BuildContext context) => [
+                    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                  ].asMap().entries.map((entry) {
+                    return PopupMenuItem<int>(
+                      value: entry.key + 1,
+                      child: Text(entry.value),
+                    );
+                  }).toList(),
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.calendar_month, size: 22, color: Colors.grey.shade700),
+                  ),
+                ),
+              ),
+
+              // Divisor vertical
+              Container(width: 1, height: 24, color: Colors.grey.shade300, margin: const EdgeInsets.symmetric(horizontal: 4)),
+
+              // Exportar PDF
+              TextButton.icon(
                 onPressed: onDownloadPdf,
-                icon: const Icon(Icons.picture_as_pdf, color: Colors.red),
-                label: const Text('PDF'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.grey.shade800,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  side: BorderSide(color: Colors.grey.shade300),
+                icon: Icon(Icons.picture_as_pdf, color: Colors.red.shade600, size: 18),
+                label: Text('PDF', style: TextStyle(color: Colors.grey.shade800, fontWeight: FontWeight.w600)),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: Colors.grey.shade200)),
                 ),
               ),
-              OutlinedButton.icon(
+
+              // Exportar Excel
+              TextButton.icon(
                 onPressed: onDownloadExcel,
-                icon: const Icon(Icons.table_chart, color: Colors.green),
-                label: const Text('Excel'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.grey.shade800,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  side: BorderSide(color: Colors.grey.shade300),
+                icon: Icon(Icons.table_chart, color: Colors.green.shade600, size: 18),
+                label: Text('Excel', style: TextStyle(color: Colors.grey.shade800, fontWeight: FontWeight.w600)),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: Colors.grey.shade200)),
                 ),
               ),
+
+              // Importar
               ElevatedButton.icon(
                 onPressed: isUploading ? null : onUploadExcel,
                 icon: isUploading
-                    ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Icon(Icons.upload_file),
-                label: Text(isUploading ? 'Subiendo...' : 'Importar'),
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Icon(Icons.upload_file, size: 18),
+                label: Text(isUploading ? 'Subiendo...' : 'Importar', style: const TextStyle(fontWeight: FontWeight.w600)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue.shade600,
+                  backgroundColor: Theme.of(context).primaryColor,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   elevation: 0,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          // Botones inferiores (Filtros y Calendarios)
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: LinearGradient(
-                      colors: [Colors.teal.shade300, Colors.teal.shade700],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        dropdownColor: Colors.teal.shade700,
-                        icon: const Icon(
-                          Icons.arrow_drop_down,
-                          color: Colors.white,
-                        ),
-                        isExpanded: true,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                        ),
-                        value: selectedQuickFilter,
-                        items:
-                            [
-                              'Hoy',
-                              'Ayer',
-                              'Esta semana',
-                              'Este mes',
-                              'Mes pasado',
-                              'Este año',
-                              'Personalizado',
-                            ].map((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                        onChanged: (String? newValue) {
-                          if (newValue != null) {
-                            onQuickFilterChanged(newValue);
-                          }
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Container(
-                  height: 60,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                    gradient: LinearGradient(
-                      colors: [Colors.blue.shade800, Colors.blue.shade900],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Tooltip(
-                        message: 'Seleccionar rango de fechas',
-                        child: InkWell(
-                          onTap: onDateRangeSelected,
-                          borderRadius: BorderRadius.circular(8),
-                          child: const Padding(
-                            padding: EdgeInsets.all(8.0),
-                            child: Icon(
-                              Icons.date_range,
-                              color: Colors.white,
-                              size: 28,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Container(
-                        width: 1,
-                        height: 30,
-                        color: Colors.white.withValues(alpha: 0.3),
-                      ),
-                      Theme(
-                        data: Theme.of(context).copyWith(
-                          // Removido cardColor para usar el tema por defecto del popup (blanco)
-                        ),
-                        child: PopupMenuButton<int>(
-                          icon: const Icon(
-                            Icons.flash_on,
-                            color: Colors.white,
-                            size: 28,
-                          ),
-                          tooltip: 'Buscar por mes (Este año)',
-                          onSelected: onMonthSelected,
-                          itemBuilder: (BuildContext context) =>
-                              <PopupMenuEntry<int>>[
-                                const PopupMenuItem<int>(
-                                  value: 1,
-                                  child: Text('Enero'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 2,
-                                  child: Text('Febrero'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 3,
-                                  child: Text('Marzo'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 4,
-                                  child: Text('Abril'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 5,
-                                  child: Text('Mayo'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 6,
-                                  child: Text('Junio'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 7,
-                                  child: Text('Julio'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 8,
-                                  child: Text('Agosto'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 9,
-                                  child: Text('Septiembre'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 10,
-                                  child: Text('Octubre'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 11,
-                                  child: Text('Noviembre'),
-                                ),
-                                const PopupMenuItem<int>(
-                                  value: 12,
-                                  child: Text('Diciembre'),
-                                ),
-                              ],
-                        ),
-                      ),
-                    ],
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
               ),
             ],

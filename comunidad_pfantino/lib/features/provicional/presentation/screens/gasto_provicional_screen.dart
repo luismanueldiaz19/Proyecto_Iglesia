@@ -404,7 +404,7 @@ class _GastoProvicionalScreenState
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('api_token');
 
-      String url = '${ApiConfig.baseUrl}/provicional-reportes/pdf-url';
+      String url = '${ApiConfig.baseUrl}/provicional-reportes/pdf-url-gastos';
       List<String> queryParams = [];
       if (_startDate != null) {
         queryParams.add('start_date=${_formatDateForApi(_startDate!)}');
@@ -415,7 +415,6 @@ class _GastoProvicionalScreenState
       if (_searchQuery.isNotEmpty) {
         queryParams.add('search=$_searchQuery');
       }
-      queryParams.add('type=gastos');
 
       if (queryParams.isNotEmpty) {
         url += '?${queryParams.join('&')}';
@@ -423,7 +422,10 @@ class _GastoProvicionalScreenState
 
       final response = await http.get(
         Uri.parse(url),
-        headers: {'Authorization': 'Bearer $token'},
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Accept': 'application/json',
+        },
       );
 
       if (response.statusCode == 200) {

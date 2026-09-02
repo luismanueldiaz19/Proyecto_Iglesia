@@ -164,67 +164,15 @@
             border-bottom: 2px solid #e5e7eb;
             padding-bottom: 5px;
         }
-        .footer-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 40px;
-            border-top: 1px solid #e5e7eb;
-            padding-top: 20px;
-        }
-        .footer-table td {
-            vertical-align: bottom;
-            padding-top: 20px;
-        }
-        .signature-line {
-            width: 180px;
-            border-bottom: 1px solid #d1d5db;
-            height: 28px;
-        }
-        .signature-text {
-            margin: 4px 0 0;
-            font-size: 11px;
-            color: #6b7280;
-        }
-        .address-text {
-            margin: 0;
-            font-size: 11px;
-            color: #6b7280;
-            line-height: 1.5;
-            text-align: right;
-        }
     </style>
 </head>
 <body>
 
 <div class="report-card">
-    <!-- Header -->
-    <table class="header-table">
-        <tr>
-            <td style="width: 70px;">
-                @php
-                    $logoPath = public_path('logo_app.jpeg');
-                    $logoData = '';
-                    if(file_exists($logoPath)) {
-                        $type = pathinfo($logoPath, PATHINFO_EXTENSION);
-                        $data = file_get_contents($logoPath);
-                        $logoData = 'data:image/' . $type . ';base64,' . base64_encode($data);
-                    }
-                @endphp
-                @if($logoData)
-                    <img src="{{ $logoData }}" style="width: 52px; height: 52px; border-radius: 50%; border: 2px solid #D4A017; object-fit: cover; background-color: white; vertical-align: middle; display: inline-block;" alt="Logo">
-                @else
-                    <div style="width: 52px; height: 52px; background-color: #D4A017; border-radius: 50%; text-align: center; line-height: 52px; color: #0B2E6B; font-size: 26px; font-weight: bold; display: inline-block;">+</div>
-                @endif
-            </td>
-            <td>
-                <p class="header-title-large" style="margin: 0; font-size: 16px; text-transform: uppercase; line-height: 1.3;">Fundación Centro de Evangelización<br>Padre Fantino</p>
-            </td>
-            <td>
-                <p class="header-receipt-text">Cuadre de Caja</p>
-                <p class="header-receipt-number">No. {{ str_pad($reconciliation->id, 6, '0', STR_PAD_LEFT) }}</p>
-            </td>
-        </tr>
-    </table>
+    @include('pdf.components.header', [
+        'title' => 'Cuadre de Caja',
+        'period' => 'No. ' . str_pad($reconciliation->id, 6, '0', STR_PAD_LEFT)
+    ])
 
     <div class="body-section">
         <table class="title-table">
@@ -359,21 +307,7 @@
     </div>
     @endif
 
-        <table class="footer-table">
-            <tr>
-                <td style="width: 40%;">
-                    <div class="signature-line"></div>
-                    <p class="signature-text">Firma Responsable / Cajero</p>
-                </td>
-                <td style="width: 60%;">
-                    <p class="address-text">
-                        Av. Presidente Antonio Guzmán Fernández<br/>
-                        Jamo Las Vegas, tramo Controba - San Francisco de Macorís<br/>
-                        Tel (809) 697-8028 · RNC 43-30-37238-2
-                    </p>
-                </td>
-            </tr>
-        </table>
+        @include('pdf.components.footer')
     </div>
 
 </body>

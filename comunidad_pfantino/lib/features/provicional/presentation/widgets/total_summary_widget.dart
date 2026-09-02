@@ -23,7 +23,7 @@ class TotalSummaryWidget extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
@@ -48,13 +48,13 @@ class TotalSummaryWidget extends StatelessWidget {
         children: [
           // ── Ícono circular ───────────────────────────────────────────────
           Container(
-            width: 52,
-            height: 52,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
               color: accentColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: accentColor, size: 26),
+            child: Icon(icon, color: accentColor, size: 22),
           ),
           const SizedBox(width: 16),
 

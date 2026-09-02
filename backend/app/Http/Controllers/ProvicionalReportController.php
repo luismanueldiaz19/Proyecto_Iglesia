@@ -11,6 +11,8 @@ use App\Models\GastoProvicional;
 use Barryvdh\DomPDF\Facade\Pdf;
 
 
+
+
 class ProvicionalReportController extends Controller
 {
     /**
@@ -25,57 +27,94 @@ class ProvicionalReportController extends Controller
         ]);
     }
     
-    public function getPdfUrl(Request $request)
+    public function getPdfUrlIngresos(Request $request)
     {
         $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
-            'provicional-reportes.pdf',
+            'provicional-reportes-ingresos.pdf',
             now()->addMinutes(30),
-            $request->only(['start_date', 'end_date', 'search', 'type'])
+            $request->only(['start_date', 'end_date', 'search'])
+        );
+        return response()->json(['url' => $url]);
+    }
+
+    public function getPdfUrlGastos(Request $request)
+    {
+        $url = \Illuminate\Support\Facades\URL::temporarySignedRoute(
+            'provicional-reportes-gastos.pdf',
+            now()->addMinutes(30),
+            $request->only(['start_date', 'end_date', 'search'])
         );
         return response()->json(['url' => $url]);
     }
 
     /**
-     * Download PDF
+     * Download PDF Ingresos
      */
-    public function exportPdf(Request $request)
-    {
-        $type = $request->input('type');
-        $queryIngresos = IngresoProvicional::with('user')->orderBy('fecha_ingreso', 'desc');
-        $queryGastos = GastoProvicional::with('user')->orderBy('fecha_gasto', 'desc');
+    public function exportPdfIngresos(Request $request) {
+        $query = IngresoProvicional::with('user')->orderBy('fecha_ingreso', 'asc');
 
         if ($request->filled('start_date')) {
-            $queryIngresos->whereDate('fecha_ingreso', '>=', $request->start_date);
-            $queryGastos->whereDate('fecha_gasto', '>=', $request->start_date);
+            $query->whereDate('fecha_ingreso', '>=', $request->start_date);
         }
 
         if ($request->filled('end_date')) {
-            $queryIngresos->whereDate('fecha_ingreso', '<=', $request->end_date);
-            $queryGastos->whereDate('fecha_gasto', '<=', $request->end_date);
+            $query->whereDate('fecha_ingreso', '<=', $request->end_date);
         }
 
         if ($request->filled('search')) {
             $searchTerm = '%' . $request->search . '%';
-            $queryIngresos->where('concepto', 'ilike', $searchTerm);
-            $queryGastos->where('concepto', 'ilike', $searchTerm);
+            $query->where('concepto', 'ilike', $searchTerm);
         }
 
-        $ingresos = collect();
-        $gastos = collect();
-
-        if ($type === 'ingresos' || $type === 'all' || empty($type)) {
-            $ingresos = $queryIngresos->get();
-        }
-
-        if ($type === 'gastos' || $type === 'all' || empty($type)) {
-            $gastos = $queryGastos->get();
-        }
+        $ingresos = $query->get();
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
         
-        // Asumiendo que usas dompdf
-        $pdf = Pdf::loadView('reports.provicional', compact('ingresos', 'gastos', 'type'));
+        $pdf = Pdf::loadView('reports.ingresos_provicional', compact('ingresos', 'startDate', 'endDate'));
         
-        return $pdf->stream('reporte_provicional.pdf');
+        return $pdf->stream('reporte_ingresos.pdf');
     }
+
+
+ 
+ /** gastos_provicional
+     * Download PDF only gasto
+     */
+    public function exportPdfGastos(Request $request) {
+    $query = GastoProvicional::with('user')->orderBy('fecha_gasto', 'asc');
+
+    if ($request->filled('start_date')) {
+        $query->whereDate('fecha_gasto', '>=', $request->start_date);
+    }
+
+    if ($request->filled('end_date')) {
+        $query->whereDate('fecha_gasto', '<=', $request->end_date);
+    }
+
+    if ($request->filled('search')) {
+        $searchTerm = '%' . $request->search . '%';
+        $query->where('concepto', 'ilike', $searchTerm);
+    }
+
+    $gastos = $query->get();
+    $startDate = $request->start_date;
+    $endDate = $request->end_date;
+
+    $pdf = Pdf::loadView('reports.gastos_provicional', compact('gastos', 'startDate', 'endDate'));
+
+    return $pdf->stream('reporte_gastos.pdf');
+}
+
+
+
+
+
+
+
+
+
+
+
     
     public function getExcelUrl(Request $request)
     {
