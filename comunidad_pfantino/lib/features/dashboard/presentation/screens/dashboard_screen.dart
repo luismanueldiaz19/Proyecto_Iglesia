@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/church_colors.dart';
-import '../../../auth/providers/auth_provider.dart';
 import '../../../cashier/providers/cash_provider.dart';
 
+import '../../../../core/utils/app_date_picker.dart';
 import '../../providers/dashboard_provider.dart';
 import '../widgets/dashboard_filter_widget.dart';
 import '../widgets/dashboard_summary_cards.dart';
@@ -17,9 +16,6 @@ class DashboardScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authProvider.notifier);
-    final user = authState.currentUser;
-
     final dashboardState = ref.watch(dashboardProvider);
     final dashboardNotifier = ref.read(dashboardProvider.notifier);
     final cashState = ref.watch(cashProvider);
@@ -29,57 +25,13 @@ class DashboardScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '¡Bienvenido, ${user?.username ?? 'Usuario'}!',
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w900,
-                        color: ChurchColors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      user?.role ?? 'Desconocido',
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: ChurchColors.grey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // IconButton(
-              //   onPressed: () => dashboardNotifier.fetchDashboardData(),
-              //   icon: const Icon(Icons.refresh),
-              //   tooltip: 'Refrescar datos',
-              //   style: IconButton.styleFrom(
-              //     backgroundColor: ChurchColors.primary.withOpacity(0.1),
-              //     foregroundColor: ChurchColors.primary,
-              //     padding: const EdgeInsets.all(12),
-              //   ),
-              // ),
-            ],
-          ),
-          const SizedBox(height: 32),
-
-          // Filtross
           DashboardFilterWidget(
             selectedQuickFilter: dashboardState.selectedQuickFilter,
             onQuickFilterChanged: (filter) =>
                 dashboardNotifier.setQuickFilter(filter),
             onDateRangeSelected: () async {
-              final picked = await showDateRangePicker(
+              final picked = await AppDatePicker.showRangePicker(
                 context: context,
-                firstDate: DateTime(2000),
-                lastDate: DateTime(2100),
                 initialDateRange: DateTimeRange(
                   start: dashboardState.startDate,
                   end: dashboardState.endDate,

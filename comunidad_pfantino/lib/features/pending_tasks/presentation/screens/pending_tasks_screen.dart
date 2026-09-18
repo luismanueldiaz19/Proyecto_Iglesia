@@ -19,6 +19,18 @@ class _PendingTasksScreenState extends ConsumerState<PendingTasksScreen> {
     final state = ref.watch(pendingTaskProvider);
     final notifier = ref.read(pendingTaskProvider.notifier);
 
+    // Escuchar errores para mostrarlos en pantalla en lugar de crashear
+    ref.listen<PendingTaskState>(pendingTaskProvider, (previous, next) {
+      if (next.error != null && next.error != previous?.error) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.error!),
+            backgroundColor: Colors.red.shade800,
+          ),
+        );
+      }
+    });
+
     // Apply filters
     var filteredTasks = state.tasks;
     if (state.filter == 'Pendiente') {

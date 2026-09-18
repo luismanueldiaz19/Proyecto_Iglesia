@@ -46,7 +46,7 @@ class _CashHistoryScreenState extends ConsumerState<CashHistoryScreen> {
           : state.historyReconciliations.isEmpty
           ? const Center(child: Text('No hay historial de cuadres cerrados.'))
           : ListView.builder(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(16),
               itemCount: state.historyReconciliations.length,
               itemBuilder: (context, index) {
                 final history = state.historyReconciliations[index];
@@ -102,173 +102,172 @@ class _CashHistoryScreenState extends ConsumerState<CashHistoryScreen> {
                       );
                     },
                     child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Info principal
-                          Expanded(
-                            flex: 2,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  '$moduleName (Cierre #${history.id}) - ${history.date}',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: ChurchColors.primary,
-                                  ),
-                                ),
-                                // const SizedBox(height: 8),
-                                // Text(
-                                //   'Gastos registrados: \$${history.totalExpenses.toStringAsFixed(2)}',
-                                //   style: const TextStyle(
-                                //     color: ChurchColors.grey,
-                                //   ),
-                                // ),
-                                const SizedBox(height: 8),
-                                Row(
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Icon(
-                                      history.isDeposited
-                                          ? Icons.account_balance
-                                          : Icons.access_time_filled,
-                                      size: 16,
-                                      color: history.isDeposited
-                                          ? Colors.green
-                                          : Colors.orange,
-                                    ),
-                                    const SizedBox(width: 4),
                                     Text(
-                                      history.isDeposited
-                                          ? 'Depositado en Banco: \$${history.depositAmount?.toStringAsFixed(2) ?? "0.00"}'
-                                          : 'Pendiente de Depósito',
-                                      style: TextStyle(
-                                        color: history.isDeposited
-                                            ? Colors.green
-                                            : Colors.orange,
+                                      '$moduleName (Cierre #${history.id}) - ${history.date}',
+                                      style: const TextStyle(
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 12,
+                                        color: ChurchColors.primary,
                                       ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          history.isDeposited
+                                              ? Icons.account_balance
+                                              : Icons.access_time_filled,
+                                          size: 14,
+                                          color: history.isDeposited
+                                              ? Colors.green
+                                              : Colors.orange,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            history.isDeposited
+                                                ? 'Depositado en Banco: \$${history.depositAmount?.toStringAsFixed(2) ?? "0.00"}'
+                                                : 'Pendiente de Depósito',
+                                            style: TextStyle(
+                                              color: history.isDeposited
+                                                  ? Colors.green
+                                                  : Colors.orange,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 11,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 12),
-                                Row(
-                                  children: [
-                                    _buildSummaryChip(
-                                      'Cuadre',
-                                      history.totalGeneral,
-                                      Colors.green,
+                              ),
+                              const SizedBox(width: 12),
+                              // Status (SIN DEPOSITAR / FALTANTE)
+                              !history.isDeposited
+                                  ? Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                                      ),
+                                      child: const Column(
+                                        children: [
+                                          Icon(
+                                            Icons.warning_amber_rounded,
+                                            color: Colors.orange,
+                                            size: 16,
+                                          ),
+                                          Text(
+                                            'SIN DEPOSITAR',
+                                            style: TextStyle(
+                                              color: Colors.orange,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 9,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  : Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 6,
+                                        horizontal: 10,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: statusColor.withValues(alpha: 0.1),
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: statusColor.withValues(alpha: 0.3),
+                                          width: 1,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            statusText,
+                                            style: TextStyle(
+                                              color: statusColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 10,
+                                            ),
+                                          ),
+                                          Text(
+                                            '\$${finalDifference.abs().toStringAsFixed(2)}',
+                                            style: TextStyle(
+                                              color: statusColor,
+                                              fontWeight: FontWeight.w900,
+                                              fontSize: 13,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                    const SizedBox(width: 8),
-                                    _buildSummaryChip(
-                                      'Gastos',
-                                      history.totalExpenses,
-                                      Colors.red,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    _buildSummaryChip(
-                                      'A Depositar',
-                                      history.totalGeneral -
-                                          history.totalExpenses,
-                                      Colors.blue,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                            ],
                           ),
-                          // Totales
-                          Expanded(
-                            flex: 1,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                const Text(
-                                  'Efectivo Físico',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: ChurchColors.grey,
-                                    fontWeight: FontWeight.bold,
+                          const SizedBox(height: 16),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            crossAxisAlignment: WrapCrossAlignment.end,
+                            alignment: WrapAlignment.spaceBetween,
+                            children: [
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  _buildSummaryChip(
+                                    'Cuadre',
+                                    history.totalGeneral,
+                                    Colors.green,
                                   ),
-                                ),
-                                Text(
-                                  '\$${history.totalGeneral.toStringAsFixed(2)}',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w900,
+                                  _buildSummaryChip(
+                                    'Gastos',
+                                    history.totalExpenses,
+                                    Colors.red,
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Diferencia
-                          const SizedBox(width: 32),
-                          !history.isDeposited
-                              ? Container(
-                                  width: 120,
-                                  alignment: Alignment.center,
-                                  child: const Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.warning_amber_rounded,
-                                        color: Colors.orange,
-                                        size: 28,
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        'SIN DEPOSITAR',
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: Colors.orange,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ],
+                                  _buildSummaryChip(
+                                    'A Depositar',
+                                    history.totalGeneral - history.totalExpenses,
+                                    Colors.blue,
                                   ),
-                                )
-                              : Container(
-                                  width: 140,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                    horizontal: 16,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: statusColor.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(8),
-                                    border: Border.all(
-                                      color: statusColor,
-                                      width: 1,
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  const Text(
+                                    'Efectivo Físico',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: ChurchColors.grey,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        statusText,
-                                        textAlign: TextAlign.center,
-                                        style: TextStyle(
-                                          color: statusColor,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        '\$${finalDifference.abs().toStringAsFixed(2)}',
-                                        style: TextStyle(
-                                          color: statusColor,
-                                          fontWeight: FontWeight.w900,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ],
+                                  Text(
+                                    '\$${history.totalGeneral.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w900,
+                                    ),
                                   ),
-                                ),
+                                ],
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -280,36 +279,34 @@ class _CashHistoryScreenState extends ConsumerState<CashHistoryScreen> {
   }
 
   Widget _buildSummaryChip(String label, double amount, Color color) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: color.withValues(alpha: 0.3)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                color: color,
-                fontWeight: FontWeight.bold,
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 10,
+              color: color,
+              fontWeight: FontWeight.bold,
             ),
-            Text(
-              '\$${amount.toStringAsFixed(2)}',
-              style: TextStyle(
-                fontSize: 12,
-                color: color,
-                fontWeight: FontWeight.w900,
-              ),
-              overflow: TextOverflow.ellipsis,
+          ),
+          Text(
+            '\$${amount.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 12,
+              color: color,
+              fontWeight: FontWeight.w900,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

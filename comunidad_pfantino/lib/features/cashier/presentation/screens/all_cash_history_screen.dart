@@ -8,6 +8,7 @@ import '../../providers/cash_provider.dart';
 import '../../providers/all_cash_history_provider.dart';
 import '../../data/models/module_model.dart';
 import 'widgets/cash_reconciliation_detail_dialog.dart';
+import '../../../../core/utils/app_date_picker.dart';
 
 class AllCashHistoryScreen extends ConsumerWidget {
   const AllCashHistoryScreen({super.key});
@@ -42,7 +43,7 @@ class AllCashHistoryScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 12.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -50,12 +51,12 @@ class AllCashHistoryScreen extends ConsumerWidget {
               title: 'Todos los Cuadres',
               subtitle: 'Historial completo de cuadres de caja',
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             // Filtros y Acciones
             Container(
               padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-                vertical: 16.0,
+                horizontal: 12.0,
+                vertical: 12.0,
               ),
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -70,20 +71,20 @@ class AllCashHistoryScreen extends ConsumerWidget {
                 ],
               ),
               child: Wrap(
-                spacing: 16,
-                runSpacing: 16,
+                spacing: 12,
+                runSpacing: 12,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 alignment: WrapAlignment.spaceBetween,
                 children: [
                   // Lado izquierdo: Filtros
                   Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
+                    spacing: 8,
+                    runSpacing: 8,
                     crossAxisAlignment: WrapCrossAlignment.center,
                     children: [
                       // Módulo
                       Container(
-                        height: 40,
+                        height: 36,
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -99,7 +100,7 @@ class AllCashHistoryScreen extends ConsumerWidget {
                             ),
                             style: TextStyle(
                               color: Colors.grey.shade800,
-                              fontSize: 14,
+                              fontSize: 13,
                               fontWeight: FontWeight.w500,
                             ),
                             items: [
@@ -129,27 +130,12 @@ class AllCashHistoryScreen extends ConsumerWidget {
                       // Rango de fechas
                       InkWell(
                         onTap: () async {
-                          final picked = await showDateRangePicker(
+                          final picked = await AppDatePicker.showRangePicker(
                             context: context,
                             initialDateRange: DateTimeRange(
                               start: state.startDate,
                               end: state.endDate,
                             ),
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                            builder: (context, child) {
-                              return Theme(
-                                data: Theme.of(context).copyWith(
-                                  colorScheme: ColorScheme.light(
-                                    primary: ChurchColors.primary,
-                                    onPrimary: Colors.white,
-                                    surface: Colors.white,
-                                    onSurface: Colors.black,
-                                  ),
-                                ),
-                                child: child!,
-                              );
-                            },
                           );
                           if (picked != null) {
                             ref
@@ -169,8 +155,8 @@ class AllCashHistoryScreen extends ConsumerWidget {
                         },
                         borderRadius: BorderRadius.circular(8),
                         child: Container(
-                          height: 40,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
+                          height: 36,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             border: Border.all(color: Colors.grey.shade300),
@@ -181,7 +167,7 @@ class AllCashHistoryScreen extends ConsumerWidget {
                             children: [
                               Icon(
                                 Icons.date_range,
-                                size: 18,
+                                size: 16,
                                 color: Colors.grey.shade600,
                               ),
                               const SizedBox(width: 8),
@@ -189,7 +175,7 @@ class AllCashHistoryScreen extends ConsumerWidget {
                                 "${state.startDate.day.toString().padLeft(2, '0')}/${state.startDate.month.toString().padLeft(2, '0')}/${state.startDate.year} - ${state.endDate.day.toString().padLeft(2, '0')}/${state.endDate.month.toString().padLeft(2, '0')}/${state.endDate.year}",
                                 style: TextStyle(
                                   color: Colors.grey.shade800,
-                                  fontSize: 14,
+                                  fontSize: 13,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -282,8 +268,8 @@ class AllCashHistoryScreen extends ConsumerWidget {
                             }),
                           ],
                           child: Container(
-                            height: 40,
-                            width: 40,
+                            height: 36,
+                            width: 36,
                             decoration: BoxDecoration(
                               color: Colors.white,
                               border: Border.all(color: Colors.grey.shade300),
@@ -292,7 +278,7 @@ class AllCashHistoryScreen extends ConsumerWidget {
                             child: Icon(
                               Icons.calendar_month,
                               color: Colors.grey.shade700,
-                              size: 22,
+                              size: 18,
                             ),
                           ),
                         ),
@@ -314,19 +300,20 @@ class AllCashHistoryScreen extends ConsumerWidget {
                         icon: Icon(
                           Icons.refresh,
                           color: ChurchColors.primary,
-                          size: 18,
+                          size: 16,
                         ),
                         label: Text(
                           'Refrescar',
                           style: TextStyle(
                             color: Colors.grey.shade800,
                             fontWeight: FontWeight.w600,
+                            fontSize: 13,
                           ),
                         ),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                            horizontal: 12,
+                            vertical: 8,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -356,19 +343,20 @@ class AllCashHistoryScreen extends ConsumerWidget {
                         icon: Icon(
                           Icons.picture_as_pdf,
                           color: Colors.red.shade600,
-                          size: 18,
+                          size: 16,
                         ),
                         label: Text(
                           'PDF',
                           style: TextStyle(
                             color: Colors.grey.shade800,
                             fontWeight: FontWeight.w600,
+                            fontSize: 13,
                           ),
                         ),
                         style: TextButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
+                            horizontal: 12,
+                            vertical: 8,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -408,13 +396,22 @@ class AllCashHistoryScreen extends ConsumerWidget {
                           scrollDirection: Axis.horizontal,
                           child: SingleChildScrollView(
                             child: DataTable(
-                              headingRowColor: WidgetStateProperty.resolveWith(
-                                (states) => Colors.grey.shade50,
-                              ),
-                              dataRowMaxHeight: 48,
-                              dataRowMinHeight: 48,
-                              horizontalMargin: 24,
-                              columnSpacing: 24,
+                                headingRowColor: WidgetStateProperty.resolveWith(
+                                  (states) => Colors.grey.shade50,
+                                ),
+                                headingTextStyle: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                  fontSize: 13,
+                                ),
+                                dataTextStyle: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.black87,
+                                ),
+                                dataRowMaxHeight: 40,
+                                dataRowMinHeight: 40,
+                                horizontalMargin: 16,
+                                columnSpacing: 16,
                               columns: const [
                                 DataColumn(
                                   label: Text(
@@ -624,15 +621,15 @@ class AllCashHistoryScreen extends ConsumerWidget {
                                     DataCell(
                                       Container(
                                         padding: const EdgeInsets.symmetric(
-                                          horizontal: 10,
-                                          vertical: 4,
+                                          horizontal: 8,
+                                          vertical: 2,
                                         ),
                                         decoration: BoxDecoration(
                                           color: statusColor.withValues(
                                             alpha: 0.1,
                                           ),
                                           borderRadius: BorderRadius.circular(
-                                            20,
+                                            12,
                                           ),
                                           border: Border.all(
                                             color: statusColor.withValues(
@@ -647,7 +644,7 @@ class AllCashHistoryScreen extends ConsumerWidget {
                                           style: TextStyle(
                                             color: statusColor,
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 12,
+                                            fontSize: 11,
                                           ),
                                         ),
                                       ),
@@ -688,8 +685,8 @@ class AllCashHistoryScreen extends ConsumerWidget {
             // Resumen Final
             if (!state.isLoading && state.reconciliations.isNotEmpty)
               Container(
-                margin: const EdgeInsets.only(top: 16),
-                padding: const EdgeInsets.symmetric(vertical: 16),
+                margin: const EdgeInsets.only(top: 12),
+                padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -713,14 +710,14 @@ class AllCashHistoryScreen extends ConsumerWidget {
                             'Total Físico',
                             style: TextStyle(
                               color: ChurchColors.grey,
-                              fontSize: 12,
+                              fontSize: 11,
                             ),
                           ),
                           Text(
                             '\$${CurrencyFormatter.formatAmount(totalFisico)}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 15,
                             ),
                           ),
                         ],
@@ -732,14 +729,14 @@ class AllCashHistoryScreen extends ConsumerWidget {
                             'Total Depositado',
                             style: TextStyle(
                               color: ChurchColors.grey,
-                              fontSize: 12,
+                              fontSize: 11,
                             ),
                           ),
                           Text(
                             '\$${CurrencyFormatter.formatAmount(totalDepositado)}',
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 15,
                               color: Colors.green,
                             ),
                           ),
@@ -752,7 +749,7 @@ class AllCashHistoryScreen extends ConsumerWidget {
                             textoDiferencia,
                             style: TextStyle(
                               color: colorDiferencia,
-                              fontSize: 12,
+                              fontSize: 11,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -760,7 +757,7 @@ class AllCashHistoryScreen extends ConsumerWidget {
                             '\$${CurrencyFormatter.formatAmount(totalDiferencia.abs())}',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              fontSize: 18,
+                              fontSize: 15,
                               color: colorDiferencia,
                             ),
                           ),

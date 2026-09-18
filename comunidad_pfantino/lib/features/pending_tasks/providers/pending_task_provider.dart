@@ -120,7 +120,6 @@ class PendingTaskNotifier extends StateNotifier<PendingTaskState> {
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
-      rethrow;
     }
   }
 
@@ -148,7 +147,6 @@ class PendingTaskNotifier extends StateNotifier<PendingTaskState> {
       }
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
-      rethrow;
     }
   }
 
@@ -165,7 +163,6 @@ class PendingTaskNotifier extends StateNotifier<PendingTaskState> {
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
-      rethrow;
     }
   }
 

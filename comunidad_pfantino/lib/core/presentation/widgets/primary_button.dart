@@ -26,7 +26,7 @@ class PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final buttonColor = color ?? ChurchColors.primary;
-    
+
     final content = isLoading
         ? SizedBox(
             height: 24,
@@ -38,7 +38,9 @@ class PrimaryButton extends StatelessWidget {
           )
         : Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: width == double.infinity ? MainAxisSize.max : MainAxisSize.min,
+            mainAxisSize: width == double.infinity
+                ? MainAxisSize.max
+                : MainAxisSize.min,
             children: [
               if (icon != null) ...[
                 Icon(icon, size: 20),

@@ -41,7 +41,12 @@ class DashboardChartWidget extends StatelessWidget {
             ),
           ],
         ),
-        child: const Center(child: Text('Sin datos para el gráfico')),
+        child: const Center(
+          child: Text(
+            'Sin datos para el gráfico',
+            style: TextStyle(color: Colors.grey, fontSize: 12),
+          ),
+        ),
       );
     }
 

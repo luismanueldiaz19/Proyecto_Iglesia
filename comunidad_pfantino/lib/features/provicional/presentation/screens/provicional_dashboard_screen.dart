@@ -6,8 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../core/network/api_config.dart';
 import '../../../../core/presentation/widgets/page_header.dart';
-import '../widgets/ingresos_filter_widget.dart';
 import '../widgets/total_summary_widget.dart';
+import '../../../../core/utils/app_date_picker.dart';
 import '../widgets/dashboard_chart_widget.dart';
 
 class ProvicionalDashboardScreen extends StatefulWidget {
@@ -141,26 +141,11 @@ class _ProvicionalDashboardScreenState
   }
 
   Future<void> _selectDateRange() async {
-    final picked = await showDateRangePicker(
+    final picked = await AppDatePicker.showRangePicker(
       context: context,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
       initialDateRange: _startDate != null && _endDate != null
           ? DateTimeRange(start: _startDate!, end: _endDate!)
           : null,
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Colors.teal.shade600,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
 
     if (picked != null) {

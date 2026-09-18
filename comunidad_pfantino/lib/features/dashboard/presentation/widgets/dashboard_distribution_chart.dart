@@ -20,7 +20,7 @@ class DashboardDistributionChart extends StatelessWidget {
         child: const Center(
           child: Text(
             'Sin efectivo para mostrar',
-            style: TextStyle(color: Colors.grey, fontSize: 14),
+            style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ),
       );
@@ -39,69 +39,69 @@ class DashboardDistributionChart extends StatelessWidget {
               Text(
                 'Destino del Efectivo',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 11,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey.shade800,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
               Tooltip(
                 message: '• Depositado: Dinero entregado al banco.\n• En Caja: Efectivo físico pendiente de depósito.\n• Gastos: Salidas de efectivo reportadas en caja.',
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(12),
-                showDuration: const Duration(seconds: 5),
+                margin: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
+                showDuration: const Duration(seconds: 3),
                 triggerMode: TooltipTriggerMode.tap,
                 child: const Icon(
                   Icons.help_outline,
                   color: Colors.grey,
-                  size: 18,
+                  size: 14,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Expanded(
             child: totalParaPorcentaje == 0
                 ? const Center(child: Text('Sin datos'))
-                : Row(
+                : Column(
                     children: [
                       Expanded(
-                        flex: 5,
+                        flex: 3,
                         child: PieChart(
                           PieChartData(
                             sectionsSpace: 2,
-                            centerSpaceRadius: 25,
+                            centerSpaceRadius: 15,
                             sections: [
                               if (depositado > 0)
                                 PieChartSectionData(
                                   color: Colors.green.shade500,
                                   value: depositado,
                                   title: '',
-                                  radius: 20,
+                                  radius: 15,
                                 ),
                               if (enCaja > 0)
                                 PieChartSectionData(
                                   color: Colors.orange.shade500,
                                   value: enCaja,
                                   title: '',
-                                  radius: 20,
+                                  radius: 15,
                                 ),
                               if (gastos > 0)
                                 PieChartSectionData(
                                   color: Colors.purple.shade500,
                                   value: gastos,
                                   title: '',
-                                  radius: 20,
+                                  radius: 15,
                                 ),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(width: 16),
+                      const SizedBox(height: 4),
                       Expanded(
-                        flex: 6,
+                        flex: 4,
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             if (depositado > 0)
@@ -111,7 +111,7 @@ class DashboardDistributionChart extends StatelessWidget {
                                 depositado,
                                 totalParaPorcentaje,
                               ),
-                            if (depositado > 0) const SizedBox(height: 8),
+                            if (depositado > 0) const SizedBox(height: 2),
                             if (enCaja > 0)
                               _buildLegendItem(
                                 Colors.orange.shade500,
@@ -119,7 +119,7 @@ class DashboardDistributionChart extends StatelessWidget {
                                 enCaja,
                                 totalParaPorcentaje,
                               ),
-                            if (enCaja > 0) const SizedBox(height: 8),
+                            if (enCaja > 0) const SizedBox(height: 2),
                             if (gastos > 0)
                               _buildLegendItem(
                                 Colors.purple.shade500,
@@ -141,16 +141,17 @@ class DashboardDistributionChart extends StatelessWidget {
   Widget _buildContainer({required Widget child}) {
     return Container(
       width: double.infinity,
-      height: 160, // Más compacto
-      padding: const EdgeInsets.all(12.0),
+      height: 130, // Más compacto
+      padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            color: Colors.grey.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -158,34 +159,33 @@ class DashboardDistributionChart extends StatelessWidget {
     );
   }
 
-
-
   Widget _buildLegendItem(Color color, String text, double value, double total) {
     if (value <= 0) return const SizedBox.shrink();
-    final percentage = total > 0 ? (value / total * 100).toStringAsFixed(1) : '0.0';
+    final percentage = total > 0 ? (value / total * 100).toStringAsFixed(0) : '0';
     return Row(
       children: [
         Container(
-          width: 10,
-          height: 10,
+          width: 6,
+          height: 6,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 4),
         Expanded(
           child: Text(
             text,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 9,
               color: Colors.grey.shade700,
               fontWeight: FontWeight.w500,
             ),
+            maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
         Text(
           '$percentage%',
           style: const TextStyle(
-            fontSize: 11,
+            fontSize: 9,
             fontWeight: FontWeight.bold,
           ),
         ),

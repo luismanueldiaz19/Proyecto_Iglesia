@@ -67,6 +67,10 @@ Route::get('/pending-tasks/download-pdf', [App\Http\Controllers\PendingTaskContr
     ->name('pending-tasks.pdf')
     ->middleware('signed');
 
+Route::get('/bank-accounts/{id}/statement/download-pdf', [App\Http\Controllers\Api\BankAccountController::class, 'downloadStatementPdf'])
+    ->name('bank-accounts.statement.pdf')
+    ->middleware('signed');
+
 
 
 // Rutas protegidas por Sanctum
@@ -157,6 +161,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Módulo de Bancos y Conciliaciones
     Route::apiResource('banks', BankController::class);
     Route::apiResource('bank-accounts', BankAccountController::class);
+    Route::get('bank-accounts/{id}/statement/pdf-url', [BankAccountController::class, 'getStatementPdfUrl']);
     Route::apiResource('bank-transactions', BankTransactionController::class);
     Route::apiResource('bank-reconciliations', BankReconciliationController::class);
 

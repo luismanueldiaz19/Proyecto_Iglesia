@@ -44,7 +44,7 @@ class DashboardReconciliationChart extends StatelessWidget {
         child: const Center(
           child: Text(
             'Sin datos para el gráfico en el rango seleccionado',
-            style: TextStyle(color: Colors.grey, fontSize: 16),
+            style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ),
       );
@@ -52,15 +52,16 @@ class DashboardReconciliationChart extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withValues(alpha: 0.07),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: Colors.blue.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -72,22 +73,22 @@ class DashboardReconciliationChart extends StatelessWidget {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Text(
-                'Comparativa Mensual de Cuadres',
+                'Comparativa Mensual',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey.shade800,
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 8),
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   _buildLegendItem(
                     [Colors.blue.shade400, Colors.blue.shade600],
-                    'Efectivo Físico',
+                    'Efectivo',
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 8),
                   _buildLegendItem(
                     [Colors.green.shade400, Colors.green.shade600],
                     'Depositado',
@@ -96,9 +97,9 @@ class DashboardReconciliationChart extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 12),
           SizedBox(
-            height: 300, // Altura fija para el gráfico
+            height: 160, // Altura muy reducida
             child: BarChart(
               BarChartData(
                 alignment: BarChartAlignment.spaceAround,
@@ -118,7 +119,7 @@ class DashboardReconciliationChart extends StatelessWidget {
                         const TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 12,
+                          fontSize: 10,
                         ),
                       );
                     },
@@ -144,24 +145,24 @@ class DashboardReconciliationChart extends StatelessWidget {
                             : mesStr;
                             
                         return Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
+                          padding: const EdgeInsets.only(top: 4.0),
                           child: Text(
                             label,
                             style: TextStyle(
                               color: Colors.grey.shade600,
-                              fontSize: 12,
+                              fontSize: 9,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         );
                       },
-                      reservedSize: 32,
+                      reservedSize: 20,
                     ),
                   ),
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 50,
+                      reservedSize: 32,
                       getTitlesWidget: (value, meta) {
                         if (value == 0) return const SizedBox.shrink();
                         final double original = value * value;
@@ -169,7 +170,7 @@ class DashboardReconciliationChart extends StatelessWidget {
                           _formatYLabel(original),
                           style: TextStyle(
                             color: Colors.grey.shade500,
-                            fontSize: 11,
+                            fontSize: 9,
                           ),
                         );
                       },
@@ -212,9 +213,9 @@ class DashboardReconciliationChart extends StatelessWidget {
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                         ),
-                        width: 16,
+                        width: 8,
                         borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(6),
+                          top: Radius.circular(4),
                         ),
                         backDrawRodData: BackgroundBarChartRodData(
                           show: true,
@@ -229,9 +230,9 @@ class DashboardReconciliationChart extends StatelessWidget {
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                         ),
-                        width: 16,
+                        width: 8,
                         borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(6),
+                          top: Radius.circular(4),
                         ),
                         backDrawRodData: BackgroundBarChartRodData(
                           show: true,
@@ -240,7 +241,7 @@ class DashboardReconciliationChart extends StatelessWidget {
                         ),
                       ),
                     ],
-                    barsSpace: 6,
+                    barsSpace: 4,
                   );
                 }).toList(),
               ),
@@ -256,22 +257,22 @@ class DashboardReconciliationChart extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Container(
-          width: 12,
-          height: 12,
+          width: 8,
+          height: 8,
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: gradientColors,
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: BorderRadius.circular(2),
           ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 4),
         Text(
           text,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 9,
             fontWeight: FontWeight.w500,
             color: Colors.grey.shade700,
           ),

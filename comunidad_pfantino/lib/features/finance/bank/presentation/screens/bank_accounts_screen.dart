@@ -48,11 +48,13 @@ class _BankAccountsScreenState extends ConsumerState<BankAccountsScreen> {
   @override
   Widget build(BuildContext context) {
     final userRole = ref.watch(authProvider.notifier).currentUser?.role;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 600;
 
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: EdgeInsets.all(isMobile ? 16.0 : 32.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -71,13 +73,15 @@ class _BankAccountsScreenState extends ConsumerState<BankAccountsScreen> {
                         }
                       },
                       icon: const Icon(Icons.add),
-                      label: const Text('Nueva Cuenta'),
+                      label: isMobile
+                          ? const Text('Nueva')
+                          : const Text('Nueva Cuenta'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ChurchColors.primary,
                         foregroundColor: ChurchColors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 16,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 16 : 24,
+                          vertical: isMobile ? 12 : 16,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -86,7 +90,7 @@ class _BankAccountsScreenState extends ConsumerState<BankAccountsScreen> {
                     )
                   : null,
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: isMobile ? 16 : 24),
             Expanded(
               child: _isLoading
                   ? const Center(child: CircularProgressIndicator())
@@ -94,18 +98,29 @@ class _BankAccountsScreenState extends ConsumerState<BankAccountsScreen> {
                   ? const Center(
                       child: Text('No hay cuentas bancarias registradas.'),
                     )
-                  : GridView.builder(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 24,
-                            mainAxisSpacing: 24,
-                            mainAxisExtent: 260, // Altura fija garantizada
-                          ),
-                      itemCount: _accounts.length,
-                      itemBuilder: (context, index) {
-                        final account = _accounts[index];
-                        return _HoverableAccountCard(account: account);
+                  : LayoutBuilder(
+                      builder: (context, constraints) {
+                        int crossAxisCount = 3;
+                        if (constraints.maxWidth < 600) {
+                          crossAxisCount = 1;
+                        } else if (constraints.maxWidth < 900) {
+                          crossAxisCount = 2;
+                        }
+
+                        return GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: crossAxisCount,
+                                crossAxisSpacing: isMobile ? 16 : 24,
+                                mainAxisSpacing: isMobile ? 16 : 24,
+                                mainAxisExtent: 260, // Altura fija garantizada
+                              ),
+                          itemCount: _accounts.length,
+                          itemBuilder: (context, index) {
+                            final account = _accounts[index];
+                            return _HoverableAccountCard(account: account);
+                          },
+                        );
                       },
                     ),
             ),
@@ -247,7 +262,7 @@ class _HoverableAccountCardState extends State<_HoverableAccountCard> {
                           const Text(
                             '\$ ',
                             style: TextStyle(
-                              fontSize: 20,
+                              fontSize: 16,
                               fontWeight: FontWeight.w700,
                               color: ChurchColors.primary,
                             ),
@@ -257,10 +272,10 @@ class _HoverableAccountCardState extends State<_HoverableAccountCard> {
                                 .format(widget.account.currentBalance)
                                 .replaceAll('\$', ''),
                             style: const TextStyle(
-                              fontSize: 32,
+                              fontSize: 24,
                               fontWeight: FontWeight.w800,
                               color: ChurchColors.primary,
-                              letterSpacing: -0.5,
+                              letterSpacing: -1.0,
                             ),
                           ),
                         ],

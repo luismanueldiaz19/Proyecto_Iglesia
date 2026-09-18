@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../auth/providers/auth_provider.dart';
+import '../../../../core/utils/app_date_picker.dart';
 import '../../../../core/network/api_config.dart';
 import '../../../../core/theme/church_colors.dart';
 import '../../../../core/presentation/widgets/page_header.dart';
@@ -196,10 +197,8 @@ class _IngresoProvicionalScreenState
   }
 
   Future<void> _selectDateRange() async {
-    final picked = await showDateRangePicker(
+    final picked = await AppDatePicker.showRangePicker(
       context: context,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
       initialDateRange: _startDate != null && _endDate != null
           ? DateTimeRange(start: _startDate!, end: _endDate!)
           : null,

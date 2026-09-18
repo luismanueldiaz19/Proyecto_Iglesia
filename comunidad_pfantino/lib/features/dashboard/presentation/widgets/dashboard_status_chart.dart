@@ -22,7 +22,7 @@ class DashboardStatusChart extends StatelessWidget {
         child: const Center(
           child: Text(
             'No hay cuadres en este periodo',
-            style: TextStyle(color: Colors.grey, fontSize: 14),
+            style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
         ),
       );
@@ -35,37 +35,37 @@ class DashboardStatusChart extends StatelessWidget {
           Text(
             'Estado de los Cuadres',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 11,
               fontWeight: FontWeight.bold,
               color: Colors.grey.shade800,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Expanded(
-            child: Row(
+            child: Column(
               children: [
                 Expanded(
-                  flex: 2,
+                  flex: 3,
                   child: PieChart(
                     PieChartData(
                       sectionsSpace: 2,
-                      centerSpaceRadius: 30, // Compacto (anillo)
+                      centerSpaceRadius: 15, // Compacto (anillo)
                       sections: _buildSections(),
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(height: 4),
                 Expanded(
-                  flex: 3,
+                  flex: 4,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildLegendItem(Colors.green.shade500, 'Depositados', depositados, total),
-                      const SizedBox(height: 8),
-                      _buildLegendItem(Colors.orange.shade500, 'Pendientes', pendientes, total),
-                      const SizedBox(height: 8),
-                      _buildLegendItem(Colors.blue.shade500, 'Abiertos', abiertos, total),
+                      _buildLegendItem(Colors.green.shade500, 'Depositado', depositados, total),
+                      const SizedBox(height: 2),
+                      _buildLegendItem(Colors.orange.shade500, 'Pendiente', pendientes, total),
+                      const SizedBox(height: 2),
+                      _buildLegendItem(Colors.blue.shade500, 'Abierto', abiertos, total),
                     ],
                   ),
                 ),
@@ -80,16 +80,17 @@ class DashboardStatusChart extends StatelessWidget {
   Widget _buildContainer({required Widget child}) {
     return Container(
       width: double.infinity,
-      height: 200, // Compacto
-      padding: const EdgeInsets.all(20.0),
+      height: 130, // Más compacto
+      padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2), width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withValues(alpha: 0.1),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+            color: Colors.grey.withValues(alpha: 0.05),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -99,9 +100,9 @@ class DashboardStatusChart extends StatelessWidget {
 
   List<PieChartSectionData> _buildSections() {
     final List<PieChartSectionData> sections = [];
-    final radius = 25.0; // Compacto
+    final radius = 15.0; // Compacto
     final titleStyle = const TextStyle(
-      fontSize: 10,
+      fontSize: 9,
       fontWeight: FontWeight.bold,
       color: Colors.white,
     );
@@ -138,23 +139,23 @@ class DashboardStatusChart extends StatelessWidget {
   }
 
   Widget _buildLegendItem(Color color, String text, int value, int total) {
-    final percentage = total > 0 ? (value / total * 100).toStringAsFixed(1) : '0.0';
+    final percentage = total > 0 ? (value / total * 100).toStringAsFixed(0) : '0';
     return Row(
       children: [
         Container(
-          width: 10,
-          height: 10,
+          width: 6,
+          height: 6,
           decoration: BoxDecoration(
             color: color,
             shape: BoxShape.circle,
           ),
         ),
-        const SizedBox(width: 6),
+        const SizedBox(width: 4),
         Expanded(
           child: Text(
             text,
             style: TextStyle(
-              fontSize: 11,
+              fontSize: 9,
               color: Colors.grey.shade700,
               fontWeight: FontWeight.w500,
             ),
@@ -165,7 +166,7 @@ class DashboardStatusChart extends StatelessWidget {
         Text(
           '$value ($percentage%)',
           style: const TextStyle(
-            fontSize: 11,
+            fontSize: 9,
             fontWeight: FontWeight.bold,
           ),
         ),

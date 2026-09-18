@@ -38,7 +38,12 @@ class IngresosChartWidget extends StatelessWidget {
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : chartData.isEmpty
-                ? const Center(child: Text('Sin datos para el gráfico'))
+                ? const Center(
+                    child: Text(
+                      'Sin datos para el gráfico',
+                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                    ),
+                  )
                 : Padding(
                     padding: const EdgeInsets.only(top: 32.0),
                     child: BarChart(

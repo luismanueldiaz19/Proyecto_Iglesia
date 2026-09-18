@@ -26,7 +26,7 @@ class DashboardFilterWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           child: _buildIconContainer(Icons.refresh, Colors.purple.shade700),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
         // Quick filter
         Tooltip(
           message: 'Filtro rápido ($selectedQuickFilter)',
@@ -71,7 +71,7 @@ class DashboardFilterWidget extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
 
         // Date range
         Tooltip(
@@ -85,7 +85,7 @@ class DashboardFilterWidget extends StatelessWidget {
             ),
           ),
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: 4),
 
         // Month filter
         Tooltip(
@@ -126,21 +126,21 @@ class DashboardFilterWidget extends StatelessWidget {
 
   Widget _buildIconContainer(IconData icon, Color color) {
     return Container(
-      width: 40,
-      height: 40,
+      width: 28,
+      height: 28,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color, width: 1.5),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color, width: 1.0),
         boxShadow: [
           BoxShadow(
             color: color.withValues(alpha: 0.1),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
           ),
         ],
       ),
-      child: Center(child: Icon(icon, color: color, size: 20)),
+      child: Center(child: Icon(icon, color: color, size: 16)),
     );
   }
 }

@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../auth/providers/auth_provider.dart';
+import '../../../../core/utils/app_date_picker.dart';
 import '../../../../core/network/api_config.dart';
 import '../../../../core/theme/church_colors.dart';
 import '../../../../core/presentation/widgets/page_header.dart';
@@ -206,10 +207,8 @@ class _GastoProvicionalScreenState
   }
 
   Future<void> _selectDateRange() async {
-    final picked = await showDateRangePicker(
+    final picked = await AppDatePicker.showRangePicker(
       context: context,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
       initialDateRange: _startDate != null && _endDate != null
           ? DateTimeRange(start: _startDate!, end: _endDate!)
           : null,
@@ -637,6 +636,10 @@ class _GastoProvicionalScreenState
                       style: ElevatedButton.styleFrom(
                         backgroundColor: ChurchColors.primary,
                         foregroundColor: ChurchColors.white,
+                        minimumSize: const Size(
+                          0,
+                          50,
+                        ), // Evita el double.infinity del theme
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 16,

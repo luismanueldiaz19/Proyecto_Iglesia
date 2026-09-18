@@ -53,19 +53,23 @@ class CashierDashboardScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: ChurchColors.background,
       body: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 12,
+              runSpacing: 12,
               children: [
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
                       'Cajero (Cuadre)',
                       style: TextStyle(
-                        fontSize: 32,
+                        fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: ChurchColors.black,
                       ),
@@ -82,9 +86,11 @@ class CashierDashboardScreen extends ConsumerWidget {
                 ),
                 if (state.modules.isNotEmpty)
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        height: 36,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
                         decoration: BoxDecoration(
                           color: ChurchColors.white,
                           borderRadius: BorderRadius.circular(8),
@@ -93,7 +99,9 @@ class CashierDashboardScreen extends ConsumerWidget {
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton<int>(
                             value: state.selectedModule?.id,
-                            hint: const Text('Seleccionar Módulo'),
+                            hint: const Text('Seleccionar Módulo', style: TextStyle(fontSize: 13)),
+                            style: const TextStyle(fontSize: 13, color: Colors.black87),
+                            icon: const Icon(Icons.arrow_drop_down, size: 20),
                             items: state.modules.map((m) {
                               return DropdownMenuItem(
                                 value: m.id,
@@ -129,16 +137,19 @@ class CashierDashboardScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
               children: [
                 const Text(
                   'Apertura, movimientos manuales y cierre de caja',
-                  style: TextStyle(fontSize: 16, color: ChurchColors.grey),
+                  style: TextStyle(fontSize: 13, color: ChurchColors.grey),
                 ),
                 TextButton.icon(
-                  icon: const Icon(Icons.history_rounded),
-                  label: const Text('Ver Historial de Cuadres'),
+                  icon: const Icon(Icons.history_rounded, size: 18),
+                  label: const Text('Ver Historial de Cuadres', style: TextStyle(fontSize: 13)),
                   onPressed: () {
                     if (state.selectedModule != null) {
                       context.push('/cashier/history');
@@ -200,33 +211,35 @@ class CashierDashboardScreen extends ConsumerWidget {
                     children: [
                       Icon(
                         Icons.point_of_sale_rounded,
-                        size: 80,
+                        size: 60,
                         color: ChurchColors.grey.withValues(alpha: 0.5),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 16),
                       Text(
                         'La caja de ${state.selectedModule!.name} está cerrada',
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                       const SizedBox(height: 8),
                       const Text(
                         'Debes abrir el turno para empezar a recibir transacciones.',
-                        style: TextStyle(color: ChurchColors.grey),
+                        style: TextStyle(color: ChurchColors.grey, fontSize: 13),
+                        textAlign: TextAlign.center,
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: 20),
                       if (canCreate)
                         ElevatedButton.icon(
-                          icon: const Icon(Icons.lock_open_rounded),
-                          label: const Text('Abrir Turno de Caja'),
+                          icon: const Icon(Icons.lock_open_rounded, size: 18),
+                          label: const Text('Abrir Turno de Caja', style: TextStyle(fontSize: 14)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: ChurchColors.primary,
                             foregroundColor: Colors.white,
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 16,
+                              horizontal: 24,
+                              vertical: 12,
                             ),
                           ),
                           onPressed: () async {
@@ -269,10 +282,10 @@ class CashierDashboardScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: ChurchColors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.05),
@@ -281,8 +294,11 @@ class CashierDashboardScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      child: Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 16,
+                        runSpacing: 16,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -292,13 +308,14 @@ class CashierDashboardScreen extends ConsumerWidget {
                                 style: TextStyle(
                                   color: Colors.green,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 12,
                                 ),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 4),
                               Text(
                                 'Caja: ${state.selectedModule!.name}',
                                 style: const TextStyle(
-                                  fontSize: 20,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -306,6 +323,7 @@ class CashierDashboardScreen extends ConsumerWidget {
                                 'Fecha: ${state.activeReconciliation!.date}',
                                 style: const TextStyle(
                                   color: ChurchColors.grey,
+                                  fontSize: 12,
                                 ),
                               ),
                             ],
@@ -319,21 +337,21 @@ class CashierDashboardScreen extends ConsumerWidget {
                                   backgroundColor: ChurchColors.primary,
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 12,
+                                    horizontal: 16,
+                                    vertical: 8,
                                   ),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(8),
                                   ),
                                   elevation: 0,
                                 ),
                                 icon: const Icon(
                                   Icons.calculate_rounded,
-                                  size: 20,
+                                  size: 16,
                                 ),
                                 label: const Text(
                                   'Cuadrar y Cerrar Caja',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
                                 ),
                                 onPressed: () {
                                   context.push('/cashier/reconciliation');

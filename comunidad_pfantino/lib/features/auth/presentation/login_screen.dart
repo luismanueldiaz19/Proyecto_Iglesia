@@ -1,61 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../core/presentation/widgets/church_loading_dialog.dart';
-import '../providers/auth_provider.dart';
 import '../../../../core/theme/church_colors.dart';
-import '../../../../core/config/app_info.dart';
-import '../../../../core/presentation/widgets/custom_text_field.dart';
-import '../../../../core/presentation/widgets/primary_button.dart';
+import 'widgets/login_form_panel.dart';
+import 'widgets/login_image_panel.dart';
 
-class LoginScreen extends ConsumerStatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
   @override
-  ConsumerState<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends ConsumerState<LoginScreen> {
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
-  String _selectedRole = 'admin'; // Para el switcher de llenado rápidos
-
-  @override
-  void dispose() {
-    _usernameController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _onLogin() async {
-    FocusScope.of(context).unfocus();
-
-    ChurchLoadingDialog.show(
-      context,
-      title: 'Iniciando Sesión',
-      message: 'Verificando credenciales...',
-    );
-
-    // Guardamos referencia al navigator para cerrarlo de forma segura
-    final nav = Navigator.of(context, rootNavigator: true);
-
-    // Retraso artificial para que se pueda apreciar la animación de carga
-    await Future.delayed(const Duration(seconds: 2));
-
-    await ref
-        .read(authProvider.notifier)
-        .login(_usernameController.text, _passwordController.text);
-
-    if (nav.canPop()) {
-      nav.pop();
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final authState = ref.watch(authProvider);
-    final authNotifier = ref.read(authProvider.notifier);
-    final isDesktop = MediaQuery.of(context).size.width > 800;
+    final size = MediaQuery.of(context).size;
+    final isMobile = size.width <= 800;
 
     return Scaffold(
       body: Container(
@@ -66,316 +20,48 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           ),
         ),
         child: Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 900),
-            height: isDesktop ? 600 : null,
-            margin: const EdgeInsets.all(32),
-            decoration: BoxDecoration(
-              color: ChurchColors.white,
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(
-                    alpha: 0.1,
-                  ), // Sombra suave premium
-                  blurRadius: 40,
-                  offset: const Offset(0, 20),
-                ),
-              ],
-            ),
-            clipBehavior: Clip
-                .antiAlias, // Redondea perfectamente los hijos sin bordes blancos
-            child: Flex(
-              direction: isDesktop ? Axis.horizontal : Axis.vertical,
-              children: [
-                // PANEL IZQUIERDO (Imagen)
-                if (isDesktop)
-                  Expanded(
-                    flex: 1,
-                    child: Stack(
-                      fit: StackFit.expand,
+          child: SingleChildScrollView(
+            child: Container(
+              margin: EdgeInsets.symmetric(
+                horizontal: isMobile ? 16 : 25, 
+                vertical: isMobile ? 16 : 25,
+              ),
+              constraints: BoxConstraints(
+                maxWidth: isMobile ? 380 : 800,
+              ),
+              height: isMobile ? null : 450,
+              decoration: BoxDecoration(
+                color: ChurchColors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 40,
+                    offset: const Offset(0, 20),
+                  ),
+                ],
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: isMobile
+                  ? const Column(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        Image.asset('assets/login_bg.png', fit: BoxFit.cover),
-                        // Overlay oscuro/gradiente para el texto
-                        Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                Colors.black.withValues(alpha: 0.6),
-                                Colors.transparent,
-                                Colors.black.withValues(alpha: 0.3),
-                              ],
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                            ),
-                          ),
+                        SizedBox(
+                          height: 180,
+                          width: double.infinity,
+                          child: LoginImagePanel(),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.all(32.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                AppInfo.name,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: 2,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              Spacer(),
-                              Text(
-                                AppInfo.subtitle,
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.w900,
-                                  height: 1.1,
-                                ),
-                              ),
-                              SizedBox(height: 16),
-                              Text(
-                                AppInfo.description,
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                        LoginFormPanel(),
+                      ],
+                    )
+                  : const Flex(
+                      direction: Axis.horizontal,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: LoginImagePanel()),
+                        Expanded(child: LoginFormPanel()),
                       ],
                     ),
-                  ),
-
-                // PANEL DERECHO (Formulario)
-                Expanded(
-                  flex: 1,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 48.0,
-                      vertical: 48.0,
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (!isDesktop) ...[
-                          const Center(
-                            child: Icon(
-                              Icons.church_rounded,
-                              size: 60,
-                              color: ChurchColors.primary,
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
-                        const Text(
-                          'Hola, Bienvenido',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.w900,
-                            color: ChurchColors.black,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        const Text(
-                          'Accede a tu cuenta para continuar',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: ChurchColors.grey,
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // SWITCHER DE LLENADO RÁPIDO (SOLO PARA PRUEBAS) - COMENTADO A PETICIÓN
-                        // Container(
-                        //   padding: const EdgeInsets.all(4),
-                        //   decoration: BoxDecoration(
-                        //     color: ChurchColors.lightGrey.withValues(
-                        //       alpha: 0.3,
-                        //     ),
-                        //     borderRadius: BorderRadius.circular(12),
-                        //   ),
-                        //   child: Row(
-                        //     children: [
-                        //       Expanded(
-                        //         child: GestureDetector(
-                        //           onTap: () {
-                        //             setState(() {
-                        //               _selectedRole = 'admin';
-                        //               _usernameController.text = 'ludeveloper';
-                        //               _passwordController.text = '199512';
-                        //             });
-                        //           },
-                        //           child: Container(
-                        //             padding: const EdgeInsets.symmetric(
-                        //               vertical: 10,
-                        //             ),
-                        //             decoration: BoxDecoration(
-                        //               color: _selectedRole == 'admin'
-                        //                   ? ChurchColors.white
-                        //                   : Colors.transparent,
-                        //               borderRadius: BorderRadius.circular(8),
-                        //               boxShadow: _selectedRole == 'admin'
-                        //                   ? [
-                        //                       BoxShadow(
-                        //                         color: Colors.black.withValues(
-                        //                           alpha: 0.05,
-                        //                         ),
-                        //                         blurRadius: 4,
-                        //                         offset: const Offset(0, 2),
-                        //                       ),
-                        //                     ]
-                        //                   : null,
-                        //             ),
-                        //             alignment: Alignment.center,
-                        //             child: Text(
-                        //               'Administrador',
-                        //               style: TextStyle(
-                        //                 fontWeight: _selectedRole == 'admin'
-                        //                     ? FontWeight.bold
-                        //                     : FontWeight.normal,
-                        //                 color: _selectedRole == 'admin'
-                        //                     ? ChurchColors.primary
-                        //                     : ChurchColors.grey,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ),
-                        //       Expanded(
-                        //         child: GestureDetector(
-                        //           onTap: () {
-                        //             setState(() {
-                        //               _selectedRole = 'operativo';
-                        //               _usernameController.text = 'supervisor1';
-                        //               _passwordController.text = '123456';
-                        //             });
-                        //           },
-                        //           child: Container(
-                        //             padding: const EdgeInsets.symmetric(
-                        //               vertical: 10,
-                        //             ),
-                        //             decoration: BoxDecoration(
-                        //               color: _selectedRole == 'operativo'
-                        //                   ? ChurchColors.white
-                        //                   : Colors.transparent,
-                        //               borderRadius: BorderRadius.circular(8),
-                        //               boxShadow: _selectedRole == 'operativo'
-                        //                   ? [
-                        //                       BoxShadow(
-                        //                         color: Colors.black.withValues(
-                        //                           alpha: 0.05,
-                        //                         ),
-                        //                         blurRadius: 4,
-                        //                         offset: const Offset(0, 2),
-                        //                       ),
-                        //                     ]
-                        //                   : null,
-                        //             ),
-                        //             alignment: Alignment.center,
-                        //             child: Text(
-                        //               'Operativo 1',
-                        //               style: TextStyle(
-                        //                 fontWeight: _selectedRole == 'operativo'
-                        //                     ? FontWeight.bold
-                        //                     : FontWeight.normal,
-                        //                 color: _selectedRole == 'operativo'
-                        //                     ? ChurchColors.primary
-                        //                     : ChurchColors.grey,
-                        //               ),
-                        //             ),
-                        //           ),
-                        //         ),
-                        //       ),
-                        //     ],
-                        //   ),
-                        // ),
-                        // const SizedBox(height: 24),
-                        if (authState == AuthState.error)
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            margin: const EdgeInsets.only(bottom: 24),
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Colors.red.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              authNotifier.errorMessage ?? 'Error desconocido',
-                              style: const TextStyle(
-                                color: Colors.red,
-                                fontWeight: FontWeight.bold,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-
-                        CustomTextField(
-                          controller: _usernameController,
-                          hintText: 'Usuario',
-                          prefixIcon: Icons.person_outline,
-                        ),
-                        const SizedBox(height: 16),
-                        CustomTextField(
-                          controller: _passwordController,
-                          hintText: 'Contraseña',
-                          prefixIcon: Icons.lock_outline,
-                          obscureText: true,
-                        ),
-                        const SizedBox(height: 12),
-
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {},
-                            child: const Text(
-                              '¿Olvidaste tu contraseña?',
-                              style: TextStyle(
-                                color: ChurchColors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-
-                        PrimaryButton(
-                          onPressed: authState == AuthState.loading
-                              ? null
-                              : _onLogin,
-                          text: 'Ingresar',
-                          isLoading: authState == AuthState.loading,
-                        ),
-                        const SizedBox(height: 32),
-
-                        Center(
-                          child: RichText(
-                            text: const TextSpan(
-                              text: '¿No tienes cuenta? ',
-                              style: TextStyle(
-                                color: ChurchColors.grey,
-                                fontSize: 14,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: 'Solicitar acceso',
-                                  style: TextStyle(
-                                    color: ChurchColors.primary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
         ),

@@ -158,4 +158,24 @@ class BankRepository {
     }
     throw Exception('Failed to update reconciliation');
   }
+
+  // --- Bank Statements ---
+  Future<String> getStatementPdfUrl(int accountId, DateTime startDate, DateTime endDate) async {
+    final token = await _getToken();
+    if (token == null) throw Exception('No token');
+
+    final start = startDate.toIso8601String().split('T')[0];
+    final end = endDate.toIso8601String().split('T')[0];
+
+    final response = await http.get(
+      Uri.parse('${ApiConfig.baseUrl}/bank-accounts/$accountId/statement/pdf-url?start_date=$start&end_date=$end'),
+      headers: _headers(token),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      return data['url'];
+    }
+    throw Exception('Failed to get statement PDF URL: ${response.statusCode} - ${response.body}');
+  }
 }

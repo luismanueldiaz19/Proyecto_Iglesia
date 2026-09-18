@@ -64,7 +64,7 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                   child: const Icon(
                     Icons.church_rounded,
-                    size: 80,
+                    size: 40,
                     color: ChurchColors.primary,
                   ),
                 ),
@@ -78,25 +78,24 @@ class _SplashScreenState extends State<SplashScreen>
                   const Text(
                     AppInfo.name,
                     style: TextStyle(
-                      fontSize: 32,
                       fontWeight: FontWeight.w900,
                       color: ChurchColors.black,
-                      letterSpacing: 4,
+                      letterSpacing:
+                          2, // Reducido un poco para equilibrar el tamaño
                     ),
                   ),
                   const SizedBox(height: 8),
                   const Text(
                     AppInfo.subtitle,
                     style: TextStyle(
-                      fontSize: 16,
                       color: ChurchColors.grey,
-                      letterSpacing: 1,
+                      letterSpacing: 0.5,
                     ),
                   ),
                   const SizedBox(height: 48),
                   SizedBox(
-                    width: 40,
-                    height: 40,
+                    width: 25,
+                    height: 25,
                     child: CircularProgressIndicator(
                       strokeWidth: 3,
                       valueColor: AlwaysStoppedAnimation<Color>(
