@@ -45,12 +45,22 @@ if (-not (Test-Path $publicDir)) {
     New-Item -ItemType Directory -Path $publicDir -Force | Out-Null
 }
 
-# 3. Limpiar carpetas de compilaciones previas para evitar acumulación
+# 3. Limpiar carpetas y archivos de compilaciones previas para evitar caché vieja
+Write-Host "Limpiando archivos antiguos en public..." -ForegroundColor Yellow
+
 $foldersToClean = @("assets", "canvaskit", "icons", "images")
 foreach ($folder in $foldersToClean) {
     $targetFolder = Join-Path $publicDir $folder
     if (Test-Path $targetFolder) {
         Remove-Item -Recurse -Force $targetFolder
+    }
+}
+
+# Limpiar archivos base de Flutter (js, json, wasm, map) en la raíz
+$filesToClean = @("*.js", "*.wasm", "*.map", "*.json")
+foreach ($pattern in $filesToClean) {
+    Get-ChildItem -Path $publicDir -Filter $pattern -File | ForEach-Object {
+        Remove-Item -Force $_.FullName
     }
 }
 
