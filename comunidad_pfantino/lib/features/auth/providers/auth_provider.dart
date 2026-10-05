@@ -59,7 +59,25 @@ class AuthStateNotifier extends StateNotifier<AuthState> {
         state = AuthState.authenticated;
       }
     } catch (e) {
-      errorMessage = e.toString().replaceAll('Exception: ', '');
+      String errorMsg = e.toString();
+      if (errorMsg.contains('ClientFailed to fetch') ||
+          errorMsg.contains('Failed host lookup') ||
+          errorMsg.contains('Connection refused') ||
+          errorMsg.contains('XMLHttpRequest error') ||
+          errorMsg.contains('Failed to connect')) {
+        errorMessage =
+            'Fallo de conexión al servidor. Verifica tu conexión a internet o intenta más tarde.';
+      } else {
+        // Limpiar cualquier URI que se haya filtrado en la excepción
+        errorMsg = errorMsg.replaceAll('Exception: ', '');
+        if (errorMsg.contains('uri=')) {
+          errorMsg = errorMsg.split('uri=')[0].trim();
+          if (errorMsg.endsWith(',')) {
+            errorMsg = errorMsg.substring(0, errorMsg.length - 1);
+          }
+        }
+        errorMessage = errorMsg;
+      }
       state = AuthState.error;
       // Regresa a unauthenticated para poder reintentar
       await Future.delayed(const Duration(seconds: 3));
