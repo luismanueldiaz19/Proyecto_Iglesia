@@ -27,6 +27,7 @@ import '../../features/finance/bank/presentation/screens/bank_reconciliation_scr
 import '../../features/users/presentation/screens/profile_screen.dart';
 import '../../features/users/presentation/screens/roles_screen.dart';
 import '../../features/pending_tasks/presentation/screens/pending_tasks_screen.dart';
+import '../../features/loans/presentation/screens/loans_screen.dart';
 import '../presentation/layout/main_layout.dart';
 
 // Clave del navegador raíz
@@ -197,6 +198,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/pending-tasks',
             builder: (context, state) => const PendingTasksScreen(),
+          ),
+          GoRoute(
+            path: '/loans',
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: LoansScreen()),
           ),
           // Más rutas irán aquí adentro de ShellRoute
         ],

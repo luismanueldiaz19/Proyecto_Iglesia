@@ -75,7 +75,7 @@ class _LoginFormPanelState extends ConsumerState<LoginFormPanel> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Puedes comentar este componente cuando ya no necesites el autocompletado
-          TestCredentialsButton(onFill: _fillTestCredentials),
+          // TestCredentialsButton(onFill: _fillTestCredentials),
 
           Text(
             'Hola, Bienvenido',

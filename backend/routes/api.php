@@ -174,4 +174,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Tareas Pendientes
     Route::apiResource('pending-tasks', PendingTaskController::class);
+
+    // Módulo de Préstamos
+    Route::get('loans', [\App\Modules\Prestamos\Http\Controllers\LoanController::class, 'index']);
+    Route::post('loans', [\App\Modules\Prestamos\Http\Controllers\LoanController::class, 'store']);
+    Route::put('loans/{id}', [\App\Modules\Prestamos\Http\Controllers\LoanController::class, 'update']);
+
+    Route::get('loans/{id}', [\App\Modules\Prestamos\Http\Controllers\LoanController::class, 'show']);
+    Route::post('loans/{id}/payments', [\App\Modules\Prestamos\Http\Controllers\LoanController::class, 'applyPayment']);
 });

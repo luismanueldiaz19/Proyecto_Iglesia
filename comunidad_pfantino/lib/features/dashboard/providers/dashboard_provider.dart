@@ -136,7 +136,7 @@ class DashboardNotifier extends StateNotifier<DashboardState> {
     double faltante = 0;
     double sobrante = 0;
     double gastos = 0;
-    
+
     int depositadosCount = 0;
     int pendientesCount = 0;
     int abiertosCount = 0;

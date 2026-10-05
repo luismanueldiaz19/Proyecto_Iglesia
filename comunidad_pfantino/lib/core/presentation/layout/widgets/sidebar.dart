@@ -189,6 +189,12 @@ class Sidebar extends ConsumerWidget {
                     isSelected: currentPath.startsWith('/bank/accounts'),
                     onTap: () => context.go('/bank/accounts'),
                   ),
+                  SidebarItem(
+                    icon: Icons.real_estate_agent_rounded,
+                    title: 'Préstamos',
+                    isSelected: currentPath.startsWith('/loans'),
+                    onTap: () => context.go('/loans'),
+                  ),
 
                   const SizedBox(height: 16),
                   if (userRole == 'Administrador') ...[

@@ -7,6 +7,7 @@ class CustomTextField extends StatelessWidget {
   final String? hintText;
   final String? labelText;
   final String? prefixText;
+  final String? suffixText;
   final IconData? prefixIcon;
   final bool obscureText;
   final TextInputType? keyboardType;
@@ -22,6 +23,7 @@ class CustomTextField extends StatelessWidget {
     this.hintText,
     this.labelText,
     this.prefixText,
+    this.suffixText,
     this.prefixIcon,
     this.obscureText = false,
     this.keyboardType,
@@ -53,6 +55,7 @@ class CustomTextField extends StatelessWidget {
           hintText: hintText,
           labelText: labelText,
           prefixText: prefixText,
+          suffixText: suffixText,
           hintStyle: const TextStyle(color: ChurchColors.grey, fontSize: 14),
           prefixIcon: prefixIcon != null
               ? Icon(prefixIcon, color: ChurchColors.primary, size: 20)
