@@ -12,7 +12,7 @@ Basado en el documento "Estado De Cuenta De Prestamo" de la imagen, aquí tienes
 ## 2. Condiciones Financieras del Préstamo
 *   **Monto Préstamo (Original):** 2,840,415.98
 *   **Fecha del Préstamo:** 19-oct-2023
-*   **Tasa (Mensual):** 1.25
+*   **Tasa (Mensual):** 1.25s
 *   **Plazo:** 60
 *   **Expresión Plazo:** Mensual(es)
 *   **Tipo Préstamo:** PRESTAMOS CORRIENTES
